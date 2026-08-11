@@ -24,6 +24,23 @@
     reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   } catch (e) { /* treat as motion-ok */ }
 
+  // Deploy base path ("/" locally, "/<repo>/" on GitHub Pages). Site-absolute
+  // URLs in data (lesson index, palette items) are written against "/", so JS
+  // navigation must re-prefix them. Derived from the stylesheet link, whose
+  // href the build's HTML base plugin has already rewritten.
+  var BASE = "/";
+  (function () {
+    var link = document.querySelector('link[rel="stylesheet"][href*="assets/styles.css"]');
+    if (!link) return;
+    var href = link.getAttribute("href") || "";
+    var idx = href.indexOf("assets/styles.css");
+    if (idx > 0) BASE = href.slice(0, idx);
+  })();
+
+  function withBase(url) {
+    return url && url.charAt(0) === "/" ? BASE + url.slice(1) : url;
+  }
+
   // ── Storage layer (all access guarded) ──────────────────────────────────
 
   function storageGet(key) {
@@ -165,7 +182,7 @@
     }
     if (!match) return; // stale slug (lesson removed) — fall back to default state
 
-    card.setAttribute("href", match.url);
+    card.setAttribute("href", withBase(match.url));
     var kicker = card.querySelector("[data-resume-kicker]");
     var title = card.querySelector("[data-resume-title]");
     var tag = card.querySelector("[data-resume-tag]");
@@ -371,7 +388,7 @@
 
     function go() {
       var item = filtered[activeIndex];
-      if (item) window.location.assign(item.url);
+      if (item) window.location.assign(withBase(item.url));
     }
 
     if (openBtn) openBtn.addEventListener("click", open);
@@ -402,7 +419,7 @@
 
     list.addEventListener("click", function (e) {
       var li = e.target.closest("[data-url]");
-      if (li) window.location.assign(li.getAttribute("data-url"));
+      if (li) window.location.assign(withBase(li.getAttribute("data-url")));
     });
     list.addEventListener("mousemove", function (e) {
       var li = e.target.closest("[data-idx]");
