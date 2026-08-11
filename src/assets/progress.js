@@ -24,6 +24,23 @@
     reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   } catch (e) { /* treat as motion-ok */ }
 
+  // Deploy base path ("/" locally, "/<repo>/" on GitHub Pages). Site-absolute
+  // URLs in data (lesson index, palette items) are written against "/", so JS
+  // navigation must re-prefix them. Derived from the stylesheet link, whose
+  // href the build's HTML base plugin has already rewritten.
+  var BASE = "/";
+  (function () {
+    var link = document.querySelector('link[rel="stylesheet"][href*="assets/styles.css"]');
+    if (!link) return;
+    var href = link.getAttribute("href") || "";
+    var idx = href.indexOf("assets/styles.css");
+    if (idx > 0) BASE = href.slice(0, idx);
+  })();
+
+  function withBase(url) {
+    return url && url.charAt(0) === "/" ? BASE + url.slice(1) : url;
+  }
+
   // ── Storage layer (all access guarded) ──────────────────────────────────
 
   function storageGet(key) {
@@ -102,10 +119,12 @@
     if (bar) bar.setAttribute("aria-valuenow", String(count));
     if (fill && total > 0) fill.style.width = (100 * count / total) + "%";
 
-    var ring = document.querySelector("[data-progress-ring]");
-    if (ring && total > 0) {
-      ring.style.strokeDashoffset = String(RING_CIRCUMFERENCE * (1 - count / total));
-      ring.classList.toggle("is-full", count >= total);
+    var rings = document.querySelectorAll("[data-progress-ring]");
+    for (var j = 0; j < rings.length; j++) {
+      if (total > 0) {
+        rings[j].style.strokeDashoffset = String(RING_CIRCUMFERENCE * (1 - count / total));
+        rings[j].classList.toggle("is-full", count >= total);
+      }
     }
   }
 
@@ -163,7 +182,7 @@
     }
     if (!match) return; // stale slug (lesson removed) — fall back to default state
 
-    card.setAttribute("href", match.url);
+    card.setAttribute("href", withBase(match.url));
     var kicker = card.querySelector("[data-resume-kicker]");
     var title = card.querySelector("[data-resume-title]");
     var tag = card.querySelector("[data-resume-tag]");
@@ -219,6 +238,39 @@
       syncLabel();
     });
     syncLabel();
+  }
+
+  // ── Mobile menu (hamburger — shown by CSS below 48rem) ─────────────────
+
+  function initMobileMenu() {
+    var btn = document.querySelector("[data-menu-toggle]");
+    var nav = document.querySelector(".site-nav");
+    if (!btn || !nav) return;
+
+    function setOpen(open) {
+      nav.classList.toggle("menu-open", open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      btn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    }
+
+    btn.addEventListener("click", function () {
+      setOpen(!nav.classList.contains("menu-open"));
+    });
+    document.addEventListener("click", function (e) {
+      if (nav.classList.contains("menu-open") && !nav.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && nav.classList.contains("menu-open")) {
+        setOpen(false);
+        btn.focus();
+      }
+    });
+    // Close when a link is chosen, so tapping the current page's link
+    // doesn't leave the menu hanging open.
+    var links = nav.querySelectorAll(".nav-links a");
+    for (var i = 0; i < links.length; i++) {
+      links[i].addEventListener("click", function () { setOpen(false); });
+    }
   }
 
   // ── Nav dropdown (hover via CSS; click/keyboard here) ──────────────────
@@ -336,7 +388,7 @@
 
     function go() {
       var item = filtered[activeIndex];
-      if (item) window.location.assign(item.url);
+      if (item) window.location.assign(withBase(item.url));
     }
 
     if (openBtn) openBtn.addEventListener("click", open);
@@ -367,7 +419,7 @@
 
     list.addEventListener("click", function (e) {
       var li = e.target.closest("[data-url]");
-      if (li) window.location.assign(li.getAttribute("data-url"));
+      if (li) window.location.assign(withBase(li.getAttribute("data-url")));
     });
     list.addEventListener("mousemove", function (e) {
       var li = e.target.closest("[data-idx]");
@@ -464,6 +516,7 @@
     renderAll(map);
     renderResumeCard();
     initThemeToggle();
+    initMobileMenu();
     initDropdown();
     initPalette();
     initReadProgress();
