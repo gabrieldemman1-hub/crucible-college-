@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <script>
+    /* Resolve the theme before first paint: stored choice, else system preference. */
+    (function () {
+      var theme = "dark";
+      try {
+        var stored = localStorage.getItem("crucible-college:theme:v1");
+        if (stored === "light" || stored === "dark") {
+          theme = stored;
+        } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) {
+          theme = "light";
+        }
+      } catch (e) { /* storage blocked — fall back to dark */ }
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <title>{{ title }} · Crucible College</title>
+  <meta name="description" content="Crucible College — a structured Destiny 2 Crucible course for Hunters.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='8' y='8' width='16' height='16' rx='2' transform='rotate(45 16 16)' fill='%239d85f2'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body{% if lesson %} data-lesson-slug="{{ lesson.slug }}"{% endif %}>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <nav class="site-nav" aria-label="Primary">
+      <a class="wordmark" href="/">
+        <span class="seal seal--mark" aria-hidden="true"><span>CC</span></span>
+        <span class="wordmark__text">Crucible <em>College</em></span>
+      </a>
+      <div class="nav-links">
+        <a href="/"{% if active == "home" %} aria-current="page"{% endif %}>Home</a>
+        <div class="nav-dropdown" data-dropdown>
+          <a href="/curriculum/"{% if active == "curriculum" %} aria-current="page"{% endif %}>Curriculum</a>
+          <button type="button" class="nav-dropdown__toggle" data-dropdown-toggle
+                  aria-expanded="false" aria-controls="curriculum-menu" aria-label="Open curriculum menu">
+            <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="nav-dropdown__panel" id="curriculum-menu" data-dropdown-panel>
+            {% for chapter in curriculum.chapters %}
+            <section class="nav-dropdown__chapter">
+              <h3 class="nav-dropdown__heading"><span>Ch. {{ chapter.number }}</span>{{ chapter.title }}</h3>
+              <ul>
+                {% for item in chapter.lessons %}
+                <li>
+                  <a data-lesson-link="{{ item.slug }}" href="/lessons/{{ item.slug }}/">
+                    <span class="nav-dropdown__tag">{{ item.tag }}</span>
+                    <span class="nav-dropdown__title">{{ item.title }}</span>
+                    <span class="nav-dropdown__tick" aria-hidden="true">✓</span>
+                  </a>
+                </li>
+                {% endfor %}
+              </ul>
+            </section>
+            {% endfor %}
+            <a class="nav-dropdown__all" href="/curriculum/">View the full curriculum →</a>
+          </div>
+        </div>
+        <a href="/builds/"{% if active == "builds" %} aria-current="page"{% endif %}>Meta Builds</a>
+        <a href="/dictionary/"{% if active == "dictionary" %} aria-current="page"{% endif %}>Dictionary</a>
+        <a href="/resources/"{% if active == "resources" %} aria-current="page"{% endif %}>Resources</a>
+      </div>
+      <button type="button" class="nav-search" data-palette-open aria-label="Search lessons (Ctrl+K)">
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="6" cy="6" r="4.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="nav-search__hint" aria-hidden="true">Ctrl K</span>
+      </button>
+      <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch to light theme">
+        <svg class="icon-sun" width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><circle cx="7.5" cy="7.5" r="3.1" fill="none" stroke="currentColor" stroke-width="1.5"/><g stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7.5 1v1.4M7.5 12.6V14M1 7.5h1.4M12.6 7.5H14M2.9 2.9l1 1M11.1 11.1l1 1M12.1 2.9l-1 1M3.9 11.1l-1 1"/></g></svg>
+        <svg class="icon-moon" width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><path d="M12.6 9.2A5.6 5.6 0 1 1 5.8 2.4a4.4 4.4 0 0 0 6.8 6.8z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="nav-progress" data-progress-total="{{ curriculum.lessons.length }}">
+        <svg class="nav-progress__ring" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
+          <circle class="nav-progress__ring-track" cx="11" cy="11" r="9"/>
+          <circle class="nav-progress__ring-fill" cx="11" cy="11" r="9" data-progress-ring/>
+        </svg>
+        <span class="nav-progress__count"><span data-progress-count>0</span>&hairsp;/&hairsp;{{ curriculum.lessons.length }}</span>
+      </span>
+    </nav>
+    {% if lesson %}
+    <div class="read-progress" aria-hidden="true"><div class="read-progress__fill" data-read-progress></div></div>
+    {% endif %}
+  </header>
+
+  <main id="main">
+    {{ content | safe }}
+  </main>
+
+  <footer class="site-footer">
+    <p><strong>Crucible College</strong> — a training program for Hunters.</p>
+    <p class="site-footer__fine">Destiny 2 and the Crucible are property of Bungie. This is an unaffiliated fan course.</p>
+  </footer>
+
+  <dialog class="palette" data-palette aria-label="Quick search">
+    <div class="palette__box">
+      <input class="palette__input" data-palette-input type="text" placeholder="Jump to a lesson or page…"
+             autocomplete="off" spellcheck="false" aria-label="Search lessons and pages">
+      <ul class="palette__results" data-palette-results role="listbox" aria-label="Search results"></ul>
+      <p class="palette__hint"><kbd>↑</kbd><kbd>↓</kbd> navigate &nbsp; <kbd>Enter</kbd> open &nbsp; <kbd>Esc</kbd> close</p>
+    </div>
+  </dialog>
+
+  <div class="toast" data-toast role="status" aria-live="polite"></div>
+
+  <script type="application/json" data-lesson-index>{{ curriculum.index | dump | safe }}</script>
+  <script src="/assets/progress.js"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+---
+layout: base.njk
+title: Meta Builds
+active: builds
+permalink: /builds/
+---
+<div class="page page--builds">
+
+  <header class="page-header">
+    <h1>Meta Builds</h1>
+    <p class="page-header__lede">The ten strongest Hunter builds in the current meta, ranked. Each slot
+    is a placeholder until the current sandbox settles — open one for the full setup, the gameplay
+    loop, and the weapons it runs.</p>
+  </header>
+
+  <ol class="build-cards">
+    {% for build in builds.builds %}
+    <li>
+      <a class="build-card" href="{{ build.url }}">
+        <span class="seal seal--rank" aria-hidden="true"><span>{{ build.rank }}</span></span>
+        <span class="build-card__body">
+          <span class="build-card__name">{{ build.name }}</span>
+          <span class="build-card__tagline placeholder-text">{{ build.tagline }}</span>
+          <span class="pills">
+            <span class="pill pill--subclass">{{ build.subclass }}</span>
+            <span class="pill">{{ build.exotic }}</span>
+          </span>
+        </span>
+        <span class="build-card__chip placeholder__chip">Placeholder</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ol>
+
+</div>

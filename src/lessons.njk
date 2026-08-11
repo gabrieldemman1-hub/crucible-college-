@@ -1,0 +1,10 @@
+---
+pagination:
+  data: curriculum.lessons
+  size: 1
+  alias: lesson
+permalink: "/lessons/{{ lesson.slug }}/"
+layout: lesson.njk
+eleventyComputed:
+  title: "{{ lesson.tag }} — {{ lesson.title }}"
+---

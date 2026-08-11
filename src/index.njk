@@ -1,0 +1,69 @@
+---
+layout: base.njk
+title: Home
+active: home
+permalink: /
+---
+<div class="page page--home">
+
+  <section class="hero">
+    <p class="hero__kicker">A training program for Hunters</p>
+    <h1 class="hero__title">Crucible <em>College</em></h1>
+    <p class="hero__lede">A structured Destiny&nbsp;2 Crucible course for the Hunter class. Setup, settings,
+    and movement — taught in order, one lesson at a time, so every match you play becomes practice
+    instead of noise.</p>
+    <div class="hero__actions">
+      <a class="button button--primary" href="/lessons/{{ curriculum.lessons[0].slug }}/">Begin Lesson 1</a>
+      <a class="button" href="/curriculum/">View the curriculum</a>
+    </div>
+  </section>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker__track">
+      <span>TTK <b>·</b> optimal shots to kill</span><span>Meta <b>·</b> what the sandbox rewards</span><span>Strafe Jump <b>·</b> air control wins duels</span><span>Flinch <b>·</b> the aim-punch of being shot</span><span>Radar <b>·</b> direction, not headcount</span><span>Dodge to cover <b>·</b> never open ground</span><span>TTK <b>·</b> optimal shots to kill</span><span>Meta <b>·</b> what the sandbox rewards</span><span>Strafe Jump <b>·</b> air control wins duels</span><span>Flinch <b>·</b> the aim-punch of being shot</span><span>Radar <b>·</b> direction, not headcount</span><span>Dodge to cover <b>·</b> never open ground</span>
+    </div>
+  </div>
+
+  <section class="resume-section" aria-labelledby="resume-heading">
+    <h2 id="resume-heading">Continue training</h2>
+    <a class="resume-card" data-resume href="/lessons/{{ curriculum.lessons[0].slug }}/">
+      <span class="seal seal--lg" data-resume-seal aria-hidden="true"><span data-resume-tag>{{ curriculum.lessons[0].tag }}</span></span>
+      <span class="resume-card__text">
+        <span class="resume-card__kicker" data-resume-kicker>New here? Start at the beginning</span>
+        <span class="resume-card__title" data-resume-title>Lesson {{ curriculum.lessons[0].tag }} — {{ curriculum.lessons[0].title }}</span>
+      </span>
+      <span class="resume-card__arrow" aria-hidden="true">→</span>
+    </a>
+  </section>
+
+  <section class="home-grid">
+    <div class="home-panel">
+      <h2>What the course covers</h2>
+      <ol class="chapter-list">
+        {% for chapter in curriculum.chapters %}
+        <li>
+          <span class="chapter-list__number">Ch. {{ chapter.number }}</span>
+          <span class="chapter-list__title">{{ chapter.title }}</span>
+          <span class="chapter-list__count">{{ chapter.lessons.length }} lesson{% if chapter.lessons.length != 1 %}s{% endif %}</span>
+        </li>
+        {% endfor %}
+      </ol>
+      <p class="home-panel__note">More chapters are on the syllabus — aim training, dueling, and game
+      sense are coming as the course grows.</p>
+    </div>
+
+    <div class="home-panel">
+      <h2>Who this is for</h2>
+      <p>Beginner-to-intermediate Hunter mains. If you can finish a Crucible match but can't say
+      <em>why</em> you lost it — or you're winning on instinct and want a foundation under it —
+      you're in the right cohort. No competitive experience is assumed.</p>
+      <h2>Prerequisites</h2>
+      <ul class="prereq-list">
+        <li>Destiny 2 installed, with a Hunter character you're willing to main</li>
+        <li>Basic comfort with the controls — you've played enough PvE to move and shoot without thinking</li>
+        <li>A tolerance for losing matches on purpose while you drill new habits</li>
+      </ul>
+    </div>
+  </section>
+
+</div>

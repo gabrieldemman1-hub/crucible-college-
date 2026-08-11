@@ -1,0 +1,76 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='8' y='8' width='16' height='16' rx='2' transform='rotate(45 16 16)' fill='%239d85f2'/%3E%3C/svg%3E">
+<title>Theme Explorations · Crucible College</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #14121c; --panel: #1d1a29; --line: #35304a; --txt: #eceaf4; --dim: #9c97b0; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--txt); font: 16px/1.6 "Inter", sans-serif; }
+  .wrap { max-width: 64rem; margin: 0 auto; padding: 3rem 1.25rem 4rem; }
+  h1 { font-family: "Fraunces", serif; font-size: 2.2rem; margin: 0 0 .4rem; }
+  .sub { color: var(--dim); margin: 0 0 2.2rem; max-width: 46rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); gap: 1.1rem; }
+  a.card { display: block; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+    text-decoration: none; color: var(--txt); transition: transform .18s ease, border-color .18s ease; }
+  a.card:hover { transform: translateY(-3px); border-color: #7c66d9; }
+  .swatches { display: flex; height: 3.2rem; }
+  .swatches i { flex: 1; }
+  .body { padding: 1rem 1.2rem 1.2rem; }
+  .num { font-size: .72rem; font-weight: 600; letter-spacing: .18em; color: #9d85f2; text-transform: uppercase; }
+  h2 { font-family: "Fraunces", serif; font-size: 1.25rem; margin: .25rem 0 .4rem; }
+  p { margin: 0; color: var(--dim); font-size: .88rem; }
+  .type { margin-top: .6rem; font-size: .74rem; color: var(--dim); }
+  .type b { color: var(--txt); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Crucible College — six home-page themes</h1>
+  <p class="sub">Each card opens a full standalone mockup of the Home page in that direction. Same content, six identities — pick one and the whole site gets rebuilt in it.</p>
+  <div class="grid">
+    <a class="card" href="01-field-manual.html">
+      <span class="swatches"><i style="background:#f6f1e7"></i><i style="background:#221d2e"></i><i style="background:#5b47b0"></i><i style="background:#a8842c"></i></span>
+      <span class="body"><span class="num">Theme 01</span><h2>Field Manual</h2>
+      <p>Light parchment, ink rules, letterpress seals. A printed training syllabus with a spec-sheet card.</p>
+      <p class="type"><b>Fraunces + Inter</b> · light · editorial-utilitarian</p></span>
+    </a>
+    <a class="card" href="02-director.html">
+      <span class="swatches"><i style="background:#0b0d13"></i><i style="background:#e2e6f2"></i><i style="background:#9d85f2"></i><i style="background:#d3b25e"></i></span>
+      <span class="body"><span class="num">Theme 02</span><h2>The Director</h2>
+      <p>Destiny's own UI language, done quietly: hairlines, tracked uppercase, stat blocks, diamond waypoints.</p>
+      <p class="type"><b>Archivo + Archivo Narrow</b> · dark · systematic</p></span>
+    </a>
+    <a class="card" href="03-catalog.html">
+      <span class="swatches"><i style="background:#f4efe3"></i><i style="background:#241c31"></i><i style="background:#7a2434"></i><i style="background:#4c3a99"></i></span>
+      <span class="body"><span class="num">Theme 03</span><h2>Course Catalog</h2>
+      <p>Cream magazine editorial: huge masthead, drop caps, dot-leader contents, oxblood + violet ink.</p>
+      <p class="type"><b>Fraunces (900 + italic) + Inter</b> · light · literary</p></span>
+    </a>
+    <a class="card" href="04-kinetic.html">
+      <span class="swatches"><i style="background:#0d0a16"></i><i style="background:#5b47b0"></i><i style="background:#9d85f2"></i><i style="background:#c9a84c"></i></span>
+      <span class="body"><span class="num">Theme 04</span><h2>Void Kinetic</h2>
+      <p>The current Void identity, motion-first: morphing seals, animated ring, glossary ticker, springy cards.</p>
+      <p class="type"><b>Fraunces + Inter</b> · dark · animated (motion-safe)</p></span>
+    </a>
+    <a class="card" href="05-atlas.html">
+      <span class="swatches"><i style="background:#0a0d1f"></i><i style="background:#121736"></i><i style="background:#dfe4ff"></i><i style="background:#c9a84c"></i></span>
+      <span class="body"><span class="num">Theme 05</span><h2>Nightfall Atlas</h2>
+      <p>An engraved star chart: indigo sky, gold constellation of chapters, lessons as stars you fix in place.</p>
+      <p class="type"><b>Cormorant Garamond + Inter</b> · dark · celestial</p></span>
+    </a>
+    <a class="card" href="06-registrar.html">
+      <span class="swatches"><i style="background:#efe9da"></i><i style="background:#2a2433"></i><i style="background:#a03236"></i><i style="background:#a8842c"></i></span>
+      <span class="body"><span class="num">Theme 06</span><h2>The Registrar</h2>
+      <p>The home page as an official transcript: form fields, course codes, red ENROLLED stamp, gold foil seal.</p>
+      <p class="type"><b>Fraunces + IBM Plex Mono + Inter</b> · light · bureaucratic-charming</p></span>
+    </a>
+  </div>
+</div>
+</body>
+</html>

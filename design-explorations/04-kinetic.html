@@ -1,0 +1,153 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='8' y='8' width='16' height='16' rx='2' transform='rotate(45 16 16)' fill='%239d85f2'/%3E%3C/svg%3E">
+<title>Theme 04 — Void Kinetic · Crucible College</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0d0a16; --panel: #1a1430; --panel-2: #221a3e; --line: #342a55;
+    --violet: #9d85f2; --violet-mid: #5b47b0; --txt: #e8e4f4; --dim: #9c93b8; --gold: #c9a84c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ink); color: var(--txt); font: 16px/1.6 "Inter", sans-serif; overflow-x: clip; }
+  h1, h2, .fr { font-family: "Fraunces", Georgia, serif; }
+  a { color: var(--violet); text-decoration: none; }
+
+  .back { position: fixed; bottom: 1rem; left: 1rem; z-index: 9; font-size: .78rem; font-weight: 600;
+    background: var(--txt); color: var(--ink); padding: .4rem .9rem; border-radius: 999px; }
+
+  nav.bar { max-width: 68rem; margin: 0 auto; padding: .8rem 1.25rem; display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap;
+    position: sticky; top: 0; background: rgba(13,10,22,.8); backdrop-filter: blur(10px); z-index: 5; }
+  .mark { display: flex; align-items: center; gap: .55rem; color: var(--txt); font-family: "Fraunces", serif; font-weight: 600; font-size: 1.15rem; }
+  .seal { width: 1.7rem; height: 1.7rem; margin: .3rem; transform: rotate(45deg); border: 1px solid var(--violet); border-radius: 4px;
+    display: inline-flex; align-items: center; justify-content: center; transition: transform .45s cubic-bezier(.2,.9,.25,1.2), border-radius .45s, background .3s; }
+  .seal span { transform: rotate(-45deg); font-size: .6rem; font-weight: 700; color: var(--violet); transition: transform .45s cubic-bezier(.2,.9,.25,1.2); }
+  .mark:hover .seal { transform: rotate(225deg); background: var(--violet-mid); }
+  .mark:hover .seal span { transform: rotate(-225deg); color: var(--txt); }
+  .bar .links { margin-left: auto; display: flex; gap: .25rem; flex-wrap: wrap; }
+  .bar .links a { color: var(--dim); font-weight: 500; font-size: .9rem; padding: .35rem .75rem; border-radius: 6px; position: relative; }
+  .bar .links a::after { content: ""; position: absolute; left: .75rem; right: 100%; bottom: 0; height: 2px; background: var(--violet); transition: right .25s ease; }
+  .bar .links a:hover::after, .bar .links a.on::after { right: .75rem; }
+  .bar .links a.on { color: var(--txt); }
+  .ring { display: inline-flex; align-items: center; gap: .5rem; border: 1px solid var(--line); border-radius: 999px; padding: .25rem .8rem; font-size: .78rem; color: var(--dim); }
+  .ring svg { transform: rotate(-90deg); }
+  .ring circle { fill: none; stroke-width: 2.5; }
+  .ring .t { stroke: var(--line); }
+  .ring .f { stroke: var(--violet); stroke-linecap: round; stroke-dasharray: 56.55; stroke-dashoffset: 56.55; animation: fill-demo 3.2s ease-in-out 1s infinite alternate; }
+  @keyframes fill-demo { to { stroke-dashoffset: 14.14; } }
+
+  .hero { max-width: 68rem; margin: 0 auto; padding: 4.5rem 1.25rem 3rem; position: relative; }
+  .hero::before { content: ""; position: absolute; inset: -3rem 0 0; z-index: -1;
+    background: radial-gradient(40rem 24rem at 80% 0%, rgba(91,71,176,.28), transparent 62%),
+                radial-gradient(28rem 18rem at 5% 90%, rgba(157,133,242,.12), transparent 65%); }
+  .hero .kick { font-size: .78rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--violet); margin: 0 0 .8rem; }
+  .hero h1 { font-size: clamp(2.8rem, 7vw, 4.6rem); line-height: 1; margin: 0 0 .9rem; font-weight: 600; }
+  .hero h1 em { font-style: italic; background: linear-gradient(100deg, var(--violet), #c3b4fa 55%, var(--violet)); background-size: 200%;
+    -webkit-background-clip: text; background-clip: text; color: transparent; animation: sheen 5s ease-in-out infinite; }
+  @keyframes sheen { 50% { background-position: 100%; } }
+  .hero .lede { color: var(--dim); font-size: 1.15rem; max-width: 36rem; margin: 0 0 1.6rem; }
+  .btn { display: inline-block; font-weight: 600; font-size: .95rem; padding: .7rem 1.4rem; border-radius: 8px; border: 1px solid var(--line);
+    color: var(--txt); transition: transform .2s cubic-bezier(.2,.9,.3,1.4), border-color .2s, background .2s; }
+  .btn--go { background: var(--violet-mid); border-color: var(--violet); }
+  .btn:hover { transform: translateY(-3px); border-color: var(--violet); }
+  .rise { animation: rise .6s ease backwards; }
+  .rise:nth-child(2) { animation-delay: .08s; } .rise:nth-child(3) { animation-delay: .16s; } .rise:nth-child(4) { animation-delay: .24s; }
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } }
+
+  .ticker { border-block: 1px solid var(--line); overflow: hidden; white-space: nowrap; padding: .55rem 0; }
+  .ticker div { display: inline-block; animation: scroll 30s linear infinite; }
+  .ticker span { font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; color: var(--dim); margin: 0 1.6rem; }
+  .ticker b { color: var(--gold); font-weight: 600; }
+  @keyframes scroll { to { transform: translateX(-50%); } }
+
+  .grid { max-width: 68rem; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; }
+  .card { grid-column: span 1; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 1.4rem 1.5rem;
+    transition: transform .25s cubic-bezier(.2,.9,.3,1.3), border-color .2s, box-shadow .25s; }
+  .card:hover { transform: translateY(-4px); border-color: var(--violet); box-shadow: 0 16px 34px rgba(0,0,0,.4); }
+  .card--wide { grid-column: span 2; display: flex; align-items: center; gap: 1.2rem; }
+  .card--full { grid-column: 1 / -1; }
+  .card h2 { font-size: 1.15rem; margin: 0 0 .7rem; }
+  .card p, .card li { color: var(--dim); font-size: .92rem; }
+  .card ul { margin: 0; padding-left: 1.1rem; } .card li { margin-bottom: .35rem; }
+  .bigseal { width: 3rem; height: 3rem; margin: .5rem; flex-shrink: 0; transform: rotate(45deg); border: 1px solid var(--violet); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; }
+  .bigseal span { transform: rotate(-45deg); font-family: "Fraunces", serif; font-weight: 700; font-size: 1.1rem; color: var(--violet); }
+  .card--wide .k { font-size: .78rem; color: var(--dim); }
+  .card--wide .t { font-family: "Fraunces", serif; font-weight: 600; font-size: 1.2rem; }
+  .card--wide a { margin-left: auto; font-weight: 600; white-space: nowrap; }
+  .chapline { display: flex; align-items: baseline; gap: .7rem; padding: .55rem 0; border-bottom: 1px solid var(--line); font-size: .95rem; }
+  .chapline:last-child { border: 0; }
+  .chapline .n { color: var(--violet); font-weight: 600; font-size: .78rem; width: 2.6rem; }
+  .chapline .c { margin-left: auto; color: var(--dim); font-size: .78rem; }
+
+  footer { border-top: 1px solid var(--line); padding: 1.3rem; text-align: center; font-size: .8rem; color: var(--dim); }
+  @media (max-width: 46rem) { .grid { grid-template-columns: 1fr; } .card--wide { grid-column: span 1; flex-wrap: wrap; } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← All themes</a>
+
+<nav class="bar">
+  <a class="mark" href="#"><span class="seal"><span>CC</span></span>Crucible <em style="color:var(--violet);font-style:italic">College</em></a>
+  <div class="links">
+    <a class="on" href="#">Home</a><a href="#">Curriculum</a><a href="#">Meta Builds</a><a href="#">Resources</a>
+  </div>
+  <span class="ring">
+    <svg width="22" height="22" viewBox="0 0 22 22"><circle class="t" cx="11" cy="11" r="9"/><circle class="f" cx="11" cy="11" r="9"/></svg>
+    <span>7½ / 10</span>
+  </span>
+</nav>
+
+<section class="hero">
+  <p class="kick rise">A training program for Hunters</p>
+  <h1 class="rise">Crucible <em>College</em></h1>
+  <p class="lede rise">Setup, settings, and movement — taught in order, animated in place. The structure you know, with motion doing the explaining.</p>
+  <p class="rise"><a class="btn btn--go" href="#">Begin Lesson 1</a> <a class="btn" href="#">View curriculum</a></p>
+</section>
+
+<div class="ticker" aria-hidden="true">
+  <div>
+    <span>TTK <b>·</b> optimal shots to kill</span><span>Meta <b>·</b> what the sandbox rewards</span><span>Strafe Jump <b>·</b> air control wins duels</span><span>Flinch <b>·</b> the aim-punch of being shot</span><span>Radar <b>·</b> direction, not headcount</span><span>Dodge to cover <b>·</b> never open ground</span>
+    <span>TTK <b>·</b> optimal shots to kill</span><span>Meta <b>·</b> what the sandbox rewards</span><span>Strafe Jump <b>·</b> air control wins duels</span><span>Flinch <b>·</b> the aim-punch of being shot</span><span>Radar <b>·</b> direction, not headcount</span><span>Dodge to cover <b>·</b> never open ground</span>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="card card--wide">
+    <span class="bigseal"><span>2B</span></span>
+    <span><span class="k">Continue where you left off</span><br><span class="t">Lesson 2B — What is Meta</span></span>
+    <a href="#">Resume →</a>
+  </div>
+  <div class="card">
+    <h2>Who this is for</h2>
+    <p>Beginner-to-intermediate Hunter mains. If you can finish a match but can't say <em>why</em> you lost it, you're in the right cohort.</p>
+  </div>
+  <div class="card">
+    <h2>What the course covers</h2>
+    <div class="chapline"><span class="n">CH.1</span>Introduction<span class="c">1 lesson</span></div>
+    <div class="chapline"><span class="n">CH.2</span>Setup<span class="c">4 lessons</span></div>
+    <div class="chapline"><span class="n">CH.3</span>Video &amp; Radar<span class="c">3 lessons</span></div>
+    <div class="chapline"><span class="n">CH.4</span>Movement<span class="c">2 lessons</span></div>
+  </div>
+  <div class="card">
+    <h2>Prerequisites</h2>
+    <ul>
+      <li>Destiny 2 + a Hunter you'll main</li>
+      <li>Basic control comfort from PvE</li>
+      <li>Tolerance for losing while drilling</li>
+    </ul>
+  </div>
+  <div class="card card--wide card--full">
+    <p style="margin:0"><strong style="color:var(--txt)">Motion notes:</strong> seals morph between pages (View Transitions), the progress ring animates as you complete lessons (looping here as a demo), cards spring on hover, and the glossary ticker idles above. Every animation stops under reduced-motion.</p>
+  </div>
+</div>
+
+<footer><strong>Crucible College</strong> — a training program for Hunters. Unaffiliated with Bungie.</footer>
+</body>
+</html>

@@ -1,0 +1,95 @@
+---
+layout: base.njk
+active: builds
+---
+<div class="page page--build">
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="/builds/">Meta Builds</a></li>
+      <li aria-current="page">#{{ build.rank }}</li>
+    </ol>
+  </nav>
+
+  <article class="build">
+    <header class="build-header">
+      <span class="seal seal--lg seal--rank" aria-hidden="true"><span>{{ build.rank }}</span></span>
+      <div class="build-header__text">
+        <p class="build-header__kicker">Ranked #{{ build.rank }} in the current meta</p>
+        <h1>{{ build.name }}</h1>
+        <!-- PLACEHOLDER: build name + tagline -->
+        <p class="build-header__tagline placeholder-text">{{ build.tagline }}</p>
+        <div class="pills">
+          <span class="pill pill--subclass">{{ build.subclass }}</span>
+          <span class="pill">{{ build.exotic }}</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="loadout" aria-labelledby="loadout-heading">
+      <h2 id="loadout-heading">The Loadout</h2>
+      <!-- PLACEHOLDER: weapons display — swap each image slot for real weapon art -->
+      <ul class="weapon-grid">
+        {% for weapon in build.weapons %}
+        <li class="weapon-card" data-placeholder>
+          <div class="weapon-card__art" aria-hidden="true">
+            <span class="weapon-card__diamond"></span>
+            <span class="placeholder__chip">Image placeholder</span>
+          </div>
+          <div class="weapon-card__info">
+            <span class="weapon-card__slot">{{ weapon.slot }}</span>
+            <span class="weapon-card__name">{{ weapon.name }}</span>
+            <span class="weapon-card__note placeholder-text">{{ weapon.note }}</span>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <div class="build-body">
+      <section aria-labelledby="setup-heading">
+        <h2 id="setup-heading">Setup</h2>
+        <!-- PLACEHOLDER: build setup description -->
+        <div class="placeholder" data-placeholder>
+          <span class="placeholder__chip">Placeholder</span>
+          <p>{{ build.setup }}</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="how-heading">
+        <h2 id="how-heading">How It Works</h2>
+        <!-- PLACEHOLDER: gameplay loop description -->
+        <div class="placeholder" data-placeholder>
+          <span class="placeholder__chip">Placeholder</span>
+          <p>{{ build.howItWorks }}</p>
+        </div>
+      </section>
+    </div>
+
+    <nav class="pager" aria-label="Build ranking">
+      {% if build.prev %}
+      <a class="pager__link pager__link--prev" href="{{ build.prev.url }}">
+        <span class="pager__dir">← Higher rank</span>
+        <span class="pager__title">#{{ build.prev.rank }} — {{ build.prev.name }}</span>
+      </a>
+      {% else %}
+      <a class="pager__link pager__link--prev" href="/builds/">
+        <span class="pager__dir">← Back</span>
+        <span class="pager__title">All builds</span>
+      </a>
+      {% endif %}
+      {% if build.next %}
+      <a class="pager__link pager__link--next" href="{{ build.next.url }}">
+        <span class="pager__dir">Lower rank →</span>
+        <span class="pager__title">#{{ build.next.rank }} — {{ build.next.name }}</span>
+      </a>
+      {% else %}
+      <a class="pager__link pager__link--next" href="/builds/">
+        <span class="pager__dir">End of list →</span>
+        <span class="pager__title">All builds</span>
+      </a>
+      {% endif %}
+    </nav>
+  </article>
+
+</div>

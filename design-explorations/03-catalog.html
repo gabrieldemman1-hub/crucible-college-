@@ -1,0 +1,117 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='8' y='8' width='16' height='16' rx='2' transform='rotate(45 16 16)' fill='%239d85f2'/%3E%3C/svg%3E">
+<title>Theme 03 — Course Catalog · Crucible College</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f4efe3; --ink: #241c31; --soft: #6b6178; --rule: #d9d1bf;
+    --violet: #4c3a99; --oxblood: #7a2434; --gold: #a8842c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--cream); color: var(--ink); font: 16px/1.65 "Inter", sans-serif; }
+  a { color: var(--violet); }
+  .fr { font-family: "Fraunces", Georgia, serif; }
+
+  .back { position: fixed; bottom: 1rem; left: 1rem; z-index: 9; font-size: .78rem; font-weight: 600;
+    background: var(--ink); color: var(--cream); padding: .4rem .9rem; border-radius: 999px; text-decoration: none; }
+
+  .masthead { max-width: 66rem; margin: 0 auto; padding: 1.6rem 1.25rem .9rem; text-align: center; border-bottom: 3px double var(--ink); }
+  .masthead .vol { display: flex; justify-content: space-between; font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; color: var(--soft); font-weight: 600; margin-bottom: .6rem; }
+  .masthead h1 { font-family: "Fraunces", serif; font-weight: 900; font-size: clamp(2.8rem, 8vw, 5.4rem); line-height: .95; margin: 0; }
+  .masthead h1 em { font-style: italic; font-weight: 600; color: var(--oxblood); }
+  .masthead .tag { font-family: "Fraunces", serif; font-style: italic; color: var(--soft); margin: .5rem 0 0; font-size: 1.05rem; }
+
+  nav.links { max-width: 66rem; margin: 0 auto; display: flex; justify-content: center; gap: 2.2rem; padding: .7rem 1.25rem; border-bottom: 1px solid var(--rule); flex-wrap: wrap; }
+  nav.links a { text-decoration: none; font-size: .8rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--soft); }
+  nav.links a.on { color: var(--oxblood); border-bottom: 2px solid var(--oxblood); padding-bottom: .2rem; }
+  nav.links .n { color: var(--gold); margin-right: .35rem; font-family: "Fraunces", serif; font-style: italic; }
+
+  .body { max-width: 66rem; margin: 0 auto; padding: 2.75rem 1.25rem 4rem; display: grid; grid-template-columns: 1.35fr .95fr; gap: 3.5rem; }
+
+  .lede-block .folio { font-family: "Fraunces", serif; font-style: italic; color: var(--gold); font-size: 1.1rem; margin: 0 0 .6rem; }
+  .lede-block h2 { font-family: "Fraunces", serif; font-weight: 600; font-size: clamp(1.7rem, 3.4vw, 2.4rem); line-height: 1.15; margin: 0 0 1rem; }
+  .lede-block .dropcap::first-letter { font-family: "Fraunces", serif; font-weight: 900; font-size: 3.4em; float: left; line-height: .8; padding: .08em .12em 0 0; color: var(--violet); }
+  .lede-block p { color: var(--soft); }
+  .cta { display: inline-block; margin-top: 1rem; background: var(--oxblood); color: var(--cream); text-decoration: none; font-weight: 600; font-size: .9rem; padding: .75rem 1.5rem; border-radius: 2px; }
+  .cta--alt { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); margin-left: .6rem; }
+
+  .resume { margin-top: 2.2rem; padding: 1.1rem 1.3rem; border: 1px solid var(--rule); background: #efe8d7; display: flex; align-items: baseline; gap: 1rem; }
+  .resume .fr { font-weight: 600; font-size: 1.05rem; }
+  .resume .k { font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; color: var(--soft); font-weight: 600; }
+  .resume a { margin-left: auto; font-weight: 600; font-size: .88rem; white-space: nowrap; }
+
+  .toc h3 { font-size: .78rem; letter-spacing: .22em; text-transform: uppercase; color: var(--oxblood); margin: 0 0 1rem; border-bottom: 1px solid var(--ink); padding-bottom: .5rem; }
+  .toc ol { list-style: none; margin: 0 0 2rem; padding: 0; }
+  .toc li { display: flex; align-items: baseline; padding: .65rem 0; font-size: 1rem; }
+  .toc .ch { font-family: "Fraunces", serif; font-weight: 600; }
+  .toc .dots { flex: 1; border-bottom: 1px dotted var(--soft); margin: 0 .6rem; transform: translateY(-4px); }
+  .toc .pg { font-family: "Fraunces", serif; font-style: italic; color: var(--gold); }
+  .toc .sm { display: block; font-size: .78rem; color: var(--soft); }
+  .notes h3 { font-size: .78rem; letter-spacing: .22em; text-transform: uppercase; color: var(--oxblood); margin: 0 0 .7rem; border-bottom: 1px solid var(--ink); padding-bottom: .5rem; }
+  .notes p, .notes li { font-size: .92rem; color: var(--soft); }
+  .notes ul { margin: 0; padding-left: 1.1rem; } .notes li { margin-bottom: .35rem; }
+
+  footer { border-top: 3px double var(--ink); max-width: 66rem; margin: 0 auto; padding: 1.1rem 1.25rem 2.2rem; display: flex; justify-content: space-between; gap: 1rem; font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; color: var(--soft); flex-wrap: wrap; }
+  @media (max-width: 46rem) { .body { grid-template-columns: 1fr; gap: 2rem; } .resume { flex-wrap: wrap; } }
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← All themes</a>
+
+<header class="masthead">
+  <div class="vol"><span>Vol. I — The Hunter Course</span><span>Est. 2026</span><span>10 Lessons</span></div>
+  <h1>Crucible <em>College</em></h1>
+  <p class="tag">A course catalog for Guardians who would rather understand the fight than repeat it.</p>
+</header>
+
+<nav class="links">
+  <a class="on" href="#"><span class="n">i.</span>Home</a>
+  <a href="#"><span class="n">ii.</span>Curriculum</a>
+  <a href="#"><span class="n">iii.</span>Meta Builds</a>
+  <a href="#"><span class="n">iv.</span>Resources</a>
+</nav>
+
+<div class="body">
+  <section class="lede-block">
+    <p class="folio">From the Registrar —</p>
+    <h2>Setup, settings, and movement: taught in order, applied in real matches.</h2>
+    <p class="dropcap">This is a structured Destiny 2 Crucible course for the Hunter class, for beginner-to-intermediate players. It assumes no competitive experience — only that you can finish a match and would like, someday, to know why it went the way it did. Configuration comes before mechanics; mechanics come before heroics.</p>
+    <p>Enrollment is open, self-paced, and free of judgment. Bring a Hunter, basic control comfort from PvE, and a tolerance for losing matches on purpose while new habits set.</p>
+    <a class="cta" href="#">Begin Lesson 1</a><a class="cta cta--alt" href="#">Full curriculum</a>
+    <div class="resume">
+      <span><span class="k">Bookmark</span><br><span class="fr">Lesson 1 — Introduction</span></span>
+      <a href="#">Resume reading →</a>
+    </div>
+  </section>
+
+  <aside>
+    <section class="toc">
+      <h3>Contents</h3>
+      <ol>
+        <li><span class="ch">Introduction<span class="sm">Chapter One</span></span><span class="dots"></span><span class="pg">1 lesson</span></li>
+        <li><span class="ch">Setup<span class="sm">Chapter Two</span></span><span class="dots"></span><span class="pg">4 lessons</span></li>
+        <li><span class="ch">Video &amp; Radar<span class="sm">Chapter Three</span></span><span class="dots"></span><span class="pg">3 lessons</span></li>
+        <li><span class="ch">Movement<span class="sm">Chapter Four</span></span><span class="dots"></span><span class="pg">2 lessons</span></li>
+      </ol>
+    </section>
+    <section class="notes">
+      <h3>Admissions notes</h3>
+      <p><strong>Who this is for.</strong> Beginner-to-intermediate Hunter mains; the winning-on-instinct and the losing-without-knowing-why alike.</p>
+      <ul>
+        <li>Destiny 2 installed, one Hunter committed</li>
+        <li>PvE-level comfort with the controls</li>
+        <li>Willingness to drill, and to lose while drilling</li>
+      </ul>
+    </section>
+  </aside>
+</div>
+
+<footer><span>Crucible College</span><span>Hunter Division</span><span>Unaffiliated with Bungie</span></footer>
+</body>
+</html>

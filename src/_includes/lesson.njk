@@ -1,0 +1,155 @@
+---
+layout: base.njk
+active: curriculum
+---
+<div class="lesson-shell">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="/curriculum/">Curriculum</a></li>
+      <li><a href="/curriculum/#chapter-{{ lesson.chapterNumber }}">Chapter {{ lesson.chapterNumber }} — {{ lesson.chapterTitle }}</a></li>
+      <li aria-current="page">{{ lesson.tag }}</li>
+    </ol>
+  </nav>
+
+  <div class="lesson-layout">
+    <article class="lesson">
+      <header class="lesson-header">
+        <div class="lesson-header__seal">
+          <span class="seal seal--lg" data-lesson-seal><span>{{ lesson.tag }}</span></span>
+        </div>
+        <div class="lesson-header__text">
+          <h1>{{ lesson.title }}</h1>
+          <p class="lesson-objective">{{ lesson.objective }}</p>
+          <div class="pills">
+            <span class="pill pill--difficulty">{{ lesson.difficulty }}</span>
+            <span class="pill pill--time">{{ lesson.time }}</span>
+          </div>
+        </div>
+        <button type="button" class="complete-toggle" data-complete-toggle aria-pressed="false">
+          <span class="complete-toggle__box" aria-hidden="true"></span>
+          <span data-complete-label>Mark as complete</span>
+        </button>
+      </header>
+
+      <section class="objectives" aria-labelledby="objectives-heading">
+        <h2 id="objectives-heading">Learning Objectives</h2>
+        <ul>
+          {% for item in lesson.learningObjectives %}
+          <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <!-- PLACEHOLDER: video embed — replace this block with a YouTube/Vimeo iframe -->
+      <div class="video-slot placeholder" data-placeholder>
+        <span class="placeholder__chip">Video placeholder</span>
+        <p>Embed the <strong>{{ lesson.tag }} — {{ lesson.title }}</strong> video here. Swap this whole
+        <code>.video-slot</code> block for a YouTube/Vimeo <code>&lt;iframe&gt;</code>; the container is
+        already sized 16:9.</p>
+      </div>
+
+      <div class="lesson-body">
+        <section aria-labelledby="overview-heading">
+          <h2 id="overview-heading">Overview</h2>
+          <!-- PLACEHOLDER: lesson body copy -->
+          <div class="placeholder" data-placeholder>
+            <span class="placeholder__chip">Placeholder</span>
+            <p>{{ lesson.placeholders.overview }}</p>
+          </div>
+        </section>
+
+        <section aria-labelledby="concepts-heading">
+          <h2 id="concepts-heading">Key Concepts</h2>
+          <!-- PLACEHOLDER: lesson body copy -->
+          <div class="placeholder" data-placeholder>
+            <span class="placeholder__chip">Placeholder</span>
+            <p>{{ lesson.placeholders.keyConcepts }}</p>
+          </div>
+        </section>
+
+        <section aria-labelledby="mistakes-heading">
+          <h2 id="mistakes-heading">Common Mistakes</h2>
+          <!-- PLACEHOLDER: lesson body copy -->
+          <div class="placeholder" data-placeholder>
+            <span class="placeholder__chip">Placeholder</span>
+            <p>{{ lesson.placeholders.commonMistakes }}</p>
+          </div>
+        </section>
+
+        <section aria-labelledby="drill-heading">
+          <h2 id="drill-heading">Practice Drill</h2>
+          <!-- PLACEHOLDER: lesson body copy -->
+          <div class="placeholder" data-placeholder>
+            <span class="placeholder__chip">Placeholder</span>
+            <p>{{ lesson.placeholders.practiceDrill }}</p>
+          </div>
+        </section>
+      </div>
+
+      <section class="takeaways" aria-labelledby="takeaways-heading">
+        <h2 id="takeaways-heading">Key Takeaways</h2>
+        <!-- PLACEHOLDER: takeaway bullets -->
+        <ul>
+          {% for item in lesson.takeaways %}
+          <li class="placeholder placeholder--inline" data-placeholder>
+            <span class="placeholder__chip">Placeholder</span>
+            <span>{{ item }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <nav class="pager" aria-label="Lesson sequence">
+        {% if lesson.prev %}
+        <a class="pager__link pager__link--prev" href="{{ lesson.prev.url }}">
+          <span class="pager__dir">← Previous</span>
+          <span class="pager__title">{{ lesson.prev.tag }} — {{ lesson.prev.title }}</span>
+        </a>
+        {% else %}
+        <a class="pager__link pager__link--prev" href="/curriculum/">
+          <span class="pager__dir">← Back</span>
+          <span class="pager__title">Curriculum</span>
+        </a>
+        {% endif %}
+        {% if lesson.next %}
+        <a class="pager__link pager__link--next" href="{{ lesson.next.url }}">
+          <span class="pager__dir">Next →</span>
+          <span class="pager__title">{{ lesson.next.tag }} — {{ lesson.next.title }}</span>
+        </a>
+        {% else %}
+        <a class="pager__link pager__link--next" href="/curriculum/">
+          <span class="pager__dir">Course complete →</span>
+          <span class="pager__title">Review the curriculum</span>
+        </a>
+        {% endif %}
+      </nav>
+    </article>
+
+    <aside class="lesson-sidebar" aria-label="Lessons in this chapter">
+      <h2 class="lesson-sidebar__title">Chapter {{ lesson.chapterNumber }}<span>{{ lesson.chapterTitle }}</span></h2>
+      <ol class="lesson-sidebar__list">
+        {% for ch in curriculum.chapters %}
+          {% if ch.number == lesson.chapterNumber %}
+            {% for item in ch.lessons %}
+            <li>
+              {% if item.slug == lesson.slug %}
+              <span class="sidebar-item is-current" data-sidebar-lesson="{{ item.slug }}" aria-current="page">
+                <span class="seal seal--sm"><span>{{ item.tag }}</span></span>
+                <span class="sidebar-item__title">{{ item.title }}</span>
+                <span class="sidebar-item__tick" aria-hidden="true">✓</span>
+              </span>
+              {% else %}
+              <a class="sidebar-item" data-sidebar-lesson="{{ item.slug }}" href="/lessons/{{ item.slug }}/">
+                <span class="seal seal--sm"><span>{{ item.tag }}</span></span>
+                <span class="sidebar-item__title">{{ item.title }}</span>
+                <span class="sidebar-item__tick" aria-hidden="true">✓</span>
+              </a>
+              {% endif %}
+            </li>
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+      </ol>
+    </aside>
+  </div>
+</div>

@@ -1,0 +1,147 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='8' y='8' width='16' height='16' rx='2' transform='rotate(45 16 16)' fill='%239d85f2'/%3E%3C/svg%3E">
+<title>Theme 01 — Field Manual · Crucible College</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f6f1e7; --paper-2: #efe8d9; --ink: #221d2e; --ink-soft: #5d5570;
+    --rule: #d9d0bd; --violet: #5b47b0; --violet-deep: #43338c; --gold: #a8842c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.65 "Inter", sans-serif; }
+  h1, h2, h3, .serif { font-family: "Fraunces", Georgia, serif; }
+  a { color: var(--violet); }
+
+  .back { position: fixed; bottom: 1rem; left: 1rem; z-index: 9; font-size: .78rem; font-weight: 600;
+    background: var(--ink); color: var(--paper); padding: .4rem .9rem; border-radius: 999px; text-decoration: none; }
+
+  .topstrip { border-bottom: 2px solid var(--ink); background: var(--paper); }
+  .topstrip__in { max-width: 64rem; margin: 0 auto; padding: .45rem 1.25rem; display: flex; gap: 1rem;
+    font-size: .72rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-soft); }
+  .topstrip__in span:last-child { margin-left: auto; }
+
+  nav.bar { max-width: 64rem; margin: 0 auto; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+  .mark { display: flex; align-items: center; gap: .6rem; font-family: "Fraunces", serif; font-weight: 700; font-size: 1.3rem; color: var(--ink); text-decoration: none; }
+  .stamp-seal { width: 2rem; height: 2rem; transform: rotate(45deg); border: 1.5px solid var(--ink); border-radius: 3px;
+    display: inline-flex; align-items: center; justify-content: center; margin: .3rem; box-shadow: inset 0 0 0 2px var(--paper), inset 0 0 0 3.5px var(--ink); }
+  .stamp-seal span { transform: rotate(-45deg); font-size: .6rem; font-weight: 700; }
+  nav.bar .links { margin-left: auto; display: flex; gap: .25rem; flex-wrap: wrap; }
+  nav.bar .links a { text-decoration: none; color: var(--ink-soft); font-weight: 600; font-size: .85rem; padding: .3rem .7rem;
+    border-radius: 3px; letter-spacing: .04em; }
+  nav.bar .links a.on { color: var(--ink); box-shadow: inset 0 -2px 0 var(--gold); }
+  .prog { font-size: .78rem; font-weight: 600; border: 1px solid var(--rule); border-radius: 999px; padding: .25rem .8rem; color: var(--ink-soft); }
+
+  .sheet { max-width: 64rem; margin: 0 auto; padding: 0 1.25rem 4rem; }
+  .hr { border: 0; border-top: 1px solid var(--rule); margin: 0; }
+
+  .hero { padding: 3.5rem 0 2.5rem; display: grid; grid-template-columns: minmax(0,1.4fr) minmax(0,1fr); gap: 2.5rem; align-items: end; }
+  .hero .kicker { font-size: .72rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); margin: 0 0 1rem; }
+  .hero h1 { font-size: clamp(2.6rem, 6vw, 4.2rem); line-height: 1.02; margin: 0 0 1rem; font-weight: 600; }
+  .hero h1 em { color: var(--violet); }
+  .hero .lede { font-size: 1.12rem; color: var(--ink-soft); max-width: 34rem; margin: 0 0 1.5rem; }
+  .btn { display: inline-block; font-weight: 600; font-size: .92rem; text-decoration: none; padding: .7rem 1.4rem; border-radius: 3px; }
+  .btn--primary { background: var(--ink); color: var(--paper); }
+  .btn--ghost { color: var(--ink); border: 1.5px solid var(--ink); margin-left: .6rem; }
+
+  .spec-card { border: 1.5px solid var(--ink); border-radius: 4px; background: var(--paper); box-shadow: 4px 4px 0 var(--rule); padding: 1.4rem 1.5rem; }
+  .spec-card h2 { margin: 0 0 .8rem; font-size: 1rem; letter-spacing: .1em; text-transform: uppercase; font-family: "Inter", sans-serif; color: var(--ink-soft); }
+  .spec-card dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: .35rem .9rem; font-size: .9rem; }
+  .spec-card dt { font-weight: 600; color: var(--gold); } .spec-card dd { margin: 0; color: var(--ink-soft); }
+
+  .resume { display: flex; align-items: center; gap: 1.1rem; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule);
+    padding: 1.1rem 0; margin: 1rem 0 2.5rem; }
+  .resume .tag { font-family: "Fraunces", serif; font-weight: 700; color: var(--violet); font-size: 1.4rem; }
+  .resume .t { font-weight: 600; } .resume .k { font-size: .8rem; color: var(--ink-soft); display: block; }
+  .resume a { margin-left: auto; white-space: nowrap; font-weight: 600; font-size: .9rem; }
+
+  .cols { display: grid; grid-template-columns: 1.2fr .9fr; gap: 3rem; }
+  .toc h2 { font-size: 1.6rem; margin: 0 0 1rem; }
+  .toc ol { list-style: none; margin: 0; padding: 0; counter-reset: ch; }
+  .toc li { display: flex; align-items: baseline; gap: .8rem; padding: .8rem 0; border-bottom: 1px solid var(--rule); }
+  .toc .n { font-family: "Fraunces", serif; font-weight: 700; font-style: italic; color: var(--gold); min-width: 2.4rem; font-size: 1.2rem; }
+  .toc .name { font-weight: 600; font-size: 1.05rem; font-family: "Fraunces", serif; }
+  .toc .ct { margin-left: auto; font-size: .78rem; color: var(--ink-soft); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+  .who h2 { font-size: 1.2rem; margin: 1.2rem 0 .5rem; }
+  .who h2:first-child { margin-top: 0; }
+  .who p, .who li { color: var(--ink-soft); font-size: .95rem; }
+  .who ul { padding-left: 1.1rem; margin: 0; } .who li { margin-bottom: .35rem; }
+  .marginal { font-size: .72rem; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin: 0 0 .4rem; }
+
+  footer { border-top: 2px solid var(--ink); padding: 1.2rem 1.25rem 2rem; text-align: center; font-size: .78rem; color: var(--ink-soft); }
+  @media (max-width: 46rem) { .hero, .cols { grid-template-columns: 1fr; } .resume { flex-wrap: wrap; } }
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← All themes</a>
+
+<div class="topstrip"><div class="topstrip__in"><span>Field Manual FM-01</span><span>Hunter Division</span><span>Rev. 2026-08</span></div></div>
+
+<nav class="bar">
+  <a class="mark" href="#"><span class="stamp-seal"><span>CC</span></span>Crucible College</a>
+  <div class="links">
+    <a class="on" href="#">Home</a><a href="#">Curriculum</a><a href="#">Meta Builds</a><a href="#">Resources</a>
+  </div>
+  <span class="prog">0 / 10 complete</span>
+</nav>
+<hr class="hr">
+
+<div class="sheet">
+  <section class="hero">
+    <div>
+      <p class="kicker">A training program for Hunters</p>
+      <h1>Crucible <em>College</em></h1>
+      <p class="lede">A structured Destiny 2 Crucible course for the Hunter class. Setup, settings, and movement — taught in order, so every match becomes practice instead of noise.</p>
+      <a class="btn btn--primary" href="#">Begin Lesson 1</a><a class="btn btn--ghost" href="#">View curriculum</a>
+    </div>
+    <aside class="spec-card">
+      <h2>Course specification</h2>
+      <dl>
+        <dt>Class</dt><dd>Hunter</dd>
+        <dt>Level</dt><dd>Beginner → Intermediate</dd>
+        <dt>Chapters</dt><dd>4 (more enrolling soon)</dd>
+        <dt>Lessons</dt><dd>10 · self-paced</dd>
+        <dt>Materials</dt><dd>Destiny 2, one Hunter, patience</dd>
+      </dl>
+    </aside>
+  </section>
+
+  <div class="resume">
+    <span class="tag">1</span>
+    <span><span class="k">New here? Start at the beginning</span><span class="t serif">Lesson 1 — Introduction</span></span>
+    <a href="#">Open lesson →</a>
+  </div>
+
+  <div class="cols">
+    <section class="toc">
+      <p class="marginal">Table of contents</p>
+      <h2>What the course covers</h2>
+      <ol>
+        <li><span class="n">I</span><span class="name">Introduction</span><span class="ct">1 lesson</span></li>
+        <li><span class="n">II</span><span class="name">Setup</span><span class="ct">4 lessons</span></li>
+        <li><span class="n">III</span><span class="name">Video &amp; Radar Settings</span><span class="ct">3 lessons</span></li>
+        <li><span class="n">IV</span><span class="name">Movement on Hunter</span><span class="ct">2 lessons</span></li>
+      </ol>
+    </section>
+    <section class="who">
+      <p class="marginal">Admissions</p>
+      <h2>Who this is for</h2>
+      <p>Beginner-to-intermediate Hunter mains. If you can finish a match but can't say <em>why</em> you lost it, you're in the right cohort.</p>
+      <h2>Prerequisites</h2>
+      <ul>
+        <li>Destiny 2 installed, with a Hunter you'll main</li>
+        <li>Basic comfort with the controls from PvE</li>
+        <li>A tolerance for losing matches while you drill</li>
+      </ul>
+    </section>
+  </div>
+</div>
+
+<footer><strong>Crucible College</strong> — a training program for Hunters. Unaffiliated with Bungie.</footer>
+</body>
+</html>

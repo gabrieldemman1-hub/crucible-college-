@@ -1,0 +1,10 @@
+---
+pagination:
+  data: builds.builds
+  size: 1
+  alias: build
+permalink: "/builds/{{ build.slug }}/"
+layout: build.njk
+eleventyComputed:
+  title: "Build #{{ build.rank }} — {{ build.name }}"
+---

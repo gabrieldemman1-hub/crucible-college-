@@ -1,0 +1,50 @@
+---
+layout: base.njk
+title: Curriculum
+active: curriculum
+permalink: /curriculum/
+---
+<div class="page page--curriculum">
+
+  <header class="page-header">
+    <h1>Curriculum</h1>
+    <p class="page-header__lede">The full teaching sequence. Lessons build on each other — take them
+    in order, and mark each one complete as you finish it.</p>
+    <div class="course-progress" role="group" aria-label="Course progress">
+      <div class="course-progress__bar" role="progressbar" aria-label="Lessons completed"
+           aria-valuemin="0" aria-valuemax="{{ curriculum.lessons.length }}" aria-valuenow="0" data-progress-bar>
+        <div class="course-progress__fill" data-progress-fill></div>
+      </div>
+      <p class="course-progress__text"><span data-progress-count>0</span> of {{ curriculum.lessons.length }} lessons complete</p>
+    </div>
+  </header>
+
+  {% for chapter in curriculum.chapters %}
+  <section class="chapter" id="chapter-{{ chapter.number }}" aria-labelledby="chapter-{{ chapter.number }}-heading">
+    <h2 id="chapter-{{ chapter.number }}-heading" class="chapter__heading">
+      <span class="chapter__number">Chapter {{ chapter.number }}</span>
+      {{ chapter.title }}
+      <span class="chapter__progress" data-chapter-progress>0/{{ chapter.lessons.length }}</span>
+    </h2>
+    <ol class="lesson-cards">
+      {% for item in chapter.lessons %}
+      <li>
+        <a class="lesson-card" data-lesson-card="{{ item.slug }}" href="/lessons/{{ item.slug }}/">
+          <span class="seal" aria-hidden="true"><span>{{ item.tag }}</span></span>
+          <span class="lesson-card__body">
+            <span class="lesson-card__title">{{ item.title }}</span>
+            <span class="lesson-card__objective">{{ item.objective }}</span>
+            <span class="pills">
+              <span class="pill pill--difficulty">{{ item.difficulty }}</span>
+              <span class="pill pill--time">{{ item.time }}</span>
+              <span class="pill pill--done">✓ Completed</span>
+            </span>
+          </span>
+        </a>
+      </li>
+      {% endfor %}
+    </ol>
+  </section>
+  {% endfor %}
+
+</div>

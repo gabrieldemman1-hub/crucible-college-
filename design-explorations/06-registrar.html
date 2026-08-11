@@ -1,0 +1,139 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='8' y='8' width='16' height='16' rx='2' transform='rotate(45 16 16)' fill='%239d85f2'/%3E%3C/svg%3E">
+<title>Theme 06 — The Registrar · Crucible College</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --manila: #efe9da; --card: #f7f3e8; --ink: #2a2433; --soft: #6d6579; --rule: #d5ccb8;
+    --violet: #4c3a99; --red: #a03236; --gold: #a8842c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--manila); color: var(--ink); font: 15px/1.6 "Inter", sans-serif; }
+  .mono { font-family: "IBM Plex Mono", monospace; }
+  a { color: var(--violet); }
+
+  .back { position: fixed; bottom: 1rem; left: 1rem; z-index: 9; font-size: .78rem; font-weight: 600;
+    background: var(--ink); color: var(--manila); padding: .4rem .9rem; border-radius: 999px; text-decoration: none; }
+
+  nav.bar { max-width: 62rem; margin: 0 auto; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; }
+  .mark { font-family: "Fraunces", serif; font-weight: 700; font-size: 1.2rem; color: var(--ink); text-decoration: none; }
+  .mark small { display: block; font-family: "IBM Plex Mono", monospace; font-weight: 400; font-size: .6rem; letter-spacing: .3em; color: var(--soft); }
+  .bar .links { margin-left: auto; display: flex; gap: .3rem; flex-wrap: wrap; }
+  .bar .links a { font-family: "IBM Plex Mono", monospace; font-size: .74rem; text-transform: uppercase; letter-spacing: .1em;
+    color: var(--soft); text-decoration: none; padding: .3rem .6rem; border: 1px solid transparent; }
+  .bar .links a.on { color: var(--ink); border: 1px solid var(--ink); background: var(--card); }
+
+  .doc { max-width: 62rem; margin: 0 auto 4rem; padding: 0 1.25rem; }
+  .transcript { background: var(--card); border: 1px solid var(--rule); box-shadow: 0 2px 0 var(--rule); padding: 2.4rem 2.6rem; position: relative; }
+  .transcript::before { content: ""; position: absolute; inset: .5rem; border: 1px solid var(--rule); pointer-events: none; }
+
+  .tr-head { text-align: center; border-bottom: 2px solid var(--ink); padding-bottom: 1.2rem; margin-bottom: 1.6rem; position: relative; }
+  .tr-head .office { font-family: "IBM Plex Mono", monospace; font-size: .68rem; letter-spacing: .34em; text-transform: uppercase; color: var(--soft); margin: 0 0 .5rem; }
+  .tr-head h1 { font-family: "Fraunces", serif; font-weight: 700; font-size: clamp(2rem, 5vw, 3rem); margin: 0; }
+  .tr-head .sub { font-family: "IBM Plex Mono", monospace; font-size: .74rem; color: var(--soft); margin: .5rem 0 0; }
+  .stamp { position: absolute; top: -0.4rem; right: -0.6rem; transform: rotate(8deg); border: 2.5px solid var(--red); color: var(--red);
+    font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: .72rem; letter-spacing: .22em; padding: .35rem .7rem; opacity: .85; }
+
+  .row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 2.4rem; }
+  .field { margin-bottom: 1.1rem; }
+  .field .lb { font-family: "IBM Plex Mono", monospace; font-size: .64rem; letter-spacing: .22em; text-transform: uppercase; color: var(--soft); display: block; margin-bottom: .15rem; }
+  .field .vl { border-bottom: 1px solid var(--ink); padding-bottom: .2rem; font-size: .95rem; }
+  .field .vl.script { font-family: "Fraunces", serif; font-style: italic; font-weight: 600; font-size: 1.1rem; }
+
+  table.courses { width: 100%; border-collapse: collapse; margin-top: .4rem; }
+  .courses caption { font-family: "IBM Plex Mono", monospace; font-size: .64rem; letter-spacing: .22em; text-transform: uppercase; color: var(--soft); text-align: left; padding-bottom: .5rem; }
+  .courses th { font-family: "IBM Plex Mono", monospace; font-size: .62rem; letter-spacing: .16em; text-transform: uppercase; color: var(--soft);
+    text-align: left; border-bottom: 1.5px solid var(--ink); padding: .3rem .4rem; }
+  .courses td { border-bottom: 1px solid var(--rule); padding: .5rem .4rem; font-size: .88rem; }
+  .courses .code { font-family: "IBM Plex Mono", monospace; font-size: .78rem; color: var(--violet); font-weight: 600; white-space: nowrap; }
+  .courses .cr, .courses .gr { text-align: center; font-family: "IBM Plex Mono", monospace; font-size: .8rem; }
+  .courses .gr { color: var(--soft); }
+
+  .actions { margin-top: 1.6rem; display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; }
+  .btn { display: inline-block; text-decoration: none; font-weight: 600; font-size: .85rem; padding: .65rem 1.3rem; }
+  .btn--go { background: var(--ink); color: var(--card); }
+  .btn--alt { border: 1.5px solid var(--ink); color: var(--ink); }
+  .resume-note { font-family: "IBM Plex Mono", monospace; font-size: .74rem; color: var(--soft); margin-left: auto; }
+  .resume-note a { font-weight: 600; }
+
+  .seal-foil { position: absolute; bottom: 1.6rem; right: 2.2rem; width: 5.2rem; height: 5.2rem; border-radius: 50%;
+    background: radial-gradient(circle at 34% 30%, #d9bd6b, var(--gold) 58%, #86691f); box-shadow: 0 2px 6px rgba(42,36,51,.3);
+    display: flex; align-items: center; justify-content: center; text-align: center; transform: rotate(-6deg); }
+  .seal-foil span { font-family: "IBM Plex Mono", monospace; font-size: .5rem; letter-spacing: .14em; text-transform: uppercase; color: #3d2f0a; line-height: 1.5; }
+  .seal-foil::before { content: ""; position: absolute; inset: .45rem; border: 1px dashed rgba(61,47,10,.55); border-radius: 50%; }
+
+  .notes { margin-top: 1.4rem; font-size: .85rem; color: var(--soft); max-width: 34rem; }
+  .notes b { color: var(--ink); }
+
+  footer { text-align: center; font-family: "IBM Plex Mono", monospace; font-size: .68rem; letter-spacing: .18em; text-transform: uppercase; color: var(--soft); padding: 0 1rem 2.5rem; }
+  @media (max-width: 46rem) { .row { grid-template-columns: 1fr; gap: .5rem; } .transcript { padding: 1.6rem 1.2rem; }
+    .seal-foil { position: static; margin: 1.5rem 0 0 auto; } .resume-note { margin-left: 0; } }
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← All themes</a>
+
+<nav class="bar">
+  <a class="mark" href="#">Crucible College<small>Office of the Registrar</small></a>
+  <div class="links">
+    <a class="on" href="#">Home</a><a href="#">Curriculum</a><a href="#">Meta&nbsp;Builds</a><a href="#">Resources</a>
+  </div>
+</nav>
+
+<div class="doc">
+  <div class="transcript">
+    <header class="tr-head">
+      <p class="office">Office of the Registrar · Hunter Division</p>
+      <h1>Crucible College</h1>
+      <p class="sub">OFFICIAL RECORD OF ENROLLMENT — FORM CC-101</p>
+      <span class="stamp">Enrolled · 2026</span>
+    </header>
+
+    <div class="row">
+      <div>
+        <div class="field"><span class="lb">Student</span><div class="vl script">A Hunter of promise</div></div>
+        <div class="field"><span class="lb">Program</span><div class="vl">The Hunter Course — Crucible fundamentals, beginner → intermediate</div></div>
+        <div class="field"><span class="lb">Prerequisites</span><div class="vl">Destiny 2 · one committed Hunter · PvE control comfort · a tolerance for losses while drilling</div></div>
+
+        <table class="courses">
+          <caption>Course of study — 10 lessons</caption>
+          <thead><tr><th>Code</th><th>Chapter</th><th class="cr">Lsn</th><th class="gr">Grade</th></tr></thead>
+          <tbody>
+            <tr><td class="code">CRU-101</td><td>Introduction</td><td class="cr">1</td><td class="gr">—</td></tr>
+            <tr><td class="code">CRU-201</td><td>Setup</td><td class="cr">4</td><td class="gr">—</td></tr>
+            <tr><td class="code">CRU-301</td><td>Video &amp; Radar Settings</td><td class="cr">3</td><td class="gr">—</td></tr>
+            <tr><td class="code">CRU-401</td><td>Movement on Hunter</td><td class="cr">2</td><td class="gr">—</td></tr>
+          </tbody>
+        </table>
+
+        <div class="actions">
+          <a class="btn btn--go" href="#">Begin Lesson 1</a>
+          <a class="btn btn--alt" href="#">Full curriculum</a>
+          <span class="resume-note">LAST ENTRY: <a href="#">Lesson 1 — Introduction ↗</a></span>
+        </div>
+
+        <p class="notes"><b>Admissions note.</b> This program serves beginner-to-intermediate Hunter mains — those who can finish a match but cannot yet say why it went the way it did. Grades are stamped in gold as lessons are completed; a certificate is issued at 10 of 10.</p>
+      </div>
+
+      <div>
+        <div class="field"><span class="lb">Class</span><div class="vl">Hunter</div></div>
+        <div class="field"><span class="lb">Standing</span><div class="vl">Good — 0 of 10 complete</div></div>
+        <div class="field"><span class="lb">Term</span><div class="vl">Self-paced, open enrollment</div></div>
+        <div class="field"><span class="lb">Electives</span><div class="vl">Meta Builds — 10 ranked slots</div></div>
+        <div class="field"><span class="lb">Registrar's remarks</span><div class="vl script">Configuration before mechanics; mechanics before heroics.</div></div>
+      </div>
+    </div>
+
+    <div class="seal-foil"><span>Crucible<br>College<br>· Sigillum ·</span></div>
+  </div>
+</div>
+
+<footer>Crucible College · Unaffiliated with Bungie</footer>
+</body>
+</html>

@@ -1,0 +1,145 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='8' y='8' width='16' height='16' rx='2' transform='rotate(45 16 16)' fill='%239d85f2'/%3E%3C/svg%3E">
+<title>Theme 02 — The Director · Crucible College</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Narrow:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #0b0d13; --panel: #11141d; --hair: rgba(226,230,242,.14); --hair-2: rgba(226,230,242,.07);
+    --txt: #e2e6f2; --dim: #8b91a6; --violet: #9d85f2; --violet-dim: #574a8f; --gold: #d3b25e;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--void); color: var(--txt); font: 15px/1.6 "Archivo", sans-serif; }
+  a { color: var(--violet); text-decoration: none; }
+  .lbl { font-family: "Archivo Narrow", sans-serif; font-size: .68rem; font-weight: 600; letter-spacing: .28em; text-transform: uppercase; color: var(--dim); }
+
+  .back { position: fixed; bottom: 1rem; left: 1rem; z-index: 9; font-size: .75rem; font-weight: 600;
+    background: var(--txt); color: var(--void); padding: .4rem .9rem; border-radius: 2px; }
+
+  header.top { border-bottom: 1px solid var(--hair); }
+  .bar { max-width: 68rem; margin: 0 auto; padding: .9rem 1.25rem; display: flex; align-items: center; gap: 1.75rem; flex-wrap: wrap; }
+  .mark { display: flex; align-items: center; gap: .7rem; color: var(--txt); font-weight: 700; letter-spacing: .12em; text-transform: uppercase; font-size: .95rem; }
+  .dia { width: .8rem; height: .8rem; transform: rotate(45deg); border: 1px solid var(--violet); }
+  .dia--fill { background: var(--violet); }
+  .bar .links { margin-left: auto; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .bar .links a { color: var(--dim); font-size: .78rem; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; padding: .2rem 0; }
+  .bar .links a.on { color: var(--txt); border-bottom: 1px solid var(--gold); }
+  .meter { display: flex; align-items: center; gap: .6rem; }
+  .meter .track { width: 72px; height: 2px; background: var(--hair); position: relative; }
+  .meter .track i { position: absolute; inset: 0 100% 0 0; background: var(--violet); }
+  .meter span { font-size: .7rem; letter-spacing: .12em; color: var(--dim); }
+
+  .wrap { max-width: 68rem; margin: 0 auto; padding: 0 1.25rem 4.5rem; }
+
+  .hero { padding: 4.5rem 0 3rem; border-bottom: 1px solid var(--hair); position: relative; }
+  .hero::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: var(--hair-2); }
+  .hero h1 { font-size: clamp(2.4rem, 5.5vw, 3.6rem); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; margin: .9rem 0 .4rem; }
+  .hero h1 span { color: var(--violet); }
+  .hero .sub { color: var(--dim); max-width: 40rem; margin: 0 0 2rem; font-size: 1.02rem; }
+  .btnrow { display: flex; gap: 1px; flex-wrap: wrap; }
+  .btn { font-size: .78rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; padding: .85rem 1.6rem; border: 1px solid var(--hair); color: var(--txt); }
+  .btn--go { background: var(--violet); border-color: var(--violet); color: #0b0d13; }
+  .btn:hover { border-color: var(--violet); }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--hair); }
+  .stat { padding: 1.3rem 1rem 1.3rem 0; border-right: 1px solid var(--hair-2); }
+  .stat:last-child { border-right: 0; }
+  .stat b { display: block; font-size: 1.7rem; font-weight: 600; letter-spacing: .04em; }
+  .stat .lbl { margin-top: .25rem; display: block; }
+
+  .resume { display: flex; align-items: center; gap: 1rem; padding: 1.1rem 0; border-bottom: 1px solid var(--hair); }
+  .resume .dia { flex-shrink: 0; }
+  .resume b { font-weight: 600; letter-spacing: .06em; }
+  .resume .lbl { letter-spacing: .2em; }
+  .resume a { margin-left: auto; font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; font-weight: 600; }
+
+  .grid { display: grid; grid-template-columns: 1.25fr .85fr; gap: 0; }
+  .chap { padding: 2.2rem 2.5rem 0 0; }
+  .chap ol { list-style: none; margin: 1.2rem 0 0; padding: 0; }
+  .chap li { display: grid; grid-template-columns: 3.2rem minmax(0,1fr) auto; align-items: center; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--hair-2); }
+  .chap .num { font-size: .72rem; letter-spacing: .18em; color: var(--gold); font-weight: 600; }
+  .chap .nm { font-weight: 600; letter-spacing: .05em; text-transform: uppercase; font-size: .92rem; }
+  .chap .bar2 { display: flex; align-items: center; gap: .6rem; }
+  .chap .track { width: 64px; height: 2px; background: var(--hair); }
+  .chap .ct { font-size: .7rem; color: var(--dim); letter-spacing: .12em; }
+  .who { padding: 2.2rem 0 0 2.5rem; border-left: 1px solid var(--hair-2); }
+  .who p, .who li { color: var(--dim); font-size: .92rem; }
+  .who ul { padding-left: 1rem; margin: .4rem 0 1.4rem; }
+  .who li { margin-bottom: .3rem; }
+  .who .lbl { display: block; margin-bottom: .5rem; color: var(--gold); }
+
+  footer { border-top: 1px solid var(--hair); padding: 1.2rem; text-align: center; }
+  footer p { margin: .2rem; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+  @media (max-width: 46rem) { .stats { grid-template-columns: 1fr 1fr; } .grid { grid-template-columns: 1fr; }
+    .who { border-left: 0; padding-left: 0; } .stat { border-right: 0; } .resume { flex-wrap: wrap; }
+    .chap { padding-right: 0; } .chap li { gap: .6rem; } .chap .track { width: 44px; } }
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← All themes</a>
+
+<header class="top">
+  <nav class="bar">
+    <span class="mark"><span class="dia dia--fill"></span>Crucible College</span>
+    <div class="links">
+      <a class="on" href="#">Home</a><a href="#">Curriculum</a><a href="#">Meta Builds</a><a href="#">Resources</a>
+    </div>
+    <span class="meter"><span class="track"><i></i></span><span>00 / 10</span></span>
+  </nav>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <span class="lbl">Training Protocol · Hunter Division</span>
+    <h1>Crucible <span>College</span></h1>
+    <p class="sub">A structured Crucible course for the Hunter class. Setup, settings, and movement — taught in sequence, so every match becomes recorded practice instead of noise.</p>
+    <div class="btnrow">
+      <a class="btn btn--go" href="#">Begin Lesson 01</a>
+      <a class="btn" href="#">View Curriculum</a>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="stat"><b>04</b><span class="lbl">Chapters</span></div>
+    <div class="stat"><b>10</b><span class="lbl">Lessons</span></div>
+    <div class="stat"><b>02</b><span class="lbl">Difficulty tiers</span></div>
+    <div class="stat"><b>∞</b><span class="lbl">Primary ammo</span></div>
+  </section>
+
+  <div class="resume">
+    <span class="dia"></span>
+    <span><span class="lbl">Resume protocol</span><br><b>Lesson 1 — Introduction</b></span>
+    <a href="#">Deploy →</a>
+  </div>
+
+  <div class="grid">
+    <section class="chap">
+      <span class="lbl">Course structure</span>
+      <ol>
+        <li><span class="num">CH.01</span><span class="nm">Introduction</span><span class="bar2"><span class="track"></span><span class="ct">1 LSN</span></span></li>
+        <li><span class="num">CH.02</span><span class="nm">Setup</span><span class="bar2"><span class="track"></span><span class="ct">4 LSN</span></span></li>
+        <li><span class="num">CH.03</span><span class="nm">Video &amp; Radar Settings</span><span class="bar2"><span class="track"></span><span class="ct">3 LSN</span></span></li>
+        <li><span class="num">CH.04</span><span class="nm">Movement on Hunter</span><span class="bar2"><span class="track"></span><span class="ct">2 LSN</span></span></li>
+      </ol>
+    </section>
+    <section class="who">
+      <span class="lbl">Eligibility</span>
+      <p>Beginner-to-intermediate Hunter mains. If you can finish a match but can't say why you lost it, you fit the profile.</p>
+      <span class="lbl">Required equipment</span>
+      <ul>
+        <li>Destiny 2 + a Hunter you'll main</li>
+        <li>Basic control comfort from PvE</li>
+        <li>Tolerance for losses while drilling</li>
+      </ul>
+    </section>
+  </div>
+</div>
+
+<footer><p>Crucible College — Hunter Division</p><p>Unaffiliated with Bungie</p></footer>
+</body>
+</html>

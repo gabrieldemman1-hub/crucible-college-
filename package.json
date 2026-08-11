@@ -1,0 +1,13 @@
+{
+  "name": "crucible-college",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Crucible College — a Destiny 2 Crucible course for Hunters",
+  "scripts": {
+    "build": "eleventy",
+    "dev": "eleventy --serve"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^3.0.0"
+  }
+}
