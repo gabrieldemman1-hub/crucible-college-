@@ -102,10 +102,12 @@
     if (bar) bar.setAttribute("aria-valuenow", String(count));
     if (fill && total > 0) fill.style.width = (100 * count / total) + "%";
 
-    var ring = document.querySelector("[data-progress-ring]");
-    if (ring && total > 0) {
-      ring.style.strokeDashoffset = String(RING_CIRCUMFERENCE * (1 - count / total));
-      ring.classList.toggle("is-full", count >= total);
+    var rings = document.querySelectorAll("[data-progress-ring]");
+    for (var j = 0; j < rings.length; j++) {
+      if (total > 0) {
+        rings[j].style.strokeDashoffset = String(RING_CIRCUMFERENCE * (1 - count / total));
+        rings[j].classList.toggle("is-full", count >= total);
+      }
     }
   }
 
@@ -219,6 +221,39 @@
       syncLabel();
     });
     syncLabel();
+  }
+
+  // ── Mobile menu (hamburger — shown by CSS below 48rem) ─────────────────
+
+  function initMobileMenu() {
+    var btn = document.querySelector("[data-menu-toggle]");
+    var nav = document.querySelector(".site-nav");
+    if (!btn || !nav) return;
+
+    function setOpen(open) {
+      nav.classList.toggle("menu-open", open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      btn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    }
+
+    btn.addEventListener("click", function () {
+      setOpen(!nav.classList.contains("menu-open"));
+    });
+    document.addEventListener("click", function (e) {
+      if (nav.classList.contains("menu-open") && !nav.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && nav.classList.contains("menu-open")) {
+        setOpen(false);
+        btn.focus();
+      }
+    });
+    // Close when a link is chosen, so tapping the current page's link
+    // doesn't leave the menu hanging open.
+    var links = nav.querySelectorAll(".nav-links a");
+    for (var i = 0; i < links.length; i++) {
+      links[i].addEventListener("click", function () { setOpen(false); });
+    }
   }
 
   // ── Nav dropdown (hover via CSS; click/keyboard here) ──────────────────
@@ -464,6 +499,7 @@
     renderAll(map);
     renderResumeCard();
     initThemeToggle();
+    initMobileMenu();
     initDropdown();
     initPalette();
     initReadProgress();

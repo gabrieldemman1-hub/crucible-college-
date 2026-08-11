@@ -95,6 +95,11 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   background: var(--ink-900);
@@ -436,7 +441,7 @@ main { min-height: 60vh; overflow-x: clip; }
 
 .home-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(19rem, 100%), 1fr));
   gap: 1.25rem;
 }
 
@@ -513,7 +518,7 @@ main { min-height: 60vh; overflow-x: clip; }
   padding: 0;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
   gap: 1rem;
 }
 
@@ -727,7 +732,7 @@ main { min-height: 60vh; overflow-x: clip; }
 .glossary { margin-bottom: 3rem; }
 .glossary__list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
   gap: 1rem;
   margin: 0;
 }
@@ -872,7 +877,7 @@ main { min-height: 60vh; overflow-x: clip; }
   text-decoration: none;
 }
 
-@media (max-width: 40rem) {
+@media (max-width: 48rem) {
   .nav-dropdown__toggle, .nav-dropdown__panel { display: none; }
 }
 
@@ -902,7 +907,7 @@ main { min-height: 60vh; overflow-x: clip; }
   border-radius: 4px;
   padding: 0.05rem 0.35rem;
 }
-@media (max-width: 40rem) { .nav-search__hint { display: none; } }
+@media (max-width: 48rem) { .nav-search__hint { display: none; } }
 
 /* ── Nav progress ring ────────────────────────────────────────────────── */
 
@@ -1155,6 +1160,30 @@ html.js-reveal .reveal.is-visible { opacity: 1; transform: none; }
 :root[data-theme="light"] .theme-toggle .icon-sun { display: none; }
 :root[data-theme="light"] .theme-toggle .icon-moon { display: block; }
 
+/* Menu button — mobile only (shown in the responsive layer) */
+.nav-burger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  flex-shrink: 0;
+  background: var(--panel-800);
+  border: 1px solid var(--line-600);
+  border-radius: 999px;
+  color: var(--text-300);
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease;
+}
+.nav-burger:hover { color: var(--text-100); border-color: var(--violet-400); }
+.nav-burger .icon-close { display: none; }
+.nav-burger[aria-expanded="true"] .icon-burger { display: none; }
+.nav-burger[aria-expanded="true"] .icon-close { display: block; }
+
+/* Progress summary row inside the mobile menu — mobile only */
+.nav-links__progress { display: none; }
+
 /* ── Chapter progress chips (curriculum page) ─────────────────────────── */
 
 .chapter__progress {
@@ -1181,7 +1210,7 @@ html.js-reveal .reveal.is-visible { opacity: 1; transform: none; }
   padding: 0;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
   gap: 1rem;
   counter-reset: none;
 }
@@ -1237,7 +1266,7 @@ html.js-reveal .reveal.is-visible { opacity: 1; transform: none; }
   padding: 0;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
   gap: 1rem;
 }
 .weapon-card {
@@ -1283,15 +1312,90 @@ html.js-reveal .reveal.is-visible { opacity: 1; transform: none; }
   .lesson-sidebar { position: static; order: 2; }
 }
 
+/* ── Mobile header: one compact row + hamburger menu ──────────────────── */
+
+@media (max-width: 48rem) {
+  .site-nav {
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    position: relative;
+    padding-block: 0.55rem;
+  }
+  .wordmark { margin-inline-end: auto; min-width: 0; font-size: 1.1rem; }
+  .wordmark__text { overflow: hidden; text-overflow: ellipsis; }
+
+  /* Comfortable touch targets for the header buttons */
+  .nav-search { min-width: 2.4rem; min-height: 2.4rem; justify-content: center; }
+  .theme-toggle { width: 2.4rem; height: 2.4rem; }
+  .nav-burger { display: inline-flex; }
+
+  /* The progress pill moves into the menu panel */
+  .nav-progress { display: none; }
+
+  /* Nav links become a drop-down panel under the sticky header */
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin: 0;
+    flex-direction: column;
+    gap: 0.15rem;
+    background: var(--ink-800);
+    border-block: 1px solid var(--line-600);
+    box-shadow: var(--shadow-pop);
+    padding: 0.6rem 0.75rem 0.75rem;
+    z-index: 30;
+  }
+  .menu-open .nav-links { display: flex; }
+
+  .nav-dropdown { display: block; }
+  .nav-links > a,
+  .nav-dropdown > a {
+    display: block;
+    font-size: var(--step-0);
+    padding: 0.7rem 0.75rem;
+    border-radius: 8px;
+  }
+  .nav-links a::after { display: none; }
+  .nav-links a:hover { background: var(--panel-700); }
+  .nav-links a[aria-current="page"] {
+    background: var(--panel-800);
+    box-shadow: inset 3px 0 0 var(--violet-300);
+  }
+
+  .nav-links__progress {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.45rem;
+    padding: 0.75rem 0.75rem 0.15rem;
+    border-top: 1px solid var(--line-600);
+    font-size: var(--step--1);
+    color: var(--text-400);
+  }
+  .nav-links__progress strong { color: var(--text-100); font-variant-numeric: tabular-nums; }
+}
+
+@media (max-width: 48rem) and (prefers-reduced-motion: no-preference) {
+  .menu-open .nav-links { animation: menu-in 200ms ease; }
+}
+
+@keyframes menu-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: none; }
+}
+
 @media (max-width: 40rem) {
   h1 { font-size: var(--step-3); }
   .hero__title { font-size: var(--step-4); }
-  .site-nav { gap: 0.5rem 1rem; }
-  .nav-links { margin-inline-start: 0; order: 3; flex-basis: 100%; flex-wrap: wrap; }
-  .nav-links a { font-size: var(--step--1); padding: 0.3rem 0.55rem; }
-  .nav-progress { margin-inline-start: auto; }
+  .page, .lesson-shell { padding: 1.75rem 1rem 3.5rem; }
+  .home-panel { padding: 1.25rem 1.1rem; }
   .pager { grid-template-columns: 1fr; }
   .pager__link--next { text-align: start; }
-  .lesson-header { flex-direction: column; }
+  .lesson-header { flex-direction: column; gap: 0.75rem; }
+  .lesson-header__text { flex-basis: auto; }
   .complete-toggle { align-self: flex-start; }
+  .objectives, .takeaways { padding: 1.1rem 1.2rem; }
 }
