@@ -1,0 +1,149 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.invalid/voice-intake-agent/routing.schema.json",
+  "title": "AI Intake routing configuration",
+  "description": "Who receives warm transfers, in what order, at what hours. Loaded and hot-reloaded by the intake service. Real numbers live in routing.json, which is not committed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["timezone", "businessHours", "staff", "lists", "overnight", "seniorManagement", "callbackWindow"],
+  "properties": {
+    "timezone": {
+      "type": "string",
+      "description": "IANA time zone used to evaluate businessHours and holidays.",
+      "examples": ["America/Los_Angeles"]
+    },
+    "businessHours": {
+      "type": "object",
+      "description": "Staffed hours per weekday as [open, close] in 24h HH:MM local time, or null for closed. Outside these hours the overnight list is used.",
+      "additionalProperties": false,
+      "required": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+      "properties": {
+        "mon": { "$ref": "#/definitions/dayHours" },
+        "tue": { "$ref": "#/definitions/dayHours" },
+        "wed": { "$ref": "#/definitions/dayHours" },
+        "thu": { "$ref": "#/definitions/dayHours" },
+        "fri": { "$ref": "#/definitions/dayHours" },
+        "sat": { "$ref": "#/definitions/dayHours" },
+        "sun": { "$ref": "#/definitions/dayHours" }
+      }
+    },
+    "holidays": {
+      "type": "array",
+      "description": "Dates (YYYY-MM-DD, local) treated as outside business hours all day.",
+      "items": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+      "uniqueItems": true,
+      "default": []
+    },
+    "staff": {
+      "type": "object",
+      "description": "Every person the agent can transfer to, keyed by a short id used in the lists below.",
+      "minProperties": 1,
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_]{1,31}$" },
+      "additionalProperties": { "$ref": "#/definitions/staffMember" }
+    },
+    "lists": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["intake", "admin", "overnight"],
+      "properties": {
+        "intake": {
+          "type": "object",
+          "description": "Ordered priority lists for new-client transfers, per caller language. Bilingual staff appear on both.",
+          "additionalProperties": false,
+          "required": ["en", "es"],
+          "properties": {
+            "en": { "$ref": "#/definitions/staffList" },
+            "es": { "$ref": "#/definitions/staffList" }
+          }
+        },
+        "admin": {
+          "$ref": "#/definitions/staffList",
+          "description": "Ordered list for existing-client and other-matter transfers."
+        },
+        "overnight": {
+          "$ref": "#/definitions/staffList",
+          "description": "Ordered list used for intake transfers outside businessHours. Should contain bilingual staff or the flow will whisper in English regardless of caller language."
+        }
+      }
+    },
+    "overnight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["handlesExistingClients"],
+      "properties": {
+        "handlesExistingClients": {
+          "type": "boolean",
+          "description": "If true, the overnight list also fills the admin slots outside business hours. If false, existing clients after hours get the fallback message and a morning callback Task."
+        }
+      }
+    },
+    "seniorManagement": {
+      "type": "array",
+      "description": "First names of senior management. Callers asking for these people are routed to the intake list. The loader rejects any staff entry whose name contains one of these (case-insensitive) so they can never be a transfer target.",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "callbackWindow": {
+      "type": "object",
+      "description": "What the agent promises in the fallback message, per hours bucket and language.",
+      "additionalProperties": false,
+      "required": ["businessHours", "afterHours"],
+      "properties": {
+        "businessHours": { "$ref": "#/definitions/bilingualPhrase" },
+        "afterHours": { "$ref": "#/definitions/bilingualPhrase" }
+      }
+    }
+  },
+  "definitions": {
+    "dayHours": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": { "type": "string", "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$" }
+        }
+      ]
+    },
+    "staffMember": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "number", "email", "languages"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "description": "Spoken by the agent in the hold message and whisper. First name is enough." },
+        "number": { "type": "string", "pattern": "^\\+[1-9]\\d{7,14}$", "description": "Direct-dial number in E.164, e.g. +14155550101." },
+        "email": { "type": "string", "format": "email", "description": "Receives the fallback alert when this person is first on the list." },
+        "languages": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["en", "es"] },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "salesforceUserId": {
+          "type": "string",
+          "pattern": "^005[A-Za-z0-9]{12}([A-Za-z0-9]{3})?$",
+          "description": "Salesforce User Id. Becomes the Lead owner when this person accepts a transfer. Optional; the queue is used if absent."
+        },
+        "role": { "type": "string", "enum": ["intake", "admin", "overnight"], "description": "Informational only." }
+      }
+    },
+    "staffList": {
+      "type": "array",
+      "description": "Ordered staff ids, first is tried first. At most 3; the flow has three transfer slots per list.",
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]{1,31}$" },
+      "minItems": 0,
+      "maxItems": 3,
+      "uniqueItems": true
+    },
+    "bilingualPhrase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["en", "es"],
+      "properties": {
+        "en": { "type": "string", "minLength": 1 },
+        "es": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

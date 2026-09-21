@@ -1,5 +1,7 @@
 # AI Voice Intake Agent: Project Plan
 
+> **Superseded.** This is the v1 plan (ElevenLabs, email capture, 4-week estimate). The current plan is [`PLAN-v2.md`](./PLAN-v2.md), written after reviewing the consultant documents and confirming decisions with the firm. Kept for history.
+
 **Client:** California employment law firm
 **Goal:** Answer 100% of inbound calls with an AI voice agent that greets the caller like a human receptionist, captures contact details, logs the lead in Salesforce, and warm-transfers the caller to the right person by language and client status.
 **Status:** Draft v1, pending answers to the open questions in section 2.
