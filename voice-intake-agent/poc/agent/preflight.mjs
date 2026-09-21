@@ -52,7 +52,7 @@ let reach;
 try { reach = await api("/list-voices"); }
 catch (e) { fail(`Cannot reach ${BASE}: ${e.cause?.code || e.message}. Allow api.retellai.com in the environment's network settings (or run on a laptop).`); console.log(`\n${problems} problem(s).`); process.exit(1); }
 const blocked = (r) => /allowlist|egress|network|proxy/i.test(typeof r.json === "string" ? r.json : JSON.stringify(r.json ?? ""));
-if (blocked(reach)) { fail(`api.retellai.com is blocked by this environment's network policy (HTTP ${reach.status}). Add api.retellai.com to the allowed hosts in the environment settings, then start a new session.`); console.log(`\n${problems} problem(s).`); process.exit(1); }
+if (blocked(reach)) { fail(`api.retellai.com is blocked by this environment's network policy (HTTP ${reach.status}). Either add an API credential for api.retellai.com on the environment, or set Network access to Custom and add api.retellai.com to Allowed domains. Then start a new session.`); console.log(`\n${problems} problem(s).`); process.exit(1); }
 if (reach.status === 401 || reach.status === 403) fail(KEY
   ? `Key rejected (HTTP ${reach.status}). Create a new key in the Retell dashboard and update RETELL_API_KEY.`
   : `No key reached Retell (HTTP ${reach.status}). Either add an API credential on the environment (Allowed websites: api.retellai.com, header Authorization, prefix Bearer) or set RETELL_API_KEY. Then start a new session.`);
