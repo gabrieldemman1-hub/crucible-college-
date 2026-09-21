@@ -1,0 +1,245 @@
+#!/usr/bin/env node
+// Creates or updates the proof-of-concept Maya agent on Retell AI and binds it to a phone number.
+// Plain Node 20+, no dependencies. Safe to re-run: ids are remembered in .retell-ids.json (gitignored).
+//
+// Required env:  RETELL_API_KEY, INTAKE_PHONE, ADMIN_PHONE
+// Optional env:  INTAKE_NAME (default "James"), ADMIN_NAME ("Ana"), FIRM_NAME ("the firm"),
+//                AGENT_NAME ("Maya"), MAIN_OFFICE_NUMBER, RETELL_PHONE_NUMBER (bind target; if unset
+//                and the account has exactly one number, that one is used), VOICE_ID (else a
+//                multilingual ElevenLabs female voice is picked from /list-voices and printed),
+//                RETELL_MODEL (default from agent.config.json), RETELL_BASE_URL.
+//
+// Usage:  node poc/agent/create-agent.mjs            create or update everything
+//         node poc/agent/create-agent.mjs --voices   just list candidate voices and exit
+//         node poc/agent/create-agent.mjs --unbind   detach the agent from the phone number
+
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const here = dirname(fileURLToPath(import.meta.url));
+const root = join(here, "..", "..");
+const BASE = process.env.RETELL_BASE_URL || "https://api.retellai.com";
+const KEY = process.env.RETELL_API_KEY;
+const IDS_FILE = join(here, ".retell-ids.json");
+
+function env(name, fallback) {
+  const v = process.env[name];
+  if (v === undefined || v === "") {
+    if (fallback !== undefined) return fallback;
+    console.error(`Missing required environment variable ${name}`);
+    process.exit(2);
+  }
+  return v;
+}
+function e164(name) {
+  const v = env(name);
+  if (!/^\+[1-9]\d{7,14}$/.test(v)) {
+    console.error(`${name} must be in E.164 format like +14155550101, got "${v}"`);
+    process.exit(2);
+  }
+  return v;
+}
+
+async function api(method, path, body) {
+  const res = await fetch(BASE + path, {
+    method,
+    headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  const text = await res.text();
+  let json;
+  try { json = text ? JSON.parse(text) : null; } catch { json = text; }
+  if (!res.ok) {
+    throw new Error(`${method} ${path} -> HTTP ${res.status}: ${typeof json === "string" ? json : JSON.stringify(json)}`);
+  }
+  return json;
+}
+
+function fill(template, vars) {
+  return template.replace(/\{\{(\w+)\}\}/g, (_, k) => (vars[k] ?? `{{${k}}}`));
+}
+
+function loadIds() {
+  return existsSync(IDS_FILE) ? JSON.parse(readFileSync(IDS_FILE, "utf8")) : {};
+}
+function saveIds(ids) {
+  writeFileSync(IDS_FILE, JSON.stringify(ids, null, 2) + "\n");
+}
+
+async function pickVoice(explicit) {
+  if (explicit) return explicit;
+  const voices = await api("GET", "/list-voices");
+  const list = Array.isArray(voices) ? voices : voices?.voices ?? [];
+  const candidates = list.filter((v) =>
+    String(v.provider || "").toLowerCase().includes("eleven") &&
+    String(v.gender || "").toLowerCase() === "female"
+  );
+  if (!candidates.length) {
+    console.error("No ElevenLabs female voice found in /list-voices. Set VOICE_ID explicitly. First voices returned:");
+    console.error(list.slice(0, 10).map((v) => `  ${v.voice_id}  ${v.voice_name}  ${v.provider}  ${v.gender}  ${v.accent || ""}`).join("\n"));
+    process.exit(2);
+  }
+  console.log("Candidate voices (set VOICE_ID to choose a different one):");
+  for (const v of candidates.slice(0, 12)) {
+    console.log(`  ${v.voice_id.padEnd(28)} ${String(v.voice_name).padEnd(14)} ${v.accent || ""} ${v.age || ""}  ${v.preview_audio_url || ""}`);
+  }
+  return candidates[0].voice_id;
+}
+
+async function main() {
+  const args = new Set(process.argv.slice(2));
+  if (!KEY) { console.error("Missing RETELL_API_KEY"); process.exit(2); }
+
+  if (args.has("--voices")) {
+    await pickVoice(undefined);
+    return;
+  }
+
+  const cfg = JSON.parse(readFileSync(join(here, "agent.config.json"), "utf8"));
+  const vars = {
+    agent_name: env("AGENT_NAME", "Maya"),
+    firm_name: env("FIRM_NAME", "the firm"),
+    intake_name: env("INTAKE_NAME", "James"),
+    admin_name: env("ADMIN_NAME", "Ana"),
+    main_office_number: env("MAIN_OFFICE_NUMBER", "the main office number"),
+  };
+  const intakePhone = e164("INTAKE_PHONE");
+  const adminPhone = e164("ADMIN_PHONE");
+
+  if (args.has("--unbind")) {
+    const ids = loadIds();
+    if (!ids.phone_number) { console.log("No bound phone number recorded."); return; }
+    await api("PATCH", `/update-phone-number/${encodeURIComponent(ids.phone_number)}`, { inbound_agents: null });
+    console.log(`Unbound ${ids.phone_number}. Callers will no longer reach ${vars.agent_name}.`);
+    return;
+  }
+
+  const prompt = fill(readFileSync(join(here, "prompt.md"), "utf8"), vars);
+  const briefing = readFileSync(join(root, "prompts", "briefing.md"), "utf8");
+
+  // The whisper is generated by the model from the conversation, guided by the template in
+  // prompts/briefing.md. A prompt-type handoff avoids depending on dynamic-variable rendering
+  // inside a static message, which is not confirmed for single-prompt agents.
+  const whisperPrompt = (who, role) => [
+    `You are ${vars.agent_name}, the intake assistant. You have just reached ${who}, a staff member. The caller is on hold and cannot hear you.`,
+    `Speak this briefing in English, in one breath, under 12 seconds, filling in the details from the conversation so far:`,
+    `"Hi ${who}, this is ${vars.agent_name}, the intake assistant. I have [caller's full name] on the line, ${role}, speaking [English or Spanish]. They're calling about: [the caller's one-sentence reason, in their words]. Callback number [the confirmed number, or 'the number they're calling from']. Stay on the line to take the call, or hang up and I'll try the next person."`,
+    `If the caller asked for Walter, Peg, or Anthony by name, add: "They asked for [name] by name." If no callback number was captured, say "No callback number captured." Do not add anything else. Do not characterize the legal matter.`,
+    `Reference template follows.\n\n${briefing}`,
+  ].join("\n");
+
+  const transferTool = (name, description, number, who, role, holdText) => ({
+    type: "transfer_call",
+    name,
+    description,
+    transfer_destination: { type: "predefined", number },
+    transfer_option: {
+      type: "warm_transfer",
+      agent_detection_timeout_ms: cfg.transfer.agent_detection_timeout_ms,
+      transfer_ring_duration_ms: cfg.transfer.transfer_ring_duration_ms,
+      on_hold_music: cfg.transfer.on_hold_music,
+      opt_out_human_detection: cfg.transfer.opt_out_human_detection,
+      show_transferee_as_caller: cfg.transfer.show_transferee_as_caller,
+      private_handoff_option: { type: "prompt", prompt: whisperPrompt(who, role) },
+    },
+    speak_during_execution: true,
+    execution_message_type: "static_text",
+    execution_message_description: holdText,
+  });
+
+  const llmBody = {
+    model: process.env[cfg.llm.model_env] || cfg.llm.model_default,
+    model_temperature: cfg.llm.model_temperature,
+    tool_call_strict_mode: cfg.llm.tool_call_strict_mode,
+    general_prompt: prompt,
+    begin_message: `Thank you for calling ${vars.firm_name}. Gracias por llamar a ${vars.firm_name}.`,
+    general_tools: [
+      { type: "end_call", name: "end_call", description: "End the call after saying goodbye, or when the caller has hung up or gone silent." },
+      transferTool(
+        "transfer_to_intake",
+        `Warm-transfer a new client (or anyone who asked for Walter, Peg, or Anthony) to the intake manager ${vars.intake_name}. Call only after name, phone, and reason are collected and you have told the caller to hold.`,
+        intakePhone, vars.intake_name, "a new client",
+        `Please hold for a moment while I connect you with ${vars.intake_name}. This may take a minute.`
+      ),
+      transferTool(
+        "transfer_to_admin",
+        `Warm-transfer an existing client or an other-matter caller to the admin team member ${vars.admin_name}. Call only after name, phone, and reason are collected and you have told the caller to hold.`,
+        adminPhone, vars.admin_name, "an existing client or other matter",
+        `Please hold while I connect you with ${vars.admin_name}.`
+      ),
+    ],
+  };
+
+  const ids = loadIds();
+
+  let llm;
+  if (ids.llm_id) {
+    llm = await api("PATCH", `/update-retell-llm/${ids.llm_id}`, llmBody);
+    console.log(`Updated Retell LLM ${ids.llm_id}`);
+  } else {
+    llm = await api("POST", "/create-retell-llm", llmBody);
+    ids.llm_id = llm.llm_id;
+    saveIds(ids);
+    console.log(`Created Retell LLM ${ids.llm_id}`);
+  }
+
+  const voiceId = await pickVoice(process.env.VOICE_ID);
+  const a = cfg.agent;
+  const agentBody = {
+    agent_name: a.agent_name,
+    response_engine: { type: "retell-llm", llm_id: ids.llm_id },
+    voice_id: voiceId,
+    voice_model: a.voice_model,
+    language: a.language,
+    responsiveness: a.responsiveness,
+    interruption_sensitivity: a.interruption_sensitivity,
+    enable_backchannel: a.enable_backchannel,
+    normalize_for_speech: a.normalize_for_speech,
+    begin_message_delay_ms: a.begin_message_delay_ms,
+    end_call_after_silence_ms: a.end_call_after_silence_ms,
+    reminder_trigger_ms: a.reminder_trigger_ms,
+    reminder_max_count: a.reminder_max_count,
+    max_call_duration_ms: a.max_call_duration_ms,
+    data_storage_setting: a.data_storage_setting,
+    opt_in_signed_url: a.opt_in_signed_url,
+    boosted_keywords: [...a.boosted_keywords_base, vars.firm_name, vars.intake_name, vars.admin_name],
+    post_call_analysis_data: a.post_call_analysis_data,
+  };
+
+  let agent;
+  if (ids.agent_id) {
+    agent = await api("PATCH", `/update-agent/${ids.agent_id}`, agentBody);
+    console.log(`Updated agent ${ids.agent_id} (version ${agent.version ?? "?"})`);
+  } else {
+    agent = await api("POST", "/create-agent", agentBody);
+    ids.agent_id = agent.agent_id;
+    saveIds(ids);
+    console.log(`Created agent ${ids.agent_id}`);
+  }
+
+  // Bind to a phone number.
+  let number = process.env.RETELL_PHONE_NUMBER;
+  if (!number) {
+    const nums = await api("GET", "/v2/list-phone-numbers");
+    const list = Array.isArray(nums) ? nums : nums?.phone_numbers ?? [];
+    if (list.length === 1) number = list[0].phone_number;
+    else if (list.length === 0) { console.log("No phone number on the account yet. Buy one in the Retell dashboard, then re-run with RETELL_PHONE_NUMBER set."); saveIds(ids); return; }
+    else { console.log("Several numbers on the account. Set RETELL_PHONE_NUMBER to one of:\n  " + list.map((n) => n.phone_number).join("\n  ")); saveIds(ids); return; }
+  }
+  await api("PATCH", `/update-phone-number/${encodeURIComponent(number)}`, {
+    nickname: `${vars.agent_name} intake POC`,
+    inbound_agents: [{ agent_id: ids.agent_id, weight: 100 }],
+  });
+  ids.phone_number = number;
+  saveIds(ids);
+
+  console.log("\nDone.");
+  console.log(`  Call ${number} to reach ${vars.agent_name}.`);
+  console.log(`  New clients transfer to ${vars.intake_name} at ${intakePhone}.`);
+  console.log(`  Existing clients and other matters transfer to ${vars.admin_name} at ${adminPhone}.`);
+  console.log(`  Model: ${llmBody.model}. Voice: ${voiceId}. Language: ${a.language}.`);
+  console.log(`  Ids saved to ${IDS_FILE} (not committed).`);
+}
+
+main().catch((err) => { console.error(err.message || err); process.exit(1); });

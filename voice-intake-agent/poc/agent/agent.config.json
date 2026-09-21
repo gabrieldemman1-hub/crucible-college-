@@ -1,0 +1,45 @@
+{
+  "$comment": "Non-secret settings for the proof-of-concept Retell agent. Field names match the Retell API (retell-sdk 6.x). Numbers, names, and the API key come from environment variables read by create-agent.mjs.",
+  "agent": {
+    "agent_name": "Maya Intake (POC)",
+    "language": "multi",
+    "voice_model": "eleven_multilingual_v2",
+    "responsiveness": 1,
+    "interruption_sensitivity": 0.8,
+    "enable_backchannel": false,
+    "normalize_for_speech": true,
+    "begin_message_delay_ms": 300,
+    "end_call_after_silence_ms": 10000,
+    "reminder_trigger_ms": 5000,
+    "reminder_max_count": 1,
+    "max_call_duration_ms": 600000,
+    "data_storage_setting": "everything",
+    "opt_in_signed_url": false,
+    "boosted_keywords_base": ["Walter", "Peg", "Anthony", "Maya", "intake", "employment", "despido", "discriminación"],
+    "post_call_analysis_data": [
+      { "type": "boolean", "name": "disclosure_given", "description": "True if the agent said the call is transcribed but not recorded before asking any question." },
+      { "type": "enum", "name": "caller_type", "choices": ["new_client", "existing_client", "other", "unknown"], "description": "new_client: a person seeking help with a new matter or unsure. existing_client: says they already have a case with the firm. other: vendor, opposing counsel, court, sales, wrong number. unknown: could not tell." },
+      { "type": "enum", "name": "language", "choices": ["en", "es", "other", "unknown"], "description": "The language the caller mostly used." },
+      { "type": "string", "name": "caller_full_name", "description": "The caller's full name as confirmed. Empty if not given.", "examples": ["Carlos Mendoza", "Jane Doe"] },
+      { "type": "string", "name": "callback_phone", "description": "The best callback number as confirmed, digits only with country code if known. If the caller confirmed the number they were calling from, write CALLER_ID.", "examples": ["+14155550123", "CALLER_ID"] },
+      { "type": "string", "name": "reason", "description": "One sentence, in the caller's own words, of why they called. No legal characterization added by the agent." },
+      { "type": "boolean", "name": "asked_for_senior_management", "description": "True if the caller asked for Walter, Peg, or Anthony by name." },
+      { "type": "string", "name": "requested_person", "description": "Name of the person the caller asked for by name, if any. Empty otherwise." },
+      { "type": "boolean", "name": "message_taken", "description": "True if the agent told the caller someone would call them back instead of connecting them." },
+      { "type": "boolean", "name": "legal_information_given", "description": "True if the agent gave any legal information, opinion, case evaluation, fee, timeline, or outcome. Should be false." }
+    ]
+  },
+  "llm": {
+    "model_env": "RETELL_MODEL",
+    "model_default": "gpt-4.1",
+    "model_temperature": 0.2,
+    "tool_call_strict_mode": true
+  },
+  "transfer": {
+    "agent_detection_timeout_ms": 25000,
+    "transfer_ring_duration_ms": 30000,
+    "on_hold_music": "relaxing_sound",
+    "opt_out_human_detection": false,
+    "show_transferee_as_caller": false
+  }
+}
