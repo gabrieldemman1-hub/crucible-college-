@@ -184,9 +184,11 @@ afternoon each, tells the firm more than any interview.
 
 ### Where to find them
 
-Retell's partner directory and community, Upwork and Toptal with the test task as the filter,
-referrals from other firms that have deployed a voice agent. For the consultant, prefer someone
-who has shipped a voice agent at a firm of similar size and will show a reference.
+The firm has hired engineers on Upwork before, so that is the default. Paste-ready posts and
+the test task are in `docs/hiring/`: `upwork-consultant.md` (post first), `upwork-engineer.md`,
+and `test-task.md`. Also worth a look: Retell's partner directory, and referrals from other
+firms that have deployed a voice agent. For the consultant, prefer someone who has shipped a
+voice agent at a firm of similar size and will show a reference.
 
 ### Questions that separate candidates
 
