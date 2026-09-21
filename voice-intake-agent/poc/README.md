@@ -35,8 +35,19 @@ export AGENT_NAME=Maya
 export MAIN_OFFICE_NUMBER=+14155550100   # what Maya reads out if a caller refuses transcription
 # optional: export RETELL_PHONE_NUMBER=+1...   export VOICE_ID=...   export RETELL_MODEL=claude-5-sonnet
 
+node poc/agent/preflight.mjs               # read-only: checks the key, the number, and the settings above
 node poc/agent/create-agent.mjs --voices   # list candidate voices with preview links, pick one
 node poc/agent/create-agent.mjs            # create or update Maya and bind the phone number
+```
+
+Step by step for the first live session: `GO-LIVE.md`.
+
+Checks that need neither a key nor network, run before any change to the prompt or scripts:
+
+```bash
+node poc/agent/create-agent.mjs --dry-run  # prints the exact Retell payloads; fails on any unfilled {{placeholder}}
+node poc/review/routing.mjs --selftest     # routing rules
+node poc/review/selftest.mjs               # review pipeline over awkward call shapes, plus a page render
 ```
 
 Call the number. After a few test calls:

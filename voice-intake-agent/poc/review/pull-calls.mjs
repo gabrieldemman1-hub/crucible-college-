@@ -94,6 +94,8 @@ function agentId() {
   process.exit(2);
 }
 
+export { loadConfig };
+
 export function summarize(call, cfg) {
   const analysis = call.call_analysis?.custom_analysis_data || {};
   const at = call.start_timestamp || Date.now();
@@ -213,4 +215,6 @@ async function main() {
   for (const c of out.calls) console.log(`  ${c.started_at}  ${c.analysis.caller_type || "?"}/${c.analysis.language || "?"}  -> ${c.routing.target?.name || "no transfer"}  [${c.salesforce.disposition}]`);
 }
 
-main().catch((err) => { console.error(err.message || err); process.exit(1); });
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  main().catch((err) => { console.error(err.message || err); process.exit(1); });
+}
