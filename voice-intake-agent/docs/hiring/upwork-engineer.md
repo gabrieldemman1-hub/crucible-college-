@@ -26,7 +26,8 @@ The design is done and a proof of concept already works on a real phone number. 
 - Everything through pull requests in our GitHub organization. An independent consultant reviews every PR and verifies each gate by placing their own test calls. Nothing merges without their approval.
 - All accounts (Retell, Salesforce, hosting, GitHub) are ours. You get access, not ownership. Credentials come from our vault, never by chat.
 - A short written status every Friday and a 30-minute call every week.
-- Payment by milestone at each gate (20 / 30 / 30 / 20 percent).
+- Payment by milestone at each gate (20 / 30 / 30 / 20 percent). The budget is built on $35 an hour for about 22 working days.
+- Weekly call at 8 to 9 a.m. Pacific time (8 to 9 p.m. in Pakistan). Otherwise your hours are your own.
 - No audio recording anywhere in the system; transcripts only. This is a legal requirement for us, not a preference.
 
 **Must have**
@@ -45,7 +46,7 @@ The design is done and a proof of concept already works on a real phone number. 
 
 **Process**
 
-Shortlisted candidates do a paid half-day test task on the proof of concept (fixed price, [$AMOUNT]). We judge the pull request, not the interview. Then a 45-minute call with our consultant present. Start date [DATE]. Estimated effort 19 to 24 working days over five to six weeks, then a four-week support window of up to [N] hours.
+Shortlisted candidates do a paid half-day test task on the proof of concept (fixed price, $150). We judge the pull request, not the interview. Then a 45-minute call with our consultant present. Start date [DATE]. Estimated effort 19 to 24 working days over five to six weeks, then a four-week support window of up to 12 hours at the same rate.
 
 **To apply**, answer the four screening questions. Applications that skip them are not read.
 
@@ -61,7 +62,9 @@ Shortlisted candidates do a paid half-day test task on the proof of concept (fix
 | Setting | Value |
 |---|---|
 | Project type | Fixed price with milestones (one per gate), or hourly with a weekly cap if you prefer; fixed price matches the gate structure |
-| Budget | [engineer days × rate; see DELIVERY-PLAN.md section 7] |
+| Budget | Fixed price $6,200 (22 days at $35 an hour). Milestones: $1,240 gate 1, $1,860 gate 2, $1,860 gate 3, $1,240 gate 4 and handover. Hold a further $1,240 (20%) for agreed extra scope only. |
+| Preferred locations | Set in the post's talent preferences, not in the text: Pakistan, Bangladesh, Sri Lanka, Nepal, Philippines, Indonesia, Vietnam, Egypt, Kenya, Nigeria. |
+| Time zone | Add "available for one weekly call at 8 a.m. Pacific" as a requirement; do not require US hours. |
 | Experience level | Expert |
 | Duration | 1 to 3 months |
 | Skills tags | Node.js, TypeScript, Retell AI, Voice AI, Salesforce API, Webhooks, PostgreSQL, Telephony |

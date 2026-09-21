@@ -27,6 +27,7 @@ This is a review and verification role, not a build role. You will pair with the
 **Must have**
 
 - Shipped a voice AI agent to production yourself, on Retell AI or a comparable platform, and can show it.
+- Able to place test calls to a US number and receive transfers: Retell's dashboard web call covers most of it, and a VoIP app with a US number covers the rest. Say how you would do this.
 - Comfortable reading Node or TypeScript services, webhooks, and Salesforce API integrations well enough to catch a fake signature check or a silent retry bug.
 - Experience reviewing other people's work and saying no with evidence. We will ask for an example.
 - Clear written English for a non-technical reader.
@@ -37,7 +38,7 @@ You cannot be affiliated with the engineer we hire, and you cannot be the person
 
 **Time and pay**
 
-Roughly 5 to 7 days spread over six weeks, front-loaded at the design review and each gate, then about two hours a week for a month after launch. Hourly with a weekly cap of [N] hours, plus a fixed [$AMOUNT] per gate report. Start [DATE].
+Roughly 5 to 7 days spread over six weeks, front-loaded at the design review and each gate, then about two hours a week for a month after launch. $35 an hour with a weekly cap of 10 hours, plus a fixed $175 for each of the four signed gate reports. About $2,100 to $2,700 in total over the build, then roughly $280 for the month after launch. Weekly call at 8 to 9 a.m. Pacific (8 to 9 p.m. in Pakistan). Start [DATE].
 
 **To apply**, answer the screening questions.
 
@@ -52,7 +53,9 @@ Roughly 5 to 7 days spread over six weeks, front-loaded at the design review and
 
 | Setting | Value |
 |---|---|
-| Project type | Hourly, weekly cap [N] hours, plus a fixed-price bonus or separate milestone per gate report |
+| Project type | Hourly at $35, weekly cap 10 hours, plus a $175 bonus per signed gate report |
+| Preferred locations | Set in talent preferences: Pakistan, Bangladesh, Sri Lanka, Nepal, Philippines, Indonesia, Vietnam, Egypt, Kenya, Nigeria |
+| Independence check | Before hiring, compare the consultant's and engineer's profiles, agencies, and past clients for overlap; ask both directly |
 | Experience level | Expert |
 | Duration | 1 to 3 months, then light ongoing |
 | Skills tags | Retell AI, Voice AI, Code Review, Node.js, Salesforce API, Technical Consulting, QA |

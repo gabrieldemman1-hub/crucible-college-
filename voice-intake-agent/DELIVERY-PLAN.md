@@ -200,22 +200,34 @@ voice agent at a firm of similar size and will show a reference.
 
 ## 7. Money
 
-Effort from `PLAN-v2.md`, in days. The firm applies its own rates; typical US contract rates for
-this work run roughly $90 to $180 an hour for the engineer and $120 to $250 for a senior
-consultant, but verify locally.
+The firm's budget is $35 an hour for both roles, hiring from Pakistan and comparable markets.
+That is a strong senior rate there, so the firm can be selective. Effort is from `PLAN-v2.md`.
 
-| Role | Days | Milestone split |
+| Item | Basis | Amount |
 |---|---|---|
-| Engineer | 19 to 24 | 20% at gate 1, 30% at gate 2, 30% at gate 3, 20% at gate 4 plus handover |
-| Consultant | 5 to 7 | monthly on hours, capped, plus a fixed fee per gate report |
+| Engineer build | 22 days at 8 hours, fixed price, paid at gates 20 / 30 / 30 / 20 percent | $6,200 |
+| Engineer contingency | 20%, released only for extra scope the firm agrees in writing | up to $1,240 |
+| Engineer support after cutover | up to 12 hours over four weeks | up to $420 |
+| Consultant review | 5 to 7 days hourly, weekly cap 10 hours | $1,400 to $1,960 |
+| Consultant gate reports | 4 signed reports at $175 | $700 |
+| Consultant after cutover | about 2 hours a week for a month | about $280 |
+| Test tasks | 2 candidates at $150 | $300 |
 | Counsel | 2 short reviews | as billed |
-| Vendors (Retell, number, hosting, Postgres) | ongoing | about $1,100 to $1,700 a month at 100 calls a day, per `PLAN-v2.md` section 16 |
+| **People total** | | **about $10,500 to $11,100** plus counsel |
+| Vendors (Retell, number, hosting, Postgres, email) | ongoing, per `PLAN-v2.md` section 16 | about $1,100 to $1,700 a month |
 
-Paying the engineer on gates, and the consultant on hours, keeps their incentives apart: the
+Paying the engineer on gates and the consultant on hours keeps their incentives apart: the
 engineer wants gates to pass, the consultant is paid the same whether they pass or not.
 
-Add a contingency of 20% of the engineer's days for Retell and telephony surprises; the proof of
-concept notes several things that can only be learned on the first live calls.
+### Working across time zones
+
+Pakistan is 12 hours ahead of California in summer, 13 in winter. One fixed weekly call at
+8 a.m. Pacific is 8 or 9 p.m. there, which is workable for both. Everything else is written and
+asynchronous by design. Test calls to the Retell number from abroad work through Retell's
+dashboard web call or a VoIP app with a US number; the transfer targets during the build are
+staff phones in the US, so the staff dry run and gate calls are scheduled in that same evening
+window. Upwork's preferred-location setting on the post does the geographic filtering; the post
+text itself does not need to mention countries.
 
 ## 8. Contract terms to include for both contractors
 

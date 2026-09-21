@@ -1,6 +1,6 @@
 # Paid test task for engineer candidates
 
-Half a day, fixed price, on a throwaway Retell account we create for the candidate. Judge the
+Half a day, fixed price $150, on a throwaway Retell account we create for the candidate. Judge the
 pull request, not the conversation. Two candidates, one afternoon each.
 
 ## What the candidate gets
@@ -9,7 +9,7 @@ pull request, not the conversation. Two candidates, one afternoon each.
   separate private repository, if we do not want to give repo access yet).
 - A throwaway Retell account with one phone number and an API key, created by us and deleted
   after the task. Trial minutes cover it.
-- Two phone numbers to use as transfer targets (ours, or two of their own).
+- Two phone numbers to use as transfer targets. From abroad the simplest is Retell's dashboard web call for the inbound side and their own mobile as the transfer target; international minutes to a US Retell number are a few cents each.
 - `poc/README.md` and `poc/GO-LIVE.md`.
 
 ## The task
@@ -41,7 +41,7 @@ calling about an invoice or a payment goes there. Specifically:
 
 ## Setting it up on Upwork
 
-Create a fixed-price contract for the task amount with one milestone, "Test task PR". Release on
+Create a fixed-price contract for $150 with one milestone, "Test task PR". Release on
 submission regardless of quality; the task is paid for the time. Have the consultant review both
 submissions and rank them with two sentences each.
 
