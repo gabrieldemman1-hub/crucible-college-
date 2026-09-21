@@ -46,7 +46,7 @@ The design is done and a proof of concept already works on a real phone number. 
 
 **Process**
 
-Shortlisted candidates do a paid half-day test task on the proof of concept (fixed price, $150). We judge the pull request, not the interview. Then a 45-minute call with our consultant present. Start date [DATE]. Estimated effort 19 to 24 working days over five to six weeks, then a four-week support window of up to 12 hours at the same rate.
+Shortlisted candidates do a paid half-day test task on the proof of concept (fixed price, $150). We judge the pull request, not the interview. Then a 45-minute call with our consultant present. Start date Monday October 5, 2026, with a hard target of full cutover by November 20. Estimated effort 19 to 24 working days over five to six weeks, then a four-week support window of up to 12 hours at the same rate.
 
 **To apply**, answer the four screening questions. Applications that skip them are not read.
 

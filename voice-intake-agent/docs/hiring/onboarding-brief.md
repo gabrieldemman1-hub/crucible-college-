@@ -62,6 +62,9 @@ Full reasoning is in `PLAN-v2.md` section 3.
 
 ## What done looks like
 
+Target: fully cut over, with Maya answering every call, by Friday November 20, 2026. The week-by-week
+schedule is `DELIVERY-PLAN.md` section 12.
+
 | Metric | Target |
 |---|---|
 | Calls answered | 100% within two rings, 24/7 |

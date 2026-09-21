@@ -38,7 +38,7 @@ You cannot be affiliated with the engineer we hire, and you cannot be the person
 
 **Time and pay**
 
-Roughly 5 to 7 days spread over six weeks, front-loaded at the design review and each gate, then about two hours a week for a month after launch. $35 an hour with a weekly cap of 10 hours, plus a fixed $175 for each of the four signed gate reports. About $2,100 to $2,700 in total over the build, then roughly $280 for the month after launch. Weekly call at 8 to 9 a.m. Pacific (8 to 9 p.m. in Pakistan). Start [DATE].
+Roughly 5 to 7 days spread over six weeks, front-loaded at the design review and each gate, then about two hours a week for a month after launch. $35 an hour with a weekly cap of 10 hours, plus a fixed $175 for each of the four signed gate reports. About $2,100 to $2,700 in total over the build, then roughly $280 for the month after launch. Weekly call at 8 to 9 a.m. Pacific (8 to 9 p.m. in Pakistan). Start Monday September 28, 2026; the engineer starts October 5 and the target is full cutover by November 20.
 
 **To apply**, answer the screening questions.
 

@@ -168,10 +168,14 @@ writes down that it accepts the gap and why.
 
 ### Sequence
 
-1. Hire the consultant first, one to two weeks before the engineer. They review `PLAN-v2.md`,
-   help write the engineer's job description, and sit in on the engineer interviews.
-2. Hire the engineer with a paid test task (below). The consultant reviews the submissions.
-3. Both start with the phase 1 design review.
+The two-month target (section 12) leaves two weeks for hiring, so both roles are posted at once.
+
+1. Post both roles the same day. Screen the consultant applications first; a consultant who is
+   in place by the end of week one reviews the engineer test tasks. If not, the firm judges the
+   test tasks with the criteria in `docs/hiring/test-task.md` and the consultant re-reads the
+   winning submission on day one.
+2. Hire the engineer with the paid test task. Two candidates, one afternoon each.
+3. Both start with the phase 1 design review on the engineer's first day.
 
 ### Paid test task for engineer candidates (half a day, paid)
 
@@ -272,13 +276,49 @@ That review is the first entry in `docs/decisions/`.
 
 ## 11. First two weeks, concretely
 
-| Day | Action | Owner |
+| Date | Action | Owner |
 |---|---|---|
-| 1 | Create the firm's GitHub organization, move this repository into it, turn on branch protection | firm |
-| 1 | Create the firm's password vault; put the Retell key there | firm |
-| 1 to 5 | Hire the consultant; they review this document and `PLAN-v2.md` | firm |
-| 3 to 8 | Post the engineer role with the test task; consultant reviews submissions | firm, consultant |
-| 8 to 10 | Engineer interviews with the consultant present; choose | firm, consultant |
-| 10 | Contracts signed; accounts issued from the vault | firm |
-| 11 | Phase 1 design review; engineer starts | all three |
-| 12 | Counsel review of `prompts/disclosure.md` scheduled | firm |
+| Mon Sep 21 to Tue Sep 22 | Post both Upwork roles. Create the firm's GitHub organization, move this repository into it, turn on branch protection. Create the password vault; put the rotated Retell key there. | firm |
+| Wed Sep 23 to Fri Sep 25 | Screen applications. Shortlist two engineers and two consultants. Send the engineer test task to both engineers. | firm |
+| Mon Sep 28 | Consultant chosen and contracted; they start reading `PLAN-v2.md` and this document. | firm |
+| Tue Sep 29 to Wed Sep 30 | Test task submissions due; consultant (or firm) ranks them. | consultant |
+| Thu Oct 1 to Fri Oct 2 | Engineer interviews with the consultant present; contract signed; accounts issued from the vault. Counsel review of `prompts/disclosure.md` booked for the week of Oct 5. Salesforce sandbox and Nextiva admin access confirmed. | firm |
+| Mon Oct 5 | Engineer starts. Phase 1 design review. | all three |
+
+## 12. Two-month schedule
+
+Target: fully cut over by Friday November 20, 2026. The plan below leaves one week of slack.
+Durations are from `PLAN-v2.md` section 13. The pilot week is fixed to calendar days because it
+has to see a full week of real calls.
+
+| Week of | Phase | What happens | Gate |
+|---|---|---|---|
+| Sep 21 | Hiring | Both roles posted; accounts, vault, repo set up; proof of concept demoed to the consultant candidates if useful | |
+| Sep 28 | Hiring | Consultant starts; test tasks judged; engineer contracted; counsel review booked; staff list, hours, and Salesforce field decisions written down | |
+| Oct 5 | Phase 0 and 1 | Design review Monday. Retell account items verified, routing file filled, Nextiva caller-id and forwarding confirmed. Conversation flow and transfer chain built. | |
+| Oct 12 | Phase 1 | Transfer testing on real staff numbers, both languages; scenario run; Spanish speaker review. | Gate 1 Wed Oct 14 |
+| Oct 19 | Phase 2 | Service, webhooks, Salesforce sandbox, store-and-forward, alerts; end-to-end scenarios. | Gate 2 Fri Oct 23 |
+| Oct 26 | Phase 3 setup | Production Salesforce, real staff numbers, staff dry run, Nextiva forward-when-unanswered on. | |
+| Nov 2 | Pilot week | Overflow calls answered by Maya; daily transcript and Salesforce review; tuning. | Gate 3 Mon Nov 9 |
+| Nov 9 | Phase 4 | Nextiva forward-always; monitoring and alerts; rollback drill; two business days at 100%; runbook handover. | Gate 4 Fri Nov 13 |
+| Nov 16 | Slack | Fixes from the first week live; consultant operates alone for a day; recorded walkthrough. Done Fri Nov 20. | |
+
+### What makes or breaks the date
+
+- **Engineer starting by Oct 5.** Every week of hiring delay moves the end date a week. Post
+  both roles today, not sequentially.
+- **The firm's own inputs by Oct 2:** staff list with direct numbers and languages, overnight
+  person, business hours, Salesforce sandbox access, Nextiva admin access, counsel booked.
+  These are `docs/firm-checklist.md`; none of them can be done by the contractors.
+- **Counsel sign-off on the disclosure wording before Oct 26.** The pilot cannot answer real
+  callers without it.
+- **Salesforce sandbox by Oct 19.** Phase 2 cannot start against production.
+- **Retell surprises in phase 1.** The proof of concept lists what only live calls can settle.
+  The slack week and the contingency budget exist for this. If phase 1 slips more than three
+  days, the consultant and firm decide whether to drop the Spanish whisper variant or the
+  overnight substitution from v1 rather than move the pilot week.
+- **The pilot week needs a normal week.** Do not schedule it over a holiday or a week when
+  half the intake team is out.
+
+If hiring slips a week, the schedule still fits by moving the pilot to the week of Nov 9 and
+cutover to the week of Nov 16, with no slack left. Slipping two weeks means a December pilot.
