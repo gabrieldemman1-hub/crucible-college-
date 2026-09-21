@@ -7,24 +7,37 @@ Retell, which means three settings changes you make once, at a computer, then a 
 
 1. **Rotate the key.** The first key was pasted into a chat. In the Retell dashboard, delete it and
    create a new one. Never paste a key into chat; the steps below keep it out of the transcript.
-2. **Environment variables.** In Claude Code on the web, open Environments, edit the environment
-   this project uses, and add:
+2. **Open the environment.** On claude.ai/code there is no settings page for environments. In the
+   row just above the message box, select the cloud button that shows the current environment's
+   name (usually "Default"). Hover over that environment in the menu and select the settings
+   icon that appears on its right. The "Update cloud environment" dialog opens.
+3. **Give the session the key.** Two ways; the first is better if you see it.
 
-   | Name | Value |
+   **A. API credentials (Pro and Max plans).** Below "Environment variables", find "API
+   credentials" and select "Add credential". Credential type "Bearer". Name: `Retell`. Allowed
+   websites: `api.retellai.com`. Custom headers: name `Authorization`, prefix `Bearer`, value: the
+   new key. Select "Connect". The key never enters the session, and this also opens the network
+   path to Retell, so step 4 is not needed. Leave `RETELL_API_KEY` unset.
+
+   **B. Environment variable (Team and Enterprise plans, or if A is not shown).** In the
+   "Environment variables" box add a line `RETELL_API_KEY=key_...`. Anyone who uses the
+   environment can read it, so rotate it after the demo.
+4. **Network access (only for B).** Set "Network access" to "Custom", check "Also include
+   default list of common package managers", and add `api.retellai.com` to "Allowed domains".
+5. **Non-secret values.** In the same "Environment variables" box, optionally add:
+
+   | Line | Value |
    |---|---|
-   | `RETELL_API_KEY` | the new key |
-   | `RETELL_PHONE_NUMBER` | the number you bought, as `+1XXXXXXXXXX` |
-   | `INTAKE_PHONE` | the phone that plays intake manager, `+1XXXXXXXXXX` |
-   | `INTAKE_NAME` | that person's first name |
-   | `ADMIN_PHONE` | the phone that plays admin, `+1XXXXXXXXXX` |
-   | `ADMIN_NAME` | that person's first name |
-   | `FIRM_NAME` | the firm name exactly as Maya should say it |
-   | `MAIN_OFFICE_NUMBER` | the number Maya reads out if a caller refuses transcription, `+1XXXXXXXXXX` |
+   | `RETELL_PHONE_NUMBER=` | the number you bought, as `+1XXXXXXXXXX` |
+   | `INTAKE_PHONE=` | the phone that plays intake manager, `+1XXXXXXXXXX` |
+   | `INTAKE_NAME=` | that person's first name |
+   | `ADMIN_PHONE=` | the phone that plays admin, `+1XXXXXXXXXX` |
+   | `ADMIN_NAME=` | that person's first name |
+   | `FIRM_NAME=` | the firm name exactly as Maya should say it |
+   | `MAIN_OFFICE_NUMBER=` | the number Maya reads out if a caller refuses transcription |
 
-   Only the key is secret. The rest can also be sent in chat if that is easier.
-3. **Network access.** In the same environment settings, add `api.retellai.com` to the allowed
-   domains. Without this every script fails with "Host not in allowlist".
-4. **Save, then start a new session** on branch `claude/law-firm-voice-intake-agent-2jx95t`.
+   These can also be sent in chat instead.
+6. **Save changes, then start a new session** on branch `claude/law-firm-voice-intake-agent-2jx95t`.
    A running session never sees environment changes.
 
 ## Part 2: the message to paste into the new session

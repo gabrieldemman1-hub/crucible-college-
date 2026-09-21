@@ -2,7 +2,7 @@
 // Pulls recent calls for the POC agent from Retell, computes the routing decision, the briefing,
 // and the Salesforce preview for each, and writes poc/review/calls.json.
 //
-// Env: RETELL_API_KEY (required), INTAKE_PHONE, ADMIN_PHONE (required), INTAKE_NAME, ADMIN_NAME,
+// Env: RETELL_API_KEY (or an API credential on the environment), INTAKE_PHONE, ADMIN_PHONE (required), INTAKE_NAME, ADMIN_NAME,
 //      AGENT_NAME, RETELL_AGENT_ID (else read from ../agent/.retell-ids.json), SINCE_HOURS (default 72),
 //      RETELL_BASE_URL.
 // Usage: node poc/review/pull-calls.mjs            fetch and write calls.json
@@ -78,7 +78,7 @@ export function renderBriefing(analysis, routing, phone) {
 
 async function api(method, path, body) {
   const res = await fetch(BASE + path, {
-    method, headers: { Authorization: `Bearer ${process.env.RETELL_API_KEY}`, "Content-Type": "application/json" },
+    method, headers: { ...(process.env.RETELL_API_KEY ? { Authorization: `Bearer ${process.env.RETELL_API_KEY}` } : {}), "Content-Type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   const text = await res.text();
@@ -185,7 +185,6 @@ async function main() {
     calls = sampleCalls(cfg);
     sample = true;
   } else {
-    if (!process.env.RETELL_API_KEY) { console.error("Missing RETELL_API_KEY (or pass --sample)"); process.exit(2); }
     const id = agentId();
     const sinceHours = Number(process.env.SINCE_HOURS || 72);
     const now = Date.now();

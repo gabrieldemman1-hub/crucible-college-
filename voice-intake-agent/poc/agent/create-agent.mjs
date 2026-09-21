@@ -2,7 +2,8 @@
 // Creates or updates the proof-of-concept Maya agent on Retell AI and binds it to a phone number.
 // Plain Node 20+, no dependencies. Safe to re-run: ids are remembered in .retell-ids.json (gitignored).
 //
-// Required env:  RETELL_API_KEY, INTAKE_PHONE, ADMIN_PHONE
+// Required env:  INTAKE_PHONE, ADMIN_PHONE. RETELL_API_KEY unless the environment attaches the key
+//                as an API credential for api.retellai.com (then leave it unset).
 // Optional env:  INTAKE_NAME (default "James"), ADMIN_NAME ("Ana"), FIRM_NAME ("the firm"),
 //                AGENT_NAME ("Maya"), MAIN_OFFICE_NUMBER, RETELL_PHONE_NUMBER (bind target; if unset
 //                and the account has exactly one number, that one is used), VOICE_ID (else a
@@ -52,7 +53,8 @@ function e164(name, dryFallback) {
 async function api(method, path, body) {
   const res = await fetch(BASE + path, {
     method,
-    headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
+    // No RETELL_API_KEY: rely on an API credential attached by the environment's proxy.
+    headers: { ...(KEY ? { Authorization: `Bearer ${KEY}` } : {}), "Content-Type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   const text = await res.text();
@@ -120,7 +122,7 @@ function buildAgentBody(a, vars, llmId, voiceId) {
 
 async function main() {
   const args = new Set(process.argv.slice(2));
-  if (!KEY && !DRY) { console.error("Missing RETELL_API_KEY"); process.exit(2); }
+  if (!KEY && !DRY) console.log("RETELL_API_KEY not set; relying on an API credential configured on the environment for api.retellai.com.");
 
   if (args.has("--voices")) {
     await pickVoice(undefined);

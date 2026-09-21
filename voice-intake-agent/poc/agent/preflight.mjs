@@ -2,7 +2,7 @@
 // First thing to run in a session that can reach Retell. Confirms the key works, shows the phone
 // numbers on the account and what each is bound to, and checks the local setup. Read-only.
 //
-// Env: RETELL_API_KEY (required). INTAKE_PHONE, ADMIN_PHONE, RETELL_PHONE_NUMBER, FIRM_NAME,
+// Env: RETELL_API_KEY, or an API credential on the environment for api.retellai.com. INTAKE_PHONE, ADMIN_PHONE, RETELL_PHONE_NUMBER, FIRM_NAME,
 //      MAIN_OFFICE_NUMBER are checked if present. RETELL_BASE_URL optional.
 // Usage: node poc/agent/preflight.mjs
 
@@ -22,14 +22,14 @@ const warn = (msg) => console.log(`  warn  ${msg}`);
 const fail = (msg) => { problems++; console.log(`  FAIL  ${msg}`); };
 
 async function api(path) {
-  const res = await fetch(BASE + path, { headers: { Authorization: `Bearer ${KEY}` } });
+  const res = await fetch(BASE + path, { headers: KEY ? { Authorization: `Bearer ${KEY}` } : {} });
   const text = await res.text();
   let json; try { json = JSON.parse(text); } catch { json = text; }
   return { status: res.status, json };
 }
 
 console.log("Local setup");
-if (!KEY) fail("RETELL_API_KEY is not set. Add it in the environment settings, then start a new session.");
+if (!KEY) warn("RETELL_API_KEY not set; expecting an API credential on the environment for api.retellai.com (checked below).");
 else if (!/^key_[0-9a-f]{20,}$/i.test(KEY)) warn(`RETELL_API_KEY does not look like a Retell key (starts "${KEY.slice(0, 4)}", ${KEY.length} chars).`);
 else ok(`RETELL_API_KEY present (${KEY.length} chars).`);
 
@@ -47,15 +47,15 @@ const ids = existsSync(IDS_FILE) ? JSON.parse(readFileSync(IDS_FILE, "utf8")) : 
 if (ids.agent_id) ok(`Previous run found: llm ${ids.llm_id}, agent ${ids.agent_id}, number ${ids.phone_number || "(unbound)"}. create-agent.mjs will update, not duplicate.`);
 else ok("No previous run recorded; create-agent.mjs will create the LLM and agent.");
 
-if (!KEY) { console.log(`\n${problems} problem(s). Fix the key first.`); process.exit(1); }
-
 console.log("\nRetell API");
 let reach;
 try { reach = await api("/list-voices"); }
 catch (e) { fail(`Cannot reach ${BASE}: ${e.cause?.code || e.message}. Allow api.retellai.com in the environment's network settings (or run on a laptop).`); console.log(`\n${problems} problem(s).`); process.exit(1); }
 const blocked = (r) => /allowlist|egress|network|proxy/i.test(typeof r.json === "string" ? r.json : JSON.stringify(r.json ?? ""));
 if (blocked(reach)) { fail(`api.retellai.com is blocked by this environment's network policy (HTTP ${reach.status}). Add api.retellai.com to the allowed hosts in the environment settings, then start a new session.`); console.log(`\n${problems} problem(s).`); process.exit(1); }
-if (reach.status === 401 || reach.status === 403) fail(`Key rejected (HTTP ${reach.status}). Create a new key in the Retell dashboard and update the environment variable.`);
+if (reach.status === 401 || reach.status === 403) fail(KEY
+  ? `Key rejected (HTTP ${reach.status}). Create a new key in the Retell dashboard and update RETELL_API_KEY.`
+  : `No key reached Retell (HTTP ${reach.status}). Either add an API credential on the environment (Allowed websites: api.retellai.com, header Authorization, prefix Bearer) or set RETELL_API_KEY. Then start a new session.`);
 else if (reach.status !== 200) fail(`GET /list-voices -> HTTP ${reach.status}: ${JSON.stringify(reach.json).slice(0, 200)}`);
 else {
   const voices = Array.isArray(reach.json) ? reach.json : reach.json?.voices ?? [];

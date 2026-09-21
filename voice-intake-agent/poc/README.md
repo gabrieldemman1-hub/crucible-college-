@@ -25,7 +25,7 @@ Anything in this folder can be thrown away. The production design is `../PLAN-v2
 The scripts are plain Node 20 or newer with no dependencies. They talk to `api.retellai.com`, so they must run somewhere that can reach it: a laptop with Node installed, or a Claude Code session whose environment allows that host.
 
 ```bash
-export RETELL_API_KEY=key_...            # from the Retell dashboard
+export RETELL_API_KEY=key_...            # from the Retell dashboard; omit if the environment attaches it as an API credential
 export INTAKE_PHONE=+14155550101         # the phone that plays "intake manager"
 export INTAKE_NAME=James
 export ADMIN_PHONE=+14155550201          # the phone that plays "admin"
