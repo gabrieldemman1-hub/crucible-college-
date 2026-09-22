@@ -6,7 +6,7 @@
     "voice_id_default": "11labs-Grace",
     "voice_model": "eleven_v3",
     "voice_temperature": 1.1,
-    "voice_speed": 1.1,
+    "voice_speed": 1.05,
     "responsiveness": 1,
     "interruption_sensitivity": 0.8,
     "enable_backchannel": true,
