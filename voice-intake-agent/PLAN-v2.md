@@ -140,7 +140,7 @@ Warm transfer leg:
 7. **Warm transfer chain.** Intake list for the caller's language (new client or senior-management ask), admin list (existing client or other matter). Up to three slots.
 8. **Fallback.** "I'm sorry, everyone is helping other clients right now. I have your details and someone will call you back {within one business hour | first thing in the morning}. Is there anything else you'd like me to pass along?" End call.
 
-Edge cases: silence → one re-prompt, hang up at 10 seconds, log as spam, no Lead. Call drop → partial Lead if a phone number was captured, disposition abandoned. Third language → continue in English, capture number, take message, admin list. Caller demands a human → capture number, go straight to the chain. Distressed caller → one sentence of acknowledgement, then continue. Robocall → hang up, spam.
+Edge cases: silence → one re-prompt, hang up at 10 seconds, log as spam, no Lead. Call drop → partial Lead if a phone number was captured, disposition abandoned. Third language → continue in simple English, name and number, then route like any other caller (firm decision Sep 22: new clients to intake). Caller demands a human → capture number, go straight to the chain. Distressed caller → one sentence of acknowledgement, then continue. Robocall → hang up, spam.
 
 Guardrails (in the global prompt): no legal information, opinions, fees, timelines, or outcomes; never discourage or disqualify; never argue about client status; never transfer to senior management; never repeat the disclosure; one question per turn; two sentences per turn maximum.
 

@@ -169,7 +169,7 @@ async function main() {
     `You are ${vars.agent_name}, the intake assistant. You have just reached ${who}, a staff member. The caller is on hold and cannot hear you.`,
     `Speak this briefing in English, quickly and in one breath, under 8 seconds, filling in the details from the conversation so far:`,
     `"Hi ${who}, ${vars.agent_name} here. I've got [caller's full name], ${role}, [English, Spanish, or 'limited English, speaks <language>']. [If they confirmed a number: 'Callback' followed by the digits. If they said the number they're calling from is fine: 'Best number is the one they're calling from.'] Stay on to take it, or hang up and I'll try the next person."`,
-    `If the caller volunteered why they're calling, add one short clause after the language quoting three to eight of the caller's own words: "They mentioned [their exact words]." Never add legal labels the caller did not say themselves (no "retaliation", "wrongful termination", "discrimination", "harassment claim"). If they didn't volunteer anything, add nothing. If the caller asked for Walter, Peg, or Anthony by name, add: "They asked for [name] by name." If no name was captured, say "a caller who didn't give their name" in place of the name. If no callback number was captured, say "No callback number captured." Do not add anything else. Do not characterize the legal matter.`,
+    `If the caller volunteered why they're calling, add one short clause after the language quoting three to eight of the caller's own words: "They mentioned [their exact words]." Never add legal labels the caller did not say themselves (no "retaliation", "wrongful termination", "discrimination", "harassment claim"). If they didn't volunteer anything, add nothing. If the caller asked for Walter, Peg, or Anthony by name, add: "They asked for [name] by name." If the caller said they might hurt themselves or sounded in danger, say first: "Heads up, this caller may be in crisis." If no name was captured, say "a caller who didn't give their name" in place of the name. If no callback number was captured, say "No callback number captured." Do not add anything else. Do not characterize the legal matter.`,
     `Reference template follows.\n\n${briefing}`,
   ].join("\n");
 
@@ -220,7 +220,7 @@ async function main() {
       ),
       transferTool(
         "transfer_to_admin",
-        `Warm-transfer an existing client, an other-matter caller, or any caller who speaks neither English nor Spanish to the admin team member ${vars.admin_name}. Call only after name and phone are collected and you have told the caller you're connecting them.`,
+        `Warm-transfer an existing client or an other-matter caller to the admin team member ${vars.admin_name}. Call only after name and phone are collected and you have told the caller you're connecting them.`,
         adminPhone, vars.admin_name, "an existing client or other matter",
         `Okay. Let me get you over to ${vars.admin_name}, one moment.`,
         briefingFor("Admin transfer (existing client)", "Admin transfer (other matter)")

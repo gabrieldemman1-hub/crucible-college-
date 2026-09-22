@@ -60,6 +60,7 @@ async function syncDefinitions(scenarios, engine) {
       llm_model: SIM_MODEL,
       response_engine: { type: "retell-llm", llm_id: engine.llm_id, version: engine.version },
       tool_mocks: mocksFor(sc),
+      ...(sc.dynamic_variables ? { dynamic_variables: sc.dynamic_variables } : {}),
     };
     if (known[sc.id]) {
       try { await api("PATCH", `/update-test-case-definition/${known[sc.id]}`, body); continue; }
