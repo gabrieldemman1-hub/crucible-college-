@@ -80,7 +80,7 @@ function saveIds(ids) {
 async function pickVoice(explicit) {
   if (explicit) return explicit;
   const voices = await api("GET", "/list-voices");
-  const list = Array.isArray(voices) ? voices : voices?.voices ?? [];
+  const list = Array.isArray(voices) ? voices : voices?.items ?? voices?.voices ?? [];
   const candidates = list.filter((v) =>
     String(v.provider || "").toLowerCase().includes("eleven") &&
     String(v.gender || "").toLowerCase() === "female"
@@ -274,18 +274,22 @@ async function main() {
     console.log(`Created agent ${ids.agent_id}`);
   }
 
+  // Publish the draft version so inbound calls use it.
+  await api("POST", `/publish-agent-version/${ids.agent_id}`, { version: agent.version ?? 0, version_title: "POC publish" });
+  console.log(`Published agent version ${agent.version ?? 0}`);
+
   // Bind to a phone number.
   let number = process.env.RETELL_PHONE_NUMBER;
   if (!number) {
     const nums = await api("GET", "/v2/list-phone-numbers");
-    const list = Array.isArray(nums) ? nums : nums?.phone_numbers ?? [];
+    const list = Array.isArray(nums) ? nums : nums?.items ?? nums?.phone_numbers ?? [];
     if (list.length === 1) number = list[0].phone_number;
     else if (list.length === 0) { console.log("No phone number on the account yet. Buy one in the Retell dashboard, then re-run with RETELL_PHONE_NUMBER set."); saveIds(ids); return; }
     else { console.log("Several numbers on the account. Set RETELL_PHONE_NUMBER to one of:\n  " + list.map((n) => n.phone_number).join("\n  ")); saveIds(ids); return; }
   }
   await api("PATCH", `/update-phone-number/${encodeURIComponent(number)}`, {
     nickname: `${vars.agent_name} intake POC`,
-    inbound_agents: [{ agent_id: ids.agent_id, weight: 100 }],
+    inbound_agents: [{ agent_id: ids.agent_id, weight: 1 }],
   });
   ids.phone_number = number;
   saveIds(ids);

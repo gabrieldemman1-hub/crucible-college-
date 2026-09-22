@@ -197,7 +197,7 @@ async function main() {
       limit: 50,
     };
     const res = await api("POST", "/v3/list-calls", body);
-    calls = Array.isArray(res) ? res : res?.calls ?? res?.data ?? [];
+    calls = Array.isArray(res) ? res : res?.items ?? res?.calls ?? res?.data ?? [];
     // The list endpoint may omit heavy fields; fetch each call in full.
     calls = await Promise.all(calls.map((c) => api("GET", `/v2/get-call/${c.call_id}`).catch(() => c)));
     calls = calls.filter((c) => c.call_status === "ended" || c.end_timestamp);

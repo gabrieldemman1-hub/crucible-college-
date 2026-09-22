@@ -58,7 +58,7 @@ if (reach.status === 401 || reach.status === 403) fail(KEY
   : `No key reached Retell (HTTP ${reach.status}). Either add an API credential on the environment (Allowed websites: api.retellai.com, header Authorization, prefix Bearer) or set RETELL_API_KEY. Then start a new session.`);
 else if (reach.status !== 200) fail(`GET /list-voices -> HTTP ${reach.status}: ${JSON.stringify(reach.json).slice(0, 200)}`);
 else {
-  const voices = Array.isArray(reach.json) ? reach.json : reach.json?.voices ?? [];
+  const voices = Array.isArray(reach.json) ? reach.json : reach.json?.items ?? reach.json?.voices ?? [];
   const eleven = voices.filter((v) => String(v.provider || "").toLowerCase().includes("eleven"));
   ok(`Key accepted. ${voices.length} voices available, ${eleven.length} from ElevenLabs.`);
   if (process.env.VOICE_ID && !voices.some((v) => v.voice_id === process.env.VOICE_ID)) fail(`VOICE_ID=${process.env.VOICE_ID} is not in /list-voices.`);
@@ -67,7 +67,7 @@ else {
 const nums = await api("/v2/list-phone-numbers");
 if (nums.status !== 200) fail(`GET /v2/list-phone-numbers -> HTTP ${nums.status}: ${JSON.stringify(nums.json).slice(0, 200)}`);
 else {
-  const list = Array.isArray(nums.json) ? nums.json : nums.json?.phone_numbers ?? [];
+  const list = Array.isArray(nums.json) ? nums.json : nums.json?.items ?? nums.json?.phone_numbers ?? [];
   if (!list.length) fail("No phone number on the account. Buy one in the Retell dashboard (Phone Numbers).");
   for (const n of list) {
     const bound = (n.inbound_agents || []).map((a) => `${a.agent_id} (weight ${a.weight ?? "?"})`).join(", ") || (n.inbound_agent_id ? n.inbound_agent_id : "nothing");
