@@ -121,7 +121,8 @@ if (process.argv.includes("--selftest")) {
   const check = (name, cond) => { console.log(`${cond ? "PASS" : "FAIL"}  ${name}`); if (!cond) failed++; };
 
   check("weekday 10:00 is business hours", isBusinessHours(weekday, cfg) === true);
-  check("saturday is not business hours", isBusinessHours(weekend, cfg) === false);
+  check("saturday 10am is business hours (seven-day firm)", isBusinessHours(weekend, cfg) === true);
+  check("saturday 2am is not business hours", isBusinessHours(Date.UTC(2026, 8, 26, 9, 0), cfg) === false);
   check("weekday 23:00 is not business hours", isBusinessHours(night, cfg) === false);
   check("holiday is not business hours", isBusinessHours(Date.UTC(2026, 10, 26, 18, 0), cfg) === false);
 
