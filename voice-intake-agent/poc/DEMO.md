@@ -46,3 +46,15 @@ Republish the page. Walk the consultant through one call top to bottom: transcri
 ## Shutting down
 
 `node poc/agent/create-agent.mjs --unbind` stops the number from reaching Maya. Rotate the API key in the Retell dashboard.
+
+
+## Talking to Maya during the handoff
+
+When your phone rings on a transfer, you are on a private line with Maya. The caller hears music. After her briefing she says "Ready for them?" and waits. Try:
+
+- "How angry is he?"
+- "What exactly did she say?"
+- "Did they ask for anyone?"
+- "What did you tell them?"
+
+She answers from the call, in the caller's own words. Say "okay, put them through" and she bridges the caller. Say "I can't take this one" and she goes back to the caller with the callback message.

@@ -24,6 +24,19 @@ Used only when the staff member's `whisperLanguage` is Spanish. In v1 every staf
 
 > Hi {{slot_name}}, this is {{agent_name}}. I have {{caller_name}} from {{caller_organization}} on the line. Not a client. {{reason_clause}}Callback number {{callback_phone_spoken}}. Stay on the line to take the call, or hang up and I'll try the next person.
 
+## The handoff is a conversation
+
+The staff member is on a private line with the agent while the caller hears hold music. After the briefing the agent asks "Ready for them?" and listens. The staff member can ask questions before accepting, and the agent answers from the call, in the caller's own words, without guessing or characterizing the matter. Questions the agent is prepared for:
+
+- What exactly did they say?
+- How angry are they? What are they upset about?
+- Did they say what it's about? Did they mention a deadline or a court date?
+- Did they ask for anyone by name?
+- What did you tell them? What did you promise?
+- Have they called before today?
+
+The agent bridges the caller when the staff member says "okay", "go ahead", "put them through", or similar, or when there is no further question for a few seconds. "I can't take it" or hanging up sends the agent back to the caller and the fallback.
+
 ## Upset or angry caller
 
 Prepended to any of the above, and the 8-second limit becomes 15 seconds. The staff member needs to know the mood, the grievance in the caller's words, what the caller asked for, and what the agent already promised, so they do not contradict it.
