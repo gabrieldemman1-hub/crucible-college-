@@ -23,6 +23,16 @@ If the caller's first words do not make the language clear:
 
 > Hi, I'm {{agent_name}}, the virtual assistant for {{firm_name}}. This call is transcribed for our records, but not recorded. I'll take a few quick details and connect you with the right person. Are you a new client, or do you already have a case with us?
 
+**Revised after the first live calls (Sep 22).** The firm found the sentence above read like a form when spoken. The agent now identifies itself in the greeting ("this is {{agent_name}}, the virtual assistant") and gives the transcription fact in passing, in natural words, immediately before asking for the caller's name. The two facts (transcript kept, not recorded) are required; the exact words are not. Example the agent is given:
+
+> Sure. Just so you know, we keep a transcript of the call, but it's not recorded. Can I get your full name?
+
+Spanish:
+
+> Claro. Solo para que sepa, guardamos una transcripción de la llamada, pero no se graba. ¿Me da su nombre completo?
+
+Counsel should review whether "in passing, natural words, two fixed facts" meets the standard, or whether fixed wording is required. If fixed wording is required, the example sentence above is the proposed fixed wording.
+
 ## Disclosure, Spanish
 
 > Hola, soy {{agent_name}}, la asistente virtual de {{firm_name}}. Esta llamada se transcribe para nuestros registros, pero no se graba. Le tomaré unos datos rápidos y le comunicaré con la persona indicada. ¿Es usted un cliente nuevo, o ya tiene un caso con nosotros?
