@@ -3,7 +3,7 @@
   "agent": {
     "agent_name": "Maya Intake (POC)",
     "language": "multi",
-    "voice_id_default": "11labs-Cimo",
+    "voice_id_default": "11labs-Grace",
     "voice_model": "eleven_v3",
     "voice_temperature": 1.1,
     "voice_speed": 1.0,
