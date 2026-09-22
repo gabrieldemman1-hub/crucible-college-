@@ -24,6 +24,12 @@ Used only when the staff member's `whisperLanguage` is Spanish. In v1 every staf
 
 > Hi {{slot_name}}, this is {{agent_name}}. I have {{caller_name}} from {{caller_organization}} on the line. Not a client. {{reason_clause}}Callback number {{callback_phone_spoken}}. Stay on the line to take the call, or hang up and I'll try the next person.
 
+## Upset or angry caller
+
+Prepended to any of the above, and the 8-second limit becomes 15 seconds. The staff member needs to know the mood, the grievance in the caller's words, what the caller asked for, and what the agent already promised, so they do not contradict it.
+
+> Heads up, this caller is upset. They said: {{upset_about}}. They asked for {{asked_for}}. I told them you're on the intake team and will get them to the right attorney.
+
 ## Senior management ask
 
 Same as the intake transfer, with one added clause after the reason:

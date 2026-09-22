@@ -105,6 +105,22 @@
         "type": "boolean",
         "name": "legal_information_given",
         "description": "True if the agent gave any legal information, opinion, case evaluation, fee, timeline, or outcome. Should be false."
+      },
+      {
+        "type": "enum",
+        "name": "caller_mood",
+        "choices": [
+          "calm",
+          "frustrated",
+          "angry",
+          "distressed"
+        ],
+        "description": "The caller's emotional state at their most intense point: calm; frustrated (annoyed, impatient); angry (raised voice, complaints, demands); distressed (crying, hopeless, mentions of self-harm)."
+      },
+      {
+        "type": "string",
+        "name": "upset_about",
+        "description": "If the caller was frustrated, angry, or distressed: what they were upset about, in their own words, one sentence. Otherwise empty."
       }
     ]
   },

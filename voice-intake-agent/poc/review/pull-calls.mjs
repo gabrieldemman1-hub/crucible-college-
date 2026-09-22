@@ -69,6 +69,9 @@ export function renderBriefing(analysis, routing, phone) {
     requested_person: analysis.requested_person || "",
   };
   text = text.replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k] ?? "");
+  if (["angry", "frustrated", "distressed"].includes(analysis.caller_mood)) {
+    text = `Heads up, this caller is ${analysis.caller_mood === "distressed" ? "distressed" : "upset"}.${analysis.upset_about ? ` They said: ${analysis.upset_about.replace(/[.。]\s*$/, "")}.` : ""} ` + text;
+  }
   if (analysis.asked_for_senior_management) {
     text += ` They asked for ${analysis.requested_person || "senior management"} by name.`;
   }
