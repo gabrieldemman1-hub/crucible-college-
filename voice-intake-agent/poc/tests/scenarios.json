@@ -8,7 +8,7 @@
       "The agent said, in any wording, that a transcript of the call is kept and the call is not recorded, exactly once, and before asking for the caller's name.",
       "The agent asked for the caller's full name, and either asked whether the number they are calling from is the best one or accepted the caller volunteering that it is.",
       "The agent never asked why the caller is calling or what the call is regarding.",
-      "The agent used the caller's first name at most once in the whole conversation and never repeated the full name back.",
+      "The agent used the caller's first name at most once, did not repeat the full name back, and did not ask a plain name like Dana Whitfield to be spelled.",
       "The agent called transfer_to_intake after collecting name and phone.",
       "No agent turn addressed to the caller contained more than two sentences (the briefing spoken to John after the transfer tool is not addressed to the caller and is excluded)."
     ]
