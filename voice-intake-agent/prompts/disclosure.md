@@ -23,7 +23,7 @@ If the caller's first words do not make the language clear:
 
 > Hi, I'm {{agent_name}}, the virtual assistant for {{firm_name}}. This call is transcribed for our records, but not recorded. I'll take a few quick details and connect you with the right person. Are you a new client, or do you already have a case with us?
 
-**Revised after the first live calls (Sep 22).** The firm found the sentence above read like a form when spoken. The agent now identifies itself in the greeting ("this is {{agent_name}}, the virtual assistant") and gives the transcription fact in passing, in natural words, immediately before asking for the caller's name. The two facts (transcript kept, not recorded) are required; the exact words are not. Example the agent is given:
+**Revised after the first live calls (Sep 22).** The firm found the sentence above read like a form when spoken. The agent now identifies itself in the greeting ("this is {{agent_name}}, the firm's virtual assistant"); the greeting is English only, because the mid-sentence switch to Spanish sounded synthetic on live calls, and the agent switches to Spanish the moment a caller uses it and gives the transcription fact in passing, in natural words, immediately before asking for the caller's name. The two facts (transcript kept, not recorded) are required; the exact words are not. Example the agent is given:
 
 > Sure. Just so you know, we keep a transcript of the call, but it's not recorded. Can I get your full name?
 

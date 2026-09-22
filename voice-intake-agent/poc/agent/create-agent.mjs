@@ -208,7 +208,7 @@ async function main() {
     model_temperature: cfg.llm.model_temperature,
     tool_call_strict_mode: cfg.llm.tool_call_strict_mode,
     general_prompt: prompt,
-    begin_message: `Thanks for calling ${vars.firm_name}, this is ${vars.agent_name}, the virtual assistant. Para español, solo dígame. Are you calling about a new matter, or do you already have a case with us?`,
+    begin_message: `Thanks for calling ${vars.firm_name}, this is ${vars.agent_name}, the firm's virtual assistant. Are you calling about a new matter, or do you already have a case with us?`,
     general_tools: [
       { type: "end_call", name: "end_call", description: "End the call after saying goodbye, or when the caller has hung up or gone silent." },
       transferTool(

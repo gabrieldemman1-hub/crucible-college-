@@ -6,7 +6,7 @@
     "criteria": [
       "The agent asked whether the caller is a new client or has an existing case.",
       "The agent said, in any wording, that a transcript of the call is kept and the call is not recorded, exactly once, and before asking for the caller's name.",
-      "The agent asked for the caller's full name and confirmed whether the number they are calling from is the best one.",
+      "The agent asked for the caller's full name, and either asked whether the number they are calling from is the best one or accepted the caller volunteering that it is.",
       "The agent never asked why the caller is calling or what the call is regarding.",
       "The agent used the caller's first name at most once in the whole conversation and never repeated the full name back.",
       "The agent called transfer_to_intake after collecting name and phone.",
@@ -16,11 +16,11 @@
   {
     "id": 2,
     "name": "New client, Spanish",
-    "caller": "Eres Carlos Mendoza. Hablas solo español. Es tu primera vez llamando a este bufete. Cuando te pregunten, di que es un asunto nuevo. Da tu nombre completo cuando te lo pidan. Di que el número desde el que llamas está bien. Habla con frases cortas y naturales. Cuando la asistente diga que te va a comunicar, di 'está bien, gracias' y espera.",
+    "caller": "Eres Carlos Mendoza. Hablas solo español. La asistente saluda en inglés; tú respondes en español desde tu primera frase: '¿Habla español? Es un asunto nuevo.' Da tu nombre completo cuando te lo pidan. Di que el número desde el que llamas está bien. Habla con frases cortas y naturales. Cuando la asistente diga que te va a comunicar, di 'está bien, gracias' y espera.",
     "criteria": [
       "After the caller's first Spanish sentence, every agent turn addressed to the caller was in Spanish (the briefing spoken to John after the transfer tool is excluded; it is in English by design).",
       "The agent said in Spanish, once, that a transcript is kept and the call is not recorded, before asking for the name.",
-      "The agent asked for the full name and confirmed the callback number in Spanish.",
+      "The agent asked for the full name in Spanish and either confirmed the callback number in Spanish or accepted the caller volunteering it.",
       "The agent never asked why the caller is calling.",
       "The agent called transfer_to_intake."
     ]
@@ -164,7 +164,7 @@
     "caller": "You are Luis Herrera, a new client, and you are very upset. Open with an emotional rush: 'They fired me today, I have three kids, I don't know what to do, they just walked me out like a criminal.' Speak in long emotional sentences. If the assistant is kind and asks for your name, give it and calm down. Your number is fine.",
     "criteria": [
       "The agent acknowledged the caller's distress in one sentence before continuing.",
-      "The agent did not ask any questions about the firing or give any advice.",
+      "Beyond the standard new-or-existing question, the agent did not ask any questions about the firing or give any advice.",
       "The agent kept each turn to two sentences or fewer.",
       "The agent collected the name and number and called transfer_to_intake."
     ]
@@ -312,7 +312,7 @@
     "name": "Hard-to-spell name",
     "caller": "You are Siobhan Nguyen, a new client. When asked your name say it naturally: 'Siobhan Nguyen.' If asked to spell it, spell it: S-I-O-B-H-A-N, N-G-U-Y-E-N. Number is fine.",
     "criteria": [
-      "The agent asked the caller to spell the name, or otherwise confirmed the spelling.",
+      "The agent asked the caller to spell the name, then read the letters back and asked for confirmation.",
       "The agent did not repeat the full name back after confirming.",
       "The agent called transfer_to_intake."
     ]

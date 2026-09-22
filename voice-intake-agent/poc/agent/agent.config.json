@@ -8,7 +8,7 @@
     "voice_temperature": 1.1,
     "voice_speed": 1.05,
     "responsiveness": 1,
-    "interruption_sensitivity": 0.8,
+    "interruption_sensitivity": 0.6,
     "enable_backchannel": true,
     "backchannel_frequency": 0.7,
     "backchannel_words": [
