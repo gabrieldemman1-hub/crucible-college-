@@ -76,7 +76,7 @@ Disposition mapping. Phone-based dedupe with update-not-duplicate. Timestamped n
 | Walter, Peg, Anthony | Senior management. A caller asking for any of them goes to the intake manager list, never to them directly. |
 | Other-matter callers | Take a message, transfer to admin. Salesforce Task, not a Lead. |
 | After hours | No after-hours mode. Same flow 24/7. Overnight the routing list is the overnight person. |
-| Fields before transfer | Name, phone, and a one-sentence reason. No email. Employer details belong to the full intake. |
+| Fields before transfer | Name and phone only (firm decision Sep 22, after the first live calls: asking "what is this regarding" sounded like a form). No reason question, no email. If the caller volunteers a reason it is captured and passed along; it is never asked for. |
 | Recording | No audio recording. Text transcript only. |
 
 ### 3.2 Default decisions (routine, changeable)

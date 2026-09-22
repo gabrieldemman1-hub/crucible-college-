@@ -2,25 +2,27 @@
 
 Spoken by the agent to the staff member only, after they answer and before the caller is bridged. The caller hears hold music. Kept under 12 seconds so the staff member is not left listening to a script.
 
+The agent does not ask why the caller is calling (firm decision, Sep 22). `{{reason_clause}}` is empty unless the caller volunteered a reason, in which case it is "They mentioned: {reason}. " in their own words.
+
 Variables are Retell dynamic variables. `{{slot_name}}` is the staff member's first name from `routing.json`. `{{caller_type_spoken}}`, `{{language_spoken}}`, and `{{callback_phone_spoken}}` are derived phrasings set in the flow before the hold message (e.g. "a new client", "English", "four one five, five five five, oh one oh one").
 
 ## Intake transfer, English
 
-> Hi {{slot_name}}, this is {{agent_name}}, the intake assistant. I have {{caller_name}} on the line, {{caller_type_spoken}}, speaking {{language_spoken}}. They're calling about: {{reason}}. Callback number {{callback_phone_spoken}}. Stay on the line to take the call, or hang up and I'll try the next person.
+> Hi {{slot_name}}, this is {{agent_name}}, the intake assistant. I have {{caller_name}} on the line, {{caller_type_spoken}}, speaking {{language_spoken}}. {{reason_clause}}Callback number {{callback_phone_spoken}}. Stay on the line to take the call, or hang up and I'll try the next person.
 
 ## Intake transfer, Spanish
 
 Used only when the staff member's `whisperLanguage` is Spanish. In v1 every staff member speaks English, so the English whisper is used on both chains. Kept here for when that changes.
 
-> Hola {{slot_name}}, soy {{agent_name}}, la asistente de admisión. Tengo a {{caller_name}} en la línea, {{caller_type_spoken}}, habla {{language_spoken}}. Llama por: {{reason}}. Número de contacto {{callback_phone_spoken}}. Quédese en la línea para tomar la llamada, o cuelgue y probaré con la siguiente persona.
+> Hola {{slot_name}}, soy {{agent_name}}, la asistente de admisión. Tengo a {{caller_name}} en la línea, {{caller_type_spoken}}, habla {{language_spoken}}. {{reason_clause}}Número de contacto {{callback_phone_spoken}}. Quédese en la línea para tomar la llamada, o cuelgue y probaré con la siguiente persona.
 
 ## Admin transfer (existing client), English
 
-> Hi {{slot_name}}, this is {{agent_name}}. I have {{caller_name}} on the line, an existing client, speaking {{language_spoken}}, calling about: {{reason}}. Callback number {{callback_phone_spoken}}. Stay on the line to take the call, or hang up and I'll try the next person.
+> Hi {{slot_name}}, this is {{agent_name}}. I have {{caller_name}} on the line, an existing client, speaking {{language_spoken}}. {{reason_clause}}Callback number {{callback_phone_spoken}}. Stay on the line to take the call, or hang up and I'll try the next person.
 
 ## Admin transfer (other matter), English
 
-> Hi {{slot_name}}, this is {{agent_name}}. I have {{caller_name}} from {{caller_organization}} on the line. Not a client. They're calling about: {{reason}}. Callback number {{callback_phone_spoken}}. Stay on the line to take the call, or hang up and I'll try the next person.
+> Hi {{slot_name}}, this is {{agent_name}}. I have {{caller_name}} from {{caller_organization}} on the line. Not a client. {{reason_clause}}Callback number {{callback_phone_spoken}}. Stay on the line to take the call, or hang up and I'll try the next person.
 
 ## Senior management ask
 

@@ -168,8 +168,8 @@ async function main() {
   const whisperPrompt = (who, role, briefing) => [
     `You are ${vars.agent_name}, the intake assistant. You have just reached ${who}, a staff member. The caller is on hold and cannot hear you.`,
     `Speak this briefing in English, in one breath, under 12 seconds, filling in the details from the conversation so far:`,
-    `"Hi ${who}, this is ${vars.agent_name}, the intake assistant. I have [caller's full name] on the line, ${role}, speaking [English or Spanish]. They're calling about: [the caller's one-sentence reason, in their words]. Callback number [the confirmed number, or 'the number they're calling from']. Stay on the line to take the call, or hang up and I'll try the next person."`,
-    `If the caller asked for Walter, Peg, or Anthony by name, add: "They asked for [name] by name." If no name was captured, say "a caller who didn't give their name" in place of the name. If no callback number was captured, say "No callback number captured." Do not add anything else. Do not characterize the legal matter.`,
+    `"Hi ${who}, this is ${vars.agent_name}, the intake assistant. I have [caller's full name] on the line, ${role}, speaking [English or Spanish]. Callback number [the confirmed number, or 'the number they're calling from']. Stay on the line to take the call, or hang up and I'll try the next person."`,
+    `If the caller volunteered why they're calling, add one short clause in their own words after the language: "They mentioned [their words]." If they didn't, add nothing. If the caller asked for Walter, Peg, or Anthony by name, add: "They asked for [name] by name." If no name was captured, say "a caller who didn't give their name" in place of the name. If no callback number was captured, say "No callback number captured." Do not add anything else. Do not characterize the legal matter.`,
     `Reference template follows.\n\n${briefing}`,
   ].join("\n");
 
@@ -197,9 +197,10 @@ async function main() {
     speak_during_execution: true,
     // Warm: a fixed hold line; the briefing goes to staff privately. Cold: no whisper exists, so
     // Maya tells the caller, in their language, what she is passing along, then transfers.
-    execution_message_type: transferMode === "warm" ? "static_text" : "prompt",
-    execution_message_description: transferMode === "warm" ? holdText
-      : `In the caller's language, say you are connecting them to ${who} now and that you will pass along their name, their callback number, and the reason they gave, repeating the reason back in one short sentence in their words. Two sentences at most. Do not characterize the legal matter.`,
+    execution_message_type: "prompt",
+    execution_message_description: transferMode === "warm"
+      ? `In the caller's language, in one short sentence, tell them you're connecting them with ${who} now and it may take a moment. Use their first name if you have it. Example: "${holdText}"`
+      : `In the caller's language, say you are connecting them to ${who} now and that you will pass along their name and callback number. Two sentences at most. Do not characterize the legal matter.`,
   });
 
   const llmBody = {
@@ -212,16 +213,16 @@ async function main() {
       { type: "end_call", name: "end_call", description: "End the call after saying goodbye, or when the caller has hung up or gone silent." },
       transferTool(
         "transfer_to_intake",
-        `Warm-transfer a new client (or anyone who asked for Walter, Peg, or Anthony) to the intake manager ${vars.intake_name}. Call only after name, phone, and reason are collected and you have told the caller to hold.`,
+        `Warm-transfer a new client (or anyone who asked for Walter, Peg, or Anthony) to the intake manager ${vars.intake_name}. Call only after name and phone are collected and you have told the caller you're connecting them.`,
         intakePhone, vars.intake_name, "a new client",
-        `Please hold for a moment while I connect you with ${vars.intake_name}. This may take a minute.`,
+        `Thanks, James. Let me get you over to ${vars.intake_name}, one moment.`,
         briefingFor("Intake transfer, English", "Intake transfer, Spanish", "Senior management ask")
       ),
       transferTool(
         "transfer_to_admin",
-        `Warm-transfer an existing client or an other-matter caller to the admin team member ${vars.admin_name}. Call only after name, phone, and reason are collected and you have told the caller to hold.`,
+        `Warm-transfer an existing client or an other-matter caller to the admin team member ${vars.admin_name}. Call only after name and phone are collected and you have told the caller you're connecting them.`,
         adminPhone, vars.admin_name, "an existing client or other matter",
-        `Please hold while I connect you with ${vars.admin_name}.`,
+        `Okay. Let me get you over to ${vars.admin_name}, one moment.`,
         briefingFor("Admin transfer (existing client)", "Admin transfer (other matter)")
       ),
     ],

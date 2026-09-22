@@ -63,13 +63,12 @@ export function renderBriefing(analysis, routing, phone) {
     caller_name: analysis.caller_full_name || "an unnamed caller",
     caller_type_spoken: callerType === "existing_client" ? "an existing client" : callerType === "other" ? "not a client" : "a new client",
     language_spoken: analysis.language === "es" ? "Spanish" : "English",
-    reason: (analysis.reason || "").replace(/[.。]\s*$/, ""),
+    reason_clause: analysis.reason ? `They mentioned: ${analysis.reason.replace(/[.。]\s*$/, "")}. ` : "",
     callback_phone_spoken: phone ? spokenPhone(phone) : "No callback number captured",
     caller_organization: analysis.caller_organization || "an outside organization",
     requested_person: analysis.requested_person || "",
   };
   text = text.replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k] ?? "");
-  if (!analysis.reason) text = text.replace(/\s*(They're|Llama por|They are) calling about: \.\s*/i, " ");
   if (analysis.asked_for_senior_management) {
     text += ` They asked for ${analysis.requested_person || "senior management"} by name.`;
   }
