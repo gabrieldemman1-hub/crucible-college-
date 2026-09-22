@@ -26,7 +26,7 @@ Used only when the staff member's `whisperLanguage` is Spanish. In v1 every staf
 
 ## The handoff is a conversation
 
-The staff member is on a private line with the agent while the caller hears hold music. After the briefing the agent asks "Ready for them?" and listens. The staff member can ask questions before accepting, and the agent answers from the call, in the caller's own words, without guessing or characterizing the matter. Questions the agent is prepared for:
+The staff member is on a private line with the agent while the caller hears hold music. After the briefing the agent says "Stay on to take it, or hang up and I'll take a message." and listens. The staff member can ask questions before accepting, and the agent answers from the call, in the caller's own words, without guessing or characterizing the matter. Questions the agent is prepared for:
 
 - What exactly did they say?
 - How angry are they? What are they upset about?
@@ -35,7 +35,7 @@ The staff member is on a private line with the agent while the caller hears hold
 - What did you tell them? What did you promise?
 - Have they called before today?
 
-The agent bridges the caller when the staff member says "okay", "go ahead", "put them through", or similar, or when there is no further question for a few seconds. "I can't take it" or hanging up sends the agent back to the caller and the fallback.
+The platform bridges the caller as soon as the staff member says anything that is not a question, or after a few seconds of silence. Saying "no" does not decline (confirmed on a live call); hanging up is the only decline, and it sends the agent back to the caller with the callback message.
 
 ## Upset or angry caller
 
