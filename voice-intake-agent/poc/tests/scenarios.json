@@ -313,7 +313,7 @@
     "caller": "You are a new client. When asked your name, say it the way it sounds over a phone line, not how it is spelled: 'Shivaun Nwin'. If asked to spell it, spell it letter by letter: S-I-O-B-H-A-N, then N-G-U-Y-E-N. Confirm if the read-back is right. Number is fine.",
     "criteria": [
       "The agent asked the caller to spell the name, read the letters back, and asked for confirmation.",
-      "The agent did not say the full name back to the caller other than as a letter-by-letter read-back.",
+      "Apart from the spelling read-back and at most one confirmation of the corrected name, the agent did not keep repeating the full name to the caller.",
       "The agent called transfer_to_intake."
     ]
   },
