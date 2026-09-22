@@ -141,7 +141,7 @@ async function main() {
     firm_name: env("FIRM_NAME", "the firm"),
     intake_name: env("INTAKE_NAME", "James"),
     admin_name: env("ADMIN_NAME", "Ana"),
-    main_office_number: env("MAIN_OFFICE_NUMBER", "the main office number"),
+    main_office_number: env("MAIN_OFFICE_NUMBER", "the number on our website"),
   };
   const intakePhone = e164("INTAKE_PHONE", "+14155550101");
   const adminPhone = e164("ADMIN_PHONE", "+14155550201");
