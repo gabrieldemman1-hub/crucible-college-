@@ -333,9 +333,9 @@
     "name": "Wants a human, not an attorney",
     "caller": "You are Frank Moore. Open with 'Can I just talk to a real person please? I don't want to talk to a machine.' If asked for a number, this one is fine. Cooperate after that.",
     "criteria": [
-      "The agent did not argue or over-explain that it is a virtual assistant.",
-      "The agent asked only for a callback number (and at most the name once) and then transferred to intake promptly.",
-      "The agent called transfer_to_intake."
+      "The agent did not argue or over-explain that it is a virtual assistant; it said 'Of course' or similar and moved on.",
+      "The agent asked at most: whether the caller has a case, the name, and the number, then transferred without extra questions.",
+      "The agent transferred to the destination matching the caller's answer: transfer_to_admin if they said they have a case, otherwise transfer_to_intake."
     ]
   },
   {
@@ -392,14 +392,14 @@
   {
     "id": 37,
     "name": "Angry existing client demanding an attorney",
-    "caller": "You are James Eden, an existing client, and you are angry. Open with: 'I'm super angry right now. I'm not trying to get mad at you, but I have a case with you guys already and nobody is picking up my calls or responding, and I need to talk to one of the attorneys right now.' If the assistant asks a scripted question without acknowledging what you said, say 'Did you hear what I just said?' If the assistant acknowledges the problem specifically and tells you what happens next, cooperate: give your name, say this number is fine, but repeat once 'just get me to an attorney'. If the assistant is honest that the next person is on the intake team and will get you to the right attorney, accept it.",
+    "caller": "You are James Eden, an existing client, and you are angry. Open with: 'I'm super angry right now. I'm not trying to get mad at you, but I have a case with you guys already and nobody is picking up my calls or responding, and I need to talk to one of the attorneys right now.' If the assistant asks a scripted question without acknowledging what you said, say 'Did you hear what I just said?' If the assistant acknowledges the problem specifically and tells you what happens next, cooperate: give your name, say this number is fine, but repeat once 'just get me to an attorney'. If the assistant is honest that the next person is on the team (intake or admin) and will get you to the right attorney, accept it.",
     "criteria": [
       "The agent's first response after the outburst referred specifically to the caller not getting calls returned (not a generic feeling word), included a brief apology for that, and said what it was doing next, all before asking any question.",
       "The agent never used the phrases 'I understand', 'calm down', 'I'm sorry you feel that way', or 'unfortunately'.",
-      "The agent never said or implied that John or the person being transferred to is an attorney; it said John is on the intake team and will get the caller to the right attorney.",
-      "The agent still stated the transcript fact once, collected the name, and either confirmed the number or accepted the caller volunteering that this number is fine, framing the details as being for John.",
-      "The agent called transfer_to_admin (existing client).",
-      "The briefing to John after the transfer tool began with a heads-up that the caller is upset, said in the caller's own words what they are upset about, said they asked for an attorney, and said what the agent told them about John's role."
+      "The agent never said or implied that the person being transferred to is an attorney; it said the team will get the caller to the right attorney.",
+      "The agent still stated the transcript fact once, collected the name, and either confirmed the number or accepted the caller volunteering that this number is fine, framing the details as being for the person they're about to talk to.",
+      "The agent called transfer_to_admin (existing client), not transfer_to_intake.",
+      "The briefing after the transfer tool began with the greeting and then a heads-up that the caller is upset, before the caller's name; it said in the caller's own words what they are upset about, that they asked for an attorney, and what the agent told them."
     ]
   },
   {
@@ -412,6 +412,17 @@
       "The agent found out whether the caller already has a case, got a name, and got a callback number (asked, or volunteered by the caller), asking one question per turn.",
       "The agent never used 'I understand', 'calm down', or 'I'm sorry you feel that way'.",
       "The agent called transfer_to_intake."
+    ]
+  },
+  {
+    "id": 39,
+    "name": "Says 'sí' once, then English",
+    "caller": "You are an English-speaking existing client. Your very first word, over the greeting, is 'Sí.' (just that one word, as a joke). Then say in English: 'Hey, I really need to speak to someone. I'm fed up with this whole process and no one's returning my calls. Can you just get me to someone?' Continue in English for the rest of the call. If the assistant speaks Spanish to you, say 'What? I don't speak Spanish.' Give your name as James Eden if asked. Number is fine.",
+    "criteria": [
+      "The agent never spoke Spanish to the caller; every agent turn addressed to the caller was in English.",
+      "The agent's first response after the English outburst acknowledged the unreturned calls specifically and said it was getting the caller to a person, without 'I understand', 'calm down', or 'I'm sorry you feel that way'.",
+      "The agent asked whether the caller already has a case (or otherwise established existing-client status) and called transfer_to_admin.",
+      "In the briefing after the transfer tool, 'Heads up, this caller is upset' came right after the greeting and before the caller's name."
     ]
   }
 ]
