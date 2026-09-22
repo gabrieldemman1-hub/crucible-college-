@@ -103,10 +103,14 @@ function buildAgentBody(a, vars, llmId, voiceId) {
     response_engine: { type: "retell-llm", llm_id: llmId },
     voice_id: voiceId,
     voice_model: a.voice_model,
+    voice_temperature: a.voice_temperature,
+    voice_speed: a.voice_speed,
     language: a.language,
     responsiveness: a.responsiveness,
     interruption_sensitivity: a.interruption_sensitivity,
     enable_backchannel: a.enable_backchannel,
+    backchannel_frequency: a.backchannel_frequency,
+    backchannel_words: a.backchannel_words,
     normalize_for_speech: a.normalize_for_speech,
     begin_message_delay_ms: a.begin_message_delay_ms,
     end_call_after_silence_ms: a.end_call_after_silence_ms,
@@ -203,7 +207,7 @@ async function main() {
     model_temperature: cfg.llm.model_temperature,
     tool_call_strict_mode: cfg.llm.tool_call_strict_mode,
     general_prompt: prompt,
-    begin_message: `Thank you for calling ${vars.firm_name}. Gracias por llamar a ${vars.firm_name}.`,
+    begin_message: `Thanks for calling ${vars.firm_name}, this is ${vars.agent_name}, the virtual assistant. Para español, solo dígame. Are you calling about a new matter, or do you already have a case with us?`,
     general_tools: [
       { type: "end_call", name: "end_call", description: "End the call after saying goodbye, or when the caller has hung up or gone silent." },
       transferTool(
@@ -248,10 +252,24 @@ async function main() {
     return;
   }
 
+  // Published versions are immutable. If the agent is published, open a new draft version first;
+  // Retell then gives the LLM a matching draft version to update.
+  let llmVersion;
+  if (ids.agent_id) {
+    const cur = await api("GET", `/get-agent/${ids.agent_id}`);
+    if (cur.is_published) {
+      const draft = await api("POST", `/create-agent-version/${ids.agent_id}`, { base_version: cur.version });
+      llmVersion = draft.response_engine?.version;
+      console.log(`Opened draft agent version ${draft.version} (LLM version ${llmVersion})`);
+    } else {
+      llmVersion = cur.response_engine?.version;
+    }
+  }
+
   let llm;
   if (ids.llm_id) {
-    llm = await api("PATCH", `/update-retell-llm/${ids.llm_id}`, llmBody);
-    console.log(`Updated Retell LLM ${ids.llm_id}`);
+    llm = await api("PATCH", `/update-retell-llm/${ids.llm_id}${llmVersion !== undefined ? `?version=${llmVersion}` : ""}`, llmBody);
+    console.log(`Updated Retell LLM ${ids.llm_id}${llmVersion !== undefined ? ` version ${llmVersion}` : ""}`);
   } else {
     llm = await api("POST", "/create-retell-llm", llmBody);
     ids.llm_id = llm.llm_id;
@@ -259,9 +277,10 @@ async function main() {
     console.log(`Created Retell LLM ${ids.llm_id}`);
   }
 
-  const voiceId = await pickVoice(process.env.VOICE_ID);
+  const voiceId = await pickVoice(process.env.VOICE_ID || cfg.agent.voice_id_default);
   const a = cfg.agent;
   const agentBody = buildAgentBody(a, vars, ids.llm_id, voiceId);
+  if (llmVersion !== undefined) agentBody.response_engine.version = llmVersion;
 
   let agent;
   if (ids.agent_id) {
