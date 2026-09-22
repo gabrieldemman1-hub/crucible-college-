@@ -108,6 +108,8 @@ function buildAgentBody(a, vars, llmId, voiceId) {
     language: a.language,
     responsiveness: a.responsiveness,
     interruption_sensitivity: a.interruption_sensitivity,
+    denoising_mode: a.denoising_mode,
+    stt_mode: a.stt_mode,
     enable_backchannel: a.enable_backchannel,
     backchannel_frequency: a.backchannel_frequency,
     backchannel_words: a.backchannel_words,

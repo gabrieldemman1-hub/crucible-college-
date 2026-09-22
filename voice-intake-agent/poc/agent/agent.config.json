@@ -8,7 +8,7 @@
     "voice_temperature": 0.9,
     "voice_speed": 1.05,
     "responsiveness": 1,
-    "interruption_sensitivity": 0.6,
+    "interruption_sensitivity": 0.35,
     "enable_backchannel": false,
     "backchannel_frequency": 0.7,
     "backchannel_words": [
@@ -122,7 +122,9 @@
         "name": "upset_about",
         "description": "If the caller was frustrated, angry, or distressed: what they were upset about, in their own words, one sentence. Otherwise empty."
       }
-    ]
+    ],
+    "denoising_mode": "noise-and-background-speech-cancellation",
+    "stt_mode": "accurate"
   },
   "llm": {
     "model_env": "RETELL_MODEL",
