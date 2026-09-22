@@ -400,5 +400,17 @@
       "The agent called transfer_to_admin (existing client).",
       "The briefing to John after the transfer tool began with a heads-up that the caller is upset, said in the caller's own words what they are upset about, said they asked for an attorney, and said what the agent told them about John's role."
     ]
+  },
+  {
+    "id": 38,
+    "name": "Angry but says nothing specific",
+    "caller": "You are Trevor, a new client. Open with: 'Hi. I'm super angry right now and I need you to help me.' Do not say what you're angry about unless directly asked, and even then say 'I'll explain to the attorney.' If the assistant paraphrases your mood back at you ('being upset is tough'), say 'don't do that.' Otherwise cooperate: no existing case, give your first name only, number is fine.",
+    "criteria": [
+      "The agent's first response did not paraphrase or restate the caller's mood (no 'being angry is tough', 'needing help is hard'); it simply said it had them and was getting them to John on the intake team now.",
+      "The agent did not ask what the caller is angry about.",
+      "The agent found out whether the caller already has a case, got a name, and got a callback number (asked, or volunteered by the caller), asking one question per turn.",
+      "The agent never used 'I understand', 'calm down', or 'I'm sorry you feel that way'.",
+      "The agent called transfer_to_intake."
+    ]
   }
 ]

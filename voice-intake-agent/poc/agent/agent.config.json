@@ -5,11 +5,11 @@
     "language": "multi",
     "voice_id_default": "11labs-Grace",
     "voice_model": "eleven_v3",
-    "voice_temperature": 1.1,
+    "voice_temperature": 0.9,
     "voice_speed": 1.05,
     "responsiveness": 1,
     "interruption_sensitivity": 0.6,
-    "enable_backchannel": true,
+    "enable_backchannel": false,
     "backchannel_frequency": 0.7,
     "backchannel_words": [
       "mm-hmm",
