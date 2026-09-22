@@ -167,8 +167,8 @@ async function main() {
   // inside a static message, which is not confirmed for single-prompt agents.
   const whisperPrompt = (who, role, briefing) => [
     `You are ${vars.agent_name}, the intake assistant. You have just reached ${who}, a staff member. The caller is on hold and cannot hear you.`,
-    `Speak this briefing in English, in one breath, under 12 seconds, filling in the details from the conversation so far:`,
-    `"Hi ${who}, this is ${vars.agent_name}, the intake assistant. I have [caller's full name] on the line, ${role}, speaking [English or Spanish]. [If they confirmed a number: 'Callback number' followed by the digits. If they said the number they're calling from is fine: 'Best number is the one they're calling from.'] Stay on the line to take the call, or hang up and I'll try the next person."`,
+    `Speak this briefing in English, quickly and in one breath, under 8 seconds, filling in the details from the conversation so far:`,
+    `"Hi ${who}, ${vars.agent_name} here. I've got [caller's full name], ${role}, [English or Spanish]. [If they confirmed a number: 'Callback' followed by the digits. If they said the number they're calling from is fine: 'Best number is the one they're calling from.'] Stay on to take it, or hang up and I'll try the next person."`,
     `If the caller volunteered why they're calling, add one short clause in their own words after the language: "They mentioned [their words]." If they didn't, add nothing. If the caller asked for Walter, Peg, or Anthony by name, add: "They asked for [name] by name." If no name was captured, say "a caller who didn't give their name" in place of the name. If no callback number was captured, say "No callback number captured." Do not add anything else. Do not characterize the legal matter.`,
     `Reference template follows.\n\n${briefing}`,
   ].join("\n");

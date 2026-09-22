@@ -39,7 +39,7 @@
       {
         "type": "boolean",
         "name": "disclosure_given",
-        "description": "True if the agent said the call is transcribed but not recorded before asking any question."
+        "description": "True if, before asking for the caller's name, the agent said in any wording that a transcript of the call is kept and that the call is not recorded (for example 'we keep a transcript of the call, but it's not recorded')."
       },
       {
         "type": "enum",

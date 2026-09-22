@@ -13,7 +13,7 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const fmtTime = (iso) => new Date(iso).toLocaleString("en-US", { timeZone: "America/Los_Angeles", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) + " PT";
 const LANG = { en: "English", es: "Spanish", other: "Other language", unknown: "Language unknown" };
 const TYPE = { new_client: "New client", existing_client: "Existing client", other: "Other matter", unknown: "Type unknown" };
-const TONE = { transferred_successfully: "good", existing_client_transferred: "good", other_matter_transferred: "good", transfer_failed_message_taken: "warn", abandoned: "warn", spam: "muted" };
+const TONE = { transferred_successfully: "good", existing_client_transferred: "good", other_matter_transferred: "good", transfer_failed_message_taken: "warn", hung_up_while_holding: "warn", abandoned: "warn", spam: "muted" };
 
 function kv(obj, omit = []) {
   return `<dl class="kv">` + Object.entries(obj).filter(([k]) => !omit.includes(k)).map(([k, v]) =>

@@ -6,6 +6,7 @@ const OUTCOME = {
   existing_client_transferred: "Existing Client Transferred",
   other_matter_transferred: "Other Matter Transferred",
   transfer_failed_message_taken: "Transfer Failed - Message Taken",
+  hung_up_while_holding: "Caller Hung Up While Holding",
   abandoned: "Abandoned",
   spam: "Spam",
 };
@@ -56,6 +57,9 @@ export function deriveDisposition(call, analysis) {
     key = analysis.caller_type === "existing_client" ? "existing_client_transferred"
       : analysis.caller_type === "other" ? "other_matter_transferred"
       : "transferred_successfully";
+  } else if (attempts.length && attempts.every((a) => a.succeeded === null) && reason === "user_hangup") {
+    // The transfer was dialed but never resolved: the caller hung up during hold or the whisper.
+    key = "hung_up_while_holding";
   } else if (analysis.message_taken || (attempts.length && !transferred)) {
     key = "transfer_failed_message_taken";
   } else if (["inactivity", "marked_as_spam", "scam_detected", "error_no_audio_received"].includes(reason) && !hasIdentity) {
@@ -133,7 +137,7 @@ export function buildSalesforcePreview(call, analysis, routing, opts = {}) {
     explanation.push("Abandoned before a phone number was captured: nothing written to Salesforce.");
   }
 
-  const needsTask = callerType === "other" || disposition.key === "transfer_failed_message_taken" || (disposition.key === "abandoned" && disposition.attempts.length > 0);
+  const needsTask = callerType === "other" || disposition.key === "transfer_failed_message_taken" || disposition.key === "hung_up_while_holding" || (disposition.key === "abandoned" && disposition.attempts.length > 0);
   if (needsTask && disposition.key !== "spam") {
     const assignee = routing.target ? routing.target.name : (routing.staffIds[0] ? routing.staffIds[0] : "admin team");
     task = {
@@ -144,7 +148,7 @@ export function buildSalesforcePreview(call, analysis, routing, opts = {}) {
       Status: "Not Started", Priority: disposition.key === "transfer_failed_message_taken" ? "High" : "Normal",
       Type: "Call", ActivityDate: when.toISOString().slice(0, 10), Retell_Call_Id__c: call.call_id,
     };
-    explanation.push(`Task created for ${assignee}${disposition.key === "transfer_failed_message_taken" ? " because no one answered the transfer; an email alert also goes out." : "."}`);
+    explanation.push(`Task created for ${assignee}${disposition.key === "transfer_failed_message_taken" ? " because no one answered the transfer; an email alert also goes out." : disposition.key === "hung_up_while_holding" ? " because the caller hung up while holding for the transfer; they should be called back." : "."}`);
   }
 
   if (disposition.transferred) explanation.push(`Lead owner is ${acceptedBy?.name || "the accepting staff member"} because they accepted the transfer.`);

@@ -1,6 +1,6 @@
 # Warm transfer briefing (whisper) templates
 
-Spoken by the agent to the staff member only, after they answer and before the caller is bridged. The caller hears hold music. Kept under 12 seconds so the staff member is not left listening to a script.
+Spoken by the agent to the staff member only, after they answer and before the caller is bridged. The caller hears hold music. Kept under 8 seconds: on the first live calls a 14-second whisper left the caller on hold for 30 seconds in total, and one hung up.
 
 The agent does not ask why the caller is calling (firm decision, Sep 22). `{{reason_clause}}` is empty unless the caller volunteered a reason, in which case it is "They mentioned: {reason}. " in their own words.
 
@@ -8,7 +8,7 @@ Variables are Retell dynamic variables. `{{slot_name}}` is the staff member's fi
 
 ## Intake transfer, English
 
-> Hi {{slot_name}}, this is {{agent_name}}, the intake assistant. I have {{caller_name}} on the line, {{caller_type_spoken}}, speaking {{language_spoken}}. {{reason_clause}}Callback number {{callback_phone_spoken}}. Stay on the line to take the call, or hang up and I'll try the next person.
+> Hi {{slot_name}}, {{agent_name}} here. I've got {{caller_name}}, {{caller_type_spoken}}, {{language_spoken}}. {{reason_clause}}Callback {{callback_phone_spoken}}. Stay on to take it, or hang up and I'll try the next person.
 
 ## Intake transfer, Spanish
 
