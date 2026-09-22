@@ -42,6 +42,11 @@ node poc/agent/create-agent.mjs            # create or update Maya and bind the 
 
 Step by step for the first live session: `GO-LIVE.md`.
 
+Automated caller tests, no phone needed: `poc/tests/scenarios.json` holds twenty caller personas with pass
+criteria; `node poc/tests/run-simulations.mjs` has Retell play each caller against Maya's current version with
+transfers mocked, grades the transcripts, and writes `poc/tests/report.md`. Run it after any prompt change.
+`--only 4,7` runs a subset.
+
 Checks that need neither a key nor network, run before any change to the prompt or scripts:
 
 ```bash

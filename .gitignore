@@ -5,3 +5,6 @@ _site/
 voice-intake-agent/poc/agent/.retell-ids.json
 voice-intake-agent/poc/review/calls.json
 voice-intake-agent/poc/review/index.html
+voice-intake-agent/poc/tests/.retell-tests.json
+voice-intake-agent/poc/tests/results.json
+voice-intake-agent/poc/tests/report.md
