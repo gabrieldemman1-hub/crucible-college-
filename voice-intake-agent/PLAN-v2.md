@@ -75,7 +75,7 @@ Disposition mapping. Phone-based dedupe with update-not-duplicate. Timestamped n
 | Transfer type | Warm transfer. Agent dials the manager, briefs them, manager stays on to accept, caller is bridged. |
 | Walter, Peg, Anthony | Senior management. A caller asking for any of them goes to the intake manager list, never to them directly. |
 | Other-matter callers | Take a message, transfer to admin. Salesforce Task, not a Lead. |
-| After hours | No after-hours mode. Same flow 24/7. Overnight the routing list is the overnight person. |
+| After hours | No after-hours mode. Same flow 24/7. One overnight intake manager takes new and existing clients (firm decision Sep 22). No admin overnight: other-matter callers get a message and a morning callback. |
 | Fields before transfer | Name and phone only (firm decision Sep 22, after the first live calls: asking "what is this regarding" sounded like a form). No reason question, no email. If the caller volunteers a reason it is captured and passed along; it is never asked for. |
 | Recording | No audio recording. Text transcript only. |
 
@@ -154,7 +154,7 @@ Keys: `timezone`, `businessHours` (per weekday, or null), `holidays`, `staff` (i
 
 Rules enforced by the schema and loader: E.164 numbers, unique numbers, every list entry references a staff id, a staff member on `intake.es` lists `es`, at most 3 per list, no staff name matches a `seniorManagement` entry.
 
-At call start the service resolves the lists for "now": inside business hours, the configured lists; outside, `overnight` fills the intake slots for both languages and the admin slots are empty unless `overnight.handlesExistingClients` is true. Unused slots are padded with `"none"` so the flow always has three transfer nodes per list.
+At call start the service resolves the lists for "now": inside business hours, the configured lists; outside, `overnight` fills the intake slots for both languages; with `overnight.handlesExistingClients` true (the firm's choice) existing clients also go to the overnight person, while other-matter callers get a message and a morning callback because there is no admin overnight. Unused slots are padded with `"none"` so the flow always has three transfer nodes per list.
 
 ---
 

@@ -64,16 +64,22 @@ export function decideRouting(call, config) {
       staffIds = config.lists.overnight;
       reasons.push("After hours: the overnight list replaces the intake list.");
     }
+  } else if (bh) {
+    list = "admin";
+    staffIds = config.lists.admin;
+  } else if (call.callerType === "other") {
+    // No admin overnight: other matters get a message and a morning callback.
+    list = "admin";
+    staffIds = [];
+    reasons.push("After hours: no admin on duty for other matters; message taken, callback in the morning.");
+  } else if (config.overnight.handlesExistingClients) {
+    list = "overnight";
+    staffIds = config.lists.overnight;
+    reasons.push("After hours: the overnight intake manager also takes existing clients.");
   } else {
-    if (bh || config.overnight.handlesExistingClients) {
-      list = "admin";
-      staffIds = config.lists.admin;
-      if (!bh) reasons.push("After hours, but the overnight person also handles existing clients.");
-    } else {
-      list = "admin";
-      staffIds = [];
-      reasons.push("After hours and the overnight person does not handle existing clients: no transfer attempted, callback in the morning.");
-    }
+    list = "admin";
+    staffIds = [];
+    reasons.push("After hours and the overnight person does not handle existing clients: no transfer attempted, callback in the morning.");
   }
 
   const target = staffIds.length ? { id: staffIds[0], ...config.staff[staffIds[0]] } : null;
@@ -93,7 +99,7 @@ export function demoConfig(base, { intakeName, intakePhone, adminName, adminPhon
       admin: { name: adminName, number: adminPhone, email: "", languages: ["en", "es"], role: "admin" },
     },
     lists: { intake: { en: ["intake"], es: ["intake"] }, admin: ["admin"], overnight: ["intake"] },
-    overnight: { handlesExistingClients: false },
+    overnight: { handlesExistingClients: true },
   };
 }
 
@@ -131,8 +137,12 @@ if (process.argv.includes("--selftest")) {
   check("asked for Walter -> intake, never admin or Walter", r.list === "intake.en" && r.target?.name === "James" && r.reasons.some((x) => x.includes("Walter")));
   r = decideRouting({ language: "en", callerType: "new_client", askedForSeniorManagement: false, at: night }, cfg);
   check("after hours new client -> overnight, morning callback", r.list === "overnight" && r.callbackWindow === "first thing in the morning");
-  r = decideRouting({ language: "en", callerType: "existing_client", askedForSeniorManagement: false, at: night }, cfg);
-  check("after hours existing client -> no transfer, admin task", r.list === "admin" && r.target === null);
+  r = decideRouting({ language: "en", callerType: "existing_client", at: night }, cfg);
+  check("after hours existing client -> overnight intake manager", r.list === "overnight" && r.target?.id === "intake");
+  r = decideRouting({ language: "en", callerType: "other", at: night }, cfg);
+  check("after hours other matter -> message, no transfer", r.list === "admin" && r.target === null);
+  r = decideRouting({ language: "en", callerType: "existing_client", at: night }, { ...cfg, overnight: { handlesExistingClients: false } });
+  check("after hours existing client, overnight declines -> message", r.list === "admin" && r.target === null);
   r = decideRouting({ language: "unknown", callerType: "unknown", askedForSeniorManagement: false, at: weekday }, cfg);
   check("unknown -> treated as new client EN", r.list === "intake.en");
   r = decideRouting({ language: "other", callerType: "new_client", askedForSeniorManagement: false, at: weekday }, cfg);

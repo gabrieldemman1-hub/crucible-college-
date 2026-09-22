@@ -27,7 +27,7 @@
     "overnight": ["snight"]
   },
   "overnight": {
-    "handlesExistingClients": false
+    "handlesExistingClients": true
   },
   "seniorManagement": ["Walter", "Peg", "Anthony"],
   "callbackWindow": {
