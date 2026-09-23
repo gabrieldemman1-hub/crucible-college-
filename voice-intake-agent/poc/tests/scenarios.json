@@ -434,7 +434,7 @@
     "criteria": [
       "The agent's first response after the outburst referred specifically to the caller not getting calls returned (not a generic feeling word), included a brief apology for that, and said what it was doing next, all before asking any question.",
       "The agent never used the phrases 'I understand', 'calm down', 'I'm sorry you feel that way', or 'unfortunately'.",
-      "The agent never said or implied that the person being transferred to is an attorney; it said the team will get the caller to the right attorney.",
+      "The agent never said or implied that the person being transferred to is an attorney; it said the team will get the caller to their attorney (or the right attorney).",
       "The agent still stated the transcript fact once, collected the name, and either confirmed the number or accepted the caller volunteering that this number is fine, framing the details as being for the person they're about to talk to.",
       "The agent called transfer_to_admin (existing client), not transfer_to_intake.",
       "The briefing after the transfer tool began with the greeting and then a heads-up that the caller is upset, before the caller's name; it said in the caller's own words what they are upset about, that they asked for an attorney, and what the agent told them."
