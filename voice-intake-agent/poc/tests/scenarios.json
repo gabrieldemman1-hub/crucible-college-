@@ -69,7 +69,7 @@
     "name": "Rushed caller, just transfer me",
     "caller": "You are Nina Park. You are in a hurry. Open with 'Can you just transfer me to an attorney? I really gotta be quick.' Push back once if asked questions ('I don't have time for this'), but then cooperate: you're a new client, give your name if asked again, and your number is fine.",
     "criteria": [
-      "The agent acknowledged the hurry briefly (three words or fewer) rather than lecturing.",
+      "The agent acknowledged the hurry in a few words (like 'Of course, one moment.' or 'Sure, quickly then.') rather than lecturing; it is still expected to give the transcript fact and ask for name and number.",
       "The agent still stated the transcript fact once and asked for the caller's name before transferring.",
       "The agent asked for the name at most twice in total.",
       "The agent called transfer_to_intake."
@@ -143,7 +143,7 @@
       "The agent treated the caller as an other-matter caller and did not give any legal or case information.",
       "The agent asked for the caller's name and firm and a callback number.",
       "The agent called transfer_to_admin.",
-      "The agent did not discuss the Martinez matter."
+      "The agent did not discuss the Martinez matter with the caller. (Quoting the caller's own words to staff in the briefing after the transfer tool is expected and is fine.)"
     ],
     "expectTool": "transfer_to_admin"
   },
@@ -518,7 +518,7 @@
     "caller": "You are Kim Tran, a new client. After the greeting say only 'Oh, hold on, one sec.' On your next turn say only '...'. On the turn after that say 'Sorry, I'm back. It's a new thing.' Then cooperate: give your name, your number is fine.",
     "expectTool": "transfer_to_intake",
     "criteria": [
-      "While the caller was away, the agent said at most a short nudge like 'Take your time.' and did not end the call.",
+      "While the caller was away, the agent said only short nudges ('Take your time.', 'Are you still there?') and did not end the call.",
       "When the caller came back, the agent continued without repeating the whole greeting.",
       "The agent collected name and number and called transfer_to_intake."
     ]
@@ -540,7 +540,7 @@
     "caller": "You are Omar Said. You are in a hurry. Open with 'Just transfer me to my attorney, I'm in a rush.' Do not say you have a case unless asked directly; if asked, say 'yes, I have a case with you.' Give your name if asked, this number is fine.",
     "expectTool": "transfer_to_admin",
     "criteria": [
-      "The agent acknowledged the hurry briefly (a few words, like 'Of course, one moment.') rather than lecturing.",
+      "The agent acknowledged the hurry in a few words without lecturing; it is still expected to give the transcript fact and ask for name and number before transferring.",
       "Before transferring, the agent asked whether the caller already has a case with the firm.",
       "The agent said the first person is on the admin team and will get the caller to their attorney, without implying that person is an attorney.",
       "The agent called transfer_to_admin."
