@@ -50,22 +50,37 @@ const MOCK_OK = (tool) => ({ tool_name: tool, input_match_rule: { type: "any" },
 const MOCK_FAIL = (tool) => ({ tool_name: tool, input_match_rule: { type: "any" }, output: RETELL_FAIL_TEXT, result: false });
 
 function mocksFor(sc) {
+  if (isStaff(sc)) {
+    return ["bridge_transfer", "cancel_transfer"].map((t) => ({ tool_name: t, input_match_rule: { type: "any" }, output: JSON.stringify({ status: t === "bridge_transfer" ? "bridged" : "cancelled" }), result: true }));
+  }
   return ["transfer_to_intake", "transfer_to_admin"].map((t) => ((sc.transferFails || []).includes(t) ? MOCK_FAIL(t) : MOCK_OK(t)));
 }
 
-async function currentLlm() {
+// Staff-side scenarios run against the transfer agent that talks to the intake manager, with the
+// simulated "caller" playing the staff member who picks up.
+const isStaff = (sc) => (sc.engine || "main") !== "main";
+
+async function engineFor(llmId, agentId) {
+  const agent = await api("GET", `/get-agent/${agentId}`);
+  return { llm_id: llmId, version: agent.response_engine?.version ?? agent.version, agent_version: agent.version };
+}
+
+async function currentEngines() {
   const ids = JSON.parse(readFileSync(IDS, "utf8"));
-  const agent = await api("GET", `/get-agent/${ids.agent_id}`);
-  return { llm_id: ids.llm_id, version: agent.response_engine?.version ?? agent.version, agent_version: agent.version };
+  const engines = { main: await engineFor(ids.llm_id, ids.agent_id) };
+  for (const [dest, t] of Object.entries(ids.transfer_agents || {})) engines[`transfer_${dest}`] = await engineFor(t.llm_id, t.agent_id);
+  return engines;
 }
 
 function loadKnown() {
   return existsSync(TEST_IDS) ? JSON.parse(readFileSync(TEST_IDS, "utf8")) : {};
 }
 
-async function syncDefinitions(scenarios, engine) {
+async function syncDefinitions(scenarios, engines) {
   const known = loadKnown();
   for (const sc of scenarios) {
+    const engine = engines[sc.engine || "main"];
+    if (!engine) throw new Error(`Scenario ${sc.id} needs engine ${sc.engine}, which is not in .retell-ids.json. Publish with create-agent.mjs first.`);
     const body = {
       name: `${String(sc.id).padStart(2, "0")} ${sc.name}`,
       user_prompt: fill(sc.caller),
@@ -116,7 +131,7 @@ function transcriptLines(snapshot) {
 // "transcription" alone is the refusal line ("can't continue without transcription"), not the notice.
 const NOTICE = /transcript(?!ion)|transcribed|transcripci[oó]n de la llamada|se transcribe/i;
 const toolOf = (l) => l.tool || (/^\[tool (\w+)\]$/.exec(l.content || "") || [])[1];
-const BANNED = [/\bI understand\b/i, /\bcalm down\b/i, /sorry you feel that way/i, /\bunfortunately\b/i, /\bour policy\b/i, /\bquick note\b/i, /\bmm-?hmm\b/i, /\buh-?huh\b/i];
+const BANNED = [/\bvirtual assistant\b/i, /\bnot recorded\b/i, /no se graba/i, /\bI understand\b/i, /\bcalm down\b/i, /sorry you feel that way/i, /\bunfortunately\b/i, /\bour policy\b/i, /\bquick note\b/i, /\bmm-?hmm\b/i, /\buh-?huh\b/i];
 
 /** Mechanical rules, checked in code on every run so the model grader can't wave them through. */
 export function codeChecks(sc, lines) {
@@ -128,6 +143,12 @@ export function codeChecks(sc, lines) {
 
   const ask = agentIdx.find((l) => /\b(name|number|nombre|n[uú]mero)\b[^?]*\?/i.test(l.content));
   const notice = agentIdx.find((l) => NOTICE.test(l.content));
+  if (isStaff(sc)) {
+    // Staff side: only which decision the transfer agent made, and that it never bridged without a yes.
+    const decisions = lines.filter((l) => l.role === "tool_call_invocation" && /^(bridge|cancel)_transfer$/.test(toolOf(l) || ""));
+    const got = decisions.length ? toolOf(decisions[decisions.length - 1]) : "none";
+    return sc.expectTool && got !== sc.expectTool ? [`expected ${sc.expectTool}, got ${got}`] : [];
+  }
   const transfers = lines.filter((l) => l.role === "tool_call_invocation" && /^transfer_/.test(toolOf(l) || ""));
   if (sc.notice !== false) {
     if (ask && (!notice || notice.i > ask.i)) problems.push(`transcript notice ${notice ? "came after" : "missing before"} the first name/number question ("${ask.content.slice(0, 80)}")`);
@@ -150,8 +171,14 @@ export function codeChecks(sc, lines) {
     const idx = lines.indexOf(transfers[0]);
     const turn = [...lines.slice(0, idx)].reverse().find((l) => l.role === "agent");
     // Only the hand-off sentence itself; "Thanks, Nora." earlier in the same turn is the one allowed use.
-    const handoff = (turn?.content || "").split(/(?<=[.!?])\s+/).find((x) => /get you over to|getting .* on the line|le comunico|connect(ing)? you/i.test(x));
+    const handoff = (turn?.content || "").split(/(?<=[.!?])\s+/).find((x) => /get you over to|getting .* on the line|le comunico|connect(ing)? you|transferring you/i.test(x));
     if (handoff && new RegExp(`\\b${first}\\b`).test(handoff)) problems.push(`hand-off line uses the caller's name: "${handoff}"`);
+  }
+  // Intake hand-offs say "an intake manager", never a staff first name.
+  if (transfers.length && toolOf(transfers[transfers.length - 1]) === "transfer_to_intake") {
+    const idx = lines.indexOf(transfers[transfers.length - 1]);
+    const said = lines.slice(Math.max(0, idx - 4), idx).filter((l) => l.role === "agent").map((l) => l.content).join(" ");
+    if (!/intake manager|encargad[oa]s? de admisi[oó]n/i.test(said)) problems.push(`intake hand-off did not say "intake manager": "${said.slice(-120)}"`);
   }
   return problems;
 }
@@ -177,6 +204,7 @@ function render(results, engine) {
 }
 
 async function runBatch(engine, defIds) {
+  if (!defIds.length) return null;
   const batch = await api("POST", "/create-batch-test", {
     response_engine: { type: "retell-llm", llm_id: engine.llm_id, version: engine.version },
     test_case_definition_ids: defIds,
@@ -191,7 +219,8 @@ async function main() {
     const saved = JSON.parse(readFileSync(RESULTS, "utf8"));
     render(saved.results, saved.engine); console.log(`wrote ${REPORT}`); return;
   }
-  const engine = await currentLlm();
+  const engines = await currentEngines();
+  const engine = engines.main;
   if (args.includes("--prune")) { await prune(engine); return; }
 
   const onlyIdx = args.indexOf("--only");
@@ -201,13 +230,19 @@ async function main() {
   const repeat = repIdx >= 0 ? Math.max(1, Number(args[repIdx + 1]) || 1) : 1;
 
   console.log(`Maya agent version ${engine.agent_version}, LLM ${engine.llm_id} v${engine.version}. Caller model: ${SIM_MODEL}.`);
-  const known = await syncDefinitions(scenarios, engine);
+  const known = await syncDefinitions(scenarios, engines);
   console.log(`${Object.keys(known).length} scenario definitions in sync on Retell.`);
 
-  const defIds = selected.map((s) => known[s.id]);
-  const batchIds = [];
-  for (let k = 0; k < repeat; k++) batchIds.push(await runBatch(engine, defIds));
-  console.log(`${batchIds.length} batch(es) started, ${selected.length} scenario(s) each. Waiting...`);
+  // One batch per engine (Maya, or a staff-side transfer agent) per repeat.
+  const groups = {};
+  for (const sc of selected) (groups[sc.engine || "main"] ||= []).push(sc);
+  const batchesByGroup = {};
+  for (const [g, list] of Object.entries(groups)) {
+    batchesByGroup[g] = [];
+    for (let k = 0; k < repeat; k++) batchesByGroup[g].push(await runBatch(engines[g], list.map((s) => known[s.id])));
+  }
+  const batchIds = Object.values(batchesByGroup).flat();
+  console.log(`${batchIds.length} batch(es) started for ${selected.length} scenario(s) x ${repeat}. Waiting...`);
 
   const runsByBatch = {};
   for (let i = 0; i < 180; i++) {
@@ -225,7 +260,7 @@ async function main() {
 
   const results = selected.map((sc) => ({
     id: sc.id, name: sc.name, criteria: sc.criteria.map(fill),
-    runs: batchIds.map((b) => {
+    runs: batchesByGroup[sc.engine || "main"].map((b) => {
       const r = (runsByBatch[b] || []).find((x) => x.test_case_definition_id === known[sc.id]) || {};
       const transcript = transcriptLines(r.transcript_snapshot);
       const code_problems = r.status ? codeChecks(sc, transcript) : [];

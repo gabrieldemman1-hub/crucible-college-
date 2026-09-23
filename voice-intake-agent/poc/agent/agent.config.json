@@ -39,7 +39,7 @@
       {
         "type": "boolean",
         "name": "disclosure_given",
-        "description": "True if, before asking for the caller's name or number, the agent said in any wording that a transcript of the call is kept and that it is not recorded. False if the agent asked for a name or number first, or never said it."
+        "description": "True if the agent's greeting (or its repeat after a cut-off) told the caller that a transcript of the call is kept, before asking for the caller's name or number."
       },
       {
         "type": "enum",
@@ -133,6 +133,8 @@
     "tool_call_strict_mode": true
   },
   "transfer": {
+    "mode": "agentic",
+    "decision_timeout_ms": 45000,
     "agent_detection_timeout_ms": 25000,
     "transfer_ring_duration_ms": 30000,
     "on_hold_music": "relaxing_sound",

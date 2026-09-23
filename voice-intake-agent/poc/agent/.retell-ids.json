@@ -1,5 +1,15 @@
 {
   "llm_id": "llm_2bf4d597e10cca52f86494f0dfc1",
   "agent_id": "agent_1c3903276aeffe6445eccfd2c2",
-  "phone_number": "+16812703588"
+  "phone_number": "+16812703588",
+  "transfer_agents": {
+    "intake": {
+      "llm_id": "llm_12e9596811f4ca582f59da512c2c",
+      "agent_id": "agent_d6fa020c781c1b2633cca27fe4"
+    },
+    "admin": {
+      "llm_id": "llm_e3a439f15189c237f02491afdf68",
+      "agent_id": "agent_f394c809355e8e731541094270"
+    }
+  }
 }

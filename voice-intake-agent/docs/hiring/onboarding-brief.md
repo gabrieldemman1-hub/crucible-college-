@@ -62,8 +62,8 @@ Full reasoning is in `PLAN-v2.md` section 3.
 
 ## What done looks like
 
-Target: fully cut over, with Maya answering every call, by Friday November 20, 2026. The week-by-week
-schedule is `DELIVERY-PLAN.md` section 12.
+There is no fixed go-live date. Done means Maya answering every call, with the metrics below met.
+The week-by-week plan, about nine weeks from posting the roles, is `DELIVERY-PLAN.md` section 12.
 
 | Metric | Target |
 |---|---|

@@ -276,43 +276,46 @@ That review is the first entry in `docs/decisions/`.
 
 ## 11. First two weeks, concretely
 
-| Date | Action | Owner |
+There is no fixed go-live date. The firm starts the clock when it posts the roles; weeks below
+count from that day.
+
+| When | Action | Owner |
 |---|---|---|
-| Mon Sep 21 to Tue Sep 22 | Post both Upwork roles. Create the firm's GitHub organization, move this repository into it, turn on branch protection. Create the password vault; put the rotated Retell key there. | firm |
-| Wed Sep 23 to Fri Sep 25 | Screen applications. Shortlist two engineers and two consultants. Send the engineer test task to both engineers. | firm |
-| Mon Sep 28 | Consultant chosen and contracted; they start reading `PLAN-v2.md` and this document. | firm |
-| Tue Sep 29 to Wed Sep 30 | Test task submissions due; consultant (or firm) ranks them. | consultant |
-| Thu Oct 1 to Fri Oct 2 | Engineer interviews with the consultant present; contract signed; accounts issued from the vault. Counsel review of `prompts/disclosure.md` booked for the week of Oct 5. Salesforce sandbox and Nextiva admin access confirmed. | firm |
-| Mon Oct 5 | Engineer starts. Phase 1 design review. | all three |
+| Days 1 to 2 | Post both Upwork roles. Create the firm's GitHub organization, move this repository into it, turn on branch protection. Create the password vault; put the rotated Retell key there. | firm |
+| Days 3 to 5 | Screen applications. Shortlist two engineers and two consultants. Send the engineer test task to both engineers. | firm |
+| Day 8 | Consultant chosen and contracted; they start reading `PLAN-v2.md` and this document. | firm |
+| Days 9 to 10 | Test task submissions due; consultant (or firm) ranks them. | consultant |
+| Days 11 to 12 | Engineer interviews with the consultant present; contract signed; accounts issued from the vault. Counsel review of `prompts/disclosure.md` booked for the engineer's first week. Salesforce sandbox and Nextiva admin access confirmed. | firm |
+| Day 15 | Engineer starts. Phase 1 design review. | all three |
 
-## 12. Two-month schedule
+## 12. Schedule, by week
 
-Target: fully cut over by Friday November 20, 2026. The plan below leaves one week of slack.
-Durations are from `PLAN-v2.md` section 13. The pilot week is fixed to calendar days because it
-has to see a full week of real calls.
+No target date is set. From the day the roles are posted, the plan below takes about nine weeks,
+including one week of slack. Durations are from `PLAN-v2.md` section 13. The pilot week has to
+see a full, normal week of real calls.
 
-| Week of | Phase | What happens | Gate |
+| Week | Phase | What happens | Gate |
 |---|---|---|---|
-| Sep 21 | Hiring | Both roles posted; accounts, vault, repo set up; proof of concept demoed to the consultant candidates if useful | |
-| Sep 28 | Hiring | Consultant starts; test tasks judged; engineer contracted; counsel review booked; staff list, hours, and Salesforce field decisions written down | |
-| Oct 5 | Phase 0 and 1 | Design review Monday. Retell account items verified, routing file filled, Nextiva caller-id and forwarding confirmed. Conversation flow and transfer chain built. | |
-| Oct 12 | Phase 1 | Transfer testing on real staff numbers, both languages; scenario run; Spanish speaker review. | Gate 1 Wed Oct 14 |
-| Oct 19 | Phase 2 | Service, webhooks, Salesforce sandbox, store-and-forward, alerts; end-to-end scenarios. | Gate 2 Fri Oct 23 |
-| Oct 26 | Phase 3 setup | Production Salesforce, real staff numbers, staff dry run, Nextiva forward-when-unanswered on. | |
-| Nov 2 | Pilot week | Overflow calls answered by Maya; daily transcript and Salesforce review; tuning. | Gate 3 Mon Nov 9 |
-| Nov 9 | Phase 4 | Nextiva forward-always; monitoring and alerts; rollback drill; two business days at 100%; runbook handover. | Gate 4 Fri Nov 13 |
-| Nov 16 | Slack | Fixes from the first week live; consultant operates alone for a day; recorded walkthrough. Done Fri Nov 20. | |
+| 1 | Hiring | Both roles posted; accounts, vault, repo set up; proof of concept demoed to the consultant candidates if useful | |
+| 2 | Hiring | Consultant starts; test tasks judged; engineer contracted; counsel review booked; staff list, hours, and Salesforce field decisions written down | |
+| 3 | Phase 0 and 1 | Design review. Retell account items verified, routing file filled, Nextiva caller-id and forwarding confirmed. Conversation flow and transfer chain built. | |
+| 4 | Phase 1 | Transfer testing on real staff numbers, both languages; scenario run; Spanish speaker review. | Gate 1 midweek |
+| 5 | Phase 2 | Service, webhooks, Salesforce sandbox, store-and-forward, alerts; end-to-end scenarios. | Gate 2 end of week |
+| 6 | Phase 3 setup | Production Salesforce, real staff numbers, staff dry run, Nextiva forward-when-unanswered on. | |
+| 7 | Pilot week | Overflow calls answered by Maya; daily transcript and Salesforce review; tuning. | Gate 3 start of week 8 |
+| 8 | Phase 4 | Nextiva forward-always; monitoring and alerts; rollback drill; two business days at 100%; runbook handover. | Gate 4 end of week |
+| 9 | Slack | Fixes from the first week live; consultant operates alone for a day; recorded walkthrough. | |
 
-### What makes or breaks the date
+### What sets the pace
 
-- **Engineer starting by Oct 5.** Every week of hiring delay moves the end date a week. Post
-  both roles today, not sequentially.
-- **The firm's own inputs by Oct 2:** staff list with direct numbers and languages, overnight
-  person, business hours, Salesforce sandbox access, Nextiva admin access, counsel booked.
-  These are `docs/firm-checklist.md`; none of them can be done by the contractors.
-- **Counsel sign-off on the disclosure wording before Oct 26.** The pilot cannot answer real
-  callers without it.
-- **Salesforce sandbox by Oct 19.** Phase 2 cannot start against production.
+- **When the engineer starts.** The build weeks count from the engineer's first day. Post both
+  roles at the same time, not one after the other.
+- **The firm's own inputs before the engineer starts:** staff list with direct numbers and
+  languages, overnight person, business hours, Salesforce sandbox access, Nextiva admin access,
+  counsel booked. These are `docs/firm-checklist.md`; none of them can be done by the contractors.
+- **Counsel sign-off on the disclosure wording before the pilot week.** The pilot cannot answer
+  real callers without it.
+- **Salesforce sandbox by week 5.** Phase 2 cannot start against production.
 - **Retell surprises in phase 1.** The proof of concept lists what only live calls can settle.
   The slack week and the contingency budget exist for this. If phase 1 slips more than three
   days, the consultant and firm decide whether to drop the Spanish whisper variant or the
@@ -320,5 +323,4 @@ has to see a full week of real calls.
 - **The pilot week needs a normal week.** Do not schedule it over a holiday or a week when
   half the intake team is out.
 
-If hiring slips a week, the schedule still fits by moving the pilot to the week of Nov 9 and
-cutover to the week of Nov 16, with no slack left. Slipping two weeks means a December pilot.
+If hiring takes longer, every week shifts by the same amount; nothing else in the plan depends on a calendar date.

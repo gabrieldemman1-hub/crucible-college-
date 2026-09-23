@@ -99,7 +99,9 @@ if (ids.agent_id) {
     same("backchannel", g.enable_backchannel, want.enable_backchannel);
     same("interruption sensitivity", g.interruption_sensitivity, want.interruption_sensitivity);
     same("denoising", g.denoising_mode, want.denoising_mode);
-    if (g.data_storage_setting === "everything") warn(`data_storage_setting is "everything": Retell keeps call audio, while Maya tells callers the call is not recorded. Open firm decision.`);
+    if (g.webhook_url) ok(`callback alerts: webhook set (${(g.webhook_events || []).join(", ") || "default events"})`);
+    else warn("callback alerts: no webhook_url on the agent; nobody is emailed when a transfer fails. See poc/alerts/callback-alerts.gs.");
+    if (g.data_storage_setting === "everything") warn(`data_storage_setting is "everything": Retell keeps call audio and transcripts; retention is not set yet.`);
     else ok(`data_storage_setting: ${g.data_storage_setting}`);
     const llmId = g.response_engine?.llm_id;
     const llm = llmId ? await api(`/get-retell-llm/${llmId}${g.response_engine?.version !== undefined ? `?version=${g.response_engine.version}` : ""}`) : null;
@@ -107,12 +109,15 @@ if (ids.agent_id) {
       const begin = String(llm.json.begin_message || "");
       if (begin.includes(live.firm_name)) ok(`greeting names ${live.firm_name}`);
       else fail(`greeting does not name ${live.firm_name}: "${begin}"`);
+      if (/transcript/i.test(begin)) ok("greeting gives the transcript notice");
+      else fail(`greeting does not mention the transcript: "${begin}"`);
       for (const name of ["transfer_to_intake", "transfer_to_admin"]) {
         const t = (llm.json.general_tools || []).find((x) => x.name === name);
         const num = t?.transfer_destination?.number;
         if (!t) fail(`${name} tool missing`);
         else if (!E164.test(num || "")) fail(`${name} number "${num}" is not E.164`);
-        else ok(`${name} -> ${num} (${t.transfer_option?.type})`);
+        else if (t.transfer_option?.type !== "agentic_warm_transfer") warn(`${name} -> ${num} uses ${t.transfer_option?.type}; the firm decided staff must say yes (agentic_warm_transfer).`);
+        else ok(`${name} -> ${num} (staff must say yes; transfer agent ${t.transfer_option.agentic_transfer_config?.transfer_agent?.agent_id})`);
       }
     } else warn(`Could not read the agent's LLM ${llmId} (HTTP ${llm?.status}).`);
   }
