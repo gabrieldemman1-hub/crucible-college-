@@ -138,7 +138,7 @@
   {
     "id": 12,
     "name": "Opposing counsel",
-    "caller": "You are Rebecca Stone, an attorney at Harper & Cole, calling about the Martinez matter. You are not a client. Say 'I'm opposing counsel on the Martinez case, I need to reach the attorney handling it.' Give your name and firm when asked. Your number is fine.",
+    "caller": "You are Rebecca Stone, an attorney at Harper & Cole, calling about the Martinez matter. You are not a client. Say 'I'm opposing counsel on the Martinez case, I need to reach the attorney handling it.' Give your name and firm when asked. If asked for a number, say 'my number is fine'; if the assistant says she can't see it, give 213-555-0148.",
     "criteria": [
       "The agent treated the caller as an other-matter caller and did not give any legal or case information.",
       "The agent asked for the caller's name and firm and a callback number.",
@@ -213,7 +213,7 @@
   {
     "id": 18,
     "name": "Rambling elderly caller",
-    "caller": "You are Harold Jenkins, 78, a new client. You ramble and go off topic: talk about your grandson, the weather, and how you used to work at the plant, before answering any question. Answer each question eventually but only after a tangent. Your name is Harold Jenkins. Your number is fine. You are hard of hearing and sometimes say 'what was that?'",
+    "caller": "You are Harold Jenkins, 78, a new client. You ramble and go off topic: talk about your grandson, the weather, and how you used to work at the plant, before answering any question. Answer each question eventually but only after a tangent. Your name is Harold Jenkins. Your number is fine. You are hard of hearing: exactly once, right after the assistant asks for your name, your whole turn is only 'What was that?' and nothing else; wait for her to repeat it. Do not say 'what was that' at any other time.",
     "criteria": [
       "The agent asked only one question per turn and kept turns to two sentences or fewer.",
       "The agent stayed patient and repeated questions when asked 'what was that?' without irritation.",
@@ -331,7 +331,7 @@
     "name": "Blocked caller id",
     "caller": "You are Chris Nolan, a new client, calling from a blocked number. If the assistant asks whether the number you're calling from is best, say 'my number is blocked, you won't see it. It's 310-555-0199.' Give your name when asked.",
     "dynamic_variables": {
-      "from_number": "anonymous"
+      "user_number": "anonymous"
     },
     "criteria": [
       "The agent obtained the number 310-555-0199 and read it back for confirmation (grouped as 310, 555, 0199 or with dashes; either is fine when spoken).",
@@ -540,7 +540,7 @@
     "caller": "You are Omar Said. You are in a hurry. Open with 'Just transfer me to my attorney, I'm in a rush.' Do not say you have a case unless asked directly; if asked, say 'yes, I have a case with you.' Give your name if asked, this number is fine.",
     "expectTool": "transfer_to_admin",
     "criteria": [
-      "The agent acknowledged the hurry in three words or fewer.",
+      "The agent acknowledged the hurry briefly (a few words, like 'Of course, one moment.') rather than lecturing.",
       "Before transferring, the agent asked whether the caller already has a case with the firm.",
       "The agent said the first person is on the admin team and will get the caller to their attorney, without implying that person is an attorney.",
       "The agent called transfer_to_admin."

@@ -73,7 +73,8 @@ async function syncDefinitions(scenarios, engine) {
       llm_model: SIM_MODEL,
       response_engine: { type: "retell-llm", llm_id: engine.llm_id, version: engine.version },
       tool_mocks: mocksFor(sc),
-      ...(sc.dynamic_variables ? { dynamic_variables: sc.dynamic_variables } : {}),
+      // A live call always has caller ID unless it is blocked; give the simulated caller one too.
+      dynamic_variables: sc.dynamic_variables || { user_number: "+14155550123" },
     };
     if (known[sc.id]) {
       try { await api("PUT", `/update-test-case-definition/${known[sc.id]}`, body); continue; }
