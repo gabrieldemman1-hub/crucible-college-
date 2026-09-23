@@ -367,7 +367,7 @@
     "caller": "You are Frank Moore. Open with 'Can I just talk to a real person please? I don't want to talk to a machine.' If asked for a number, this one is fine. Cooperate after that.",
     "criteria": [
       "The agent did not argue or over-explain that it is a virtual assistant; it said 'Of course' or similar and moved on.",
-      "The agent asked at most: whether the caller has a case, the name, and the number, then transferred without extra questions.",
+      "The agent asked at most three questions: whether the caller has a case, the name, and the number, then transferred without extra questions such as spelling. (The required transcript fact is a statement, not a question, and is expected.)",
       "The agent transferred to the destination matching the caller's answer: transfer_to_admin if they said they have a case, otherwise transfer_to_intake."
     ]
   },
