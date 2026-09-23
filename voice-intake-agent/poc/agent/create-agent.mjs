@@ -1,24 +1,31 @@
 #!/usr/bin/env node
 // Creates or updates the proof-of-concept Maya agent on Retell AI and binds it to a phone number.
-// Plain Node 20+, no dependencies. Safe to re-run: ids are remembered in .retell-ids.json (gitignored).
+// Plain Node 20+, no dependencies. Safe to re-run: ids are remembered in .retell-ids.json (committed,
+// no secrets in it), so every checkout updates the same agent instead of creating a second one.
 //
-// Required env:  INTAKE_PHONE, ADMIN_PHONE. RETELL_API_KEY unless the environment attaches the key
-//                as an API credential for api.retellai.com (then leave it unset).
-// Optional env:  INTAKE_NAME (default "James"), ADMIN_NAME ("Ana"), FIRM_NAME ("the firm"),
-//                AGENT_NAME ("Maya"), MAIN_OFFICE_NUMBER, RETELL_PHONE_NUMBER (bind target; if unset
-//                and the account has exactly one number, that one is used), VOICE_ID (else a
-//                multilingual ElevenLabs female voice is picked from /list-voices and printed),
-//                RETELL_MODEL (default from agent.config.json), RETELL_BASE_URL,
-//                TRANSFER_MODE ("warm" default: whisper to staff; "cold": plain transfer, Maya
-//                tells the caller what she is passing along instead. Use if the account's plan
-//                does not include warm transfer.)
+// Names (firm, agent, intake, admin, main office line) come from live.json, which is committed and is
+// the single source of truth. Environment variables with the same names are ignored, with a warning
+// if they differ, so a stale shell cannot quietly rename the firm.
 //
-// Usage:  node poc/agent/create-agent.mjs            create or update everything
+// Env:  RETELL_API_KEY unless the environment attaches the key as an API credential for
+//       api.retellai.com (then leave it unset).
+//       INTAKE_PHONE, ADMIN_PHONE: optional when the agent already exists; if unset, the numbers
+//       on the live agent's transfer tools are kept. Required for a first create.
+//       RETELL_PHONE_NUMBER (bind target; if unset, the number in .retell-ids.json, else the only
+//       number on the account), VOICE_ID (else agent.config.json's voice_id_default),
+//       RETELL_MODEL (default from agent.config.json), RETELL_BASE_URL,
+//       VERSION_NOTE (short title for the published version, shown in Retell's version list),
+//       TRANSFER_MODE ("warm" default: whisper to staff; "cold": plain transfer, Maya tells the
+//       caller what she is passing along instead. Use if the plan lacks warm transfer.)
+//
+// Usage:  node poc/agent/create-agent.mjs            create or update, publish, bind
 //         node poc/agent/create-agent.mjs --voices   just list candidate voices and exit
 //         node poc/agent/create-agent.mjs --unbind   detach the agent from the phone number
 //         node poc/agent/create-agent.mjs --dry-run  build and print the payloads, call nothing
-//                                                    (no key or network needed; phones default
+//                                                    (no key or network needed; phones fall back
 //                                                    to placeholders if unset)
+//         --new                                      allow creating a new agent even though the
+//                                                    phone number is bound to another agent
 
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -29,6 +36,9 @@ const root = join(here, "..", "..");
 const BASE = process.env.RETELL_BASE_URL || "https://api.retellai.com";
 const KEY = process.env.RETELL_API_KEY;
 const IDS_FILE = join(here, ".retell-ids.json");
+const LIVE_FILE = join(here, "live.json");
+// Retell fills these at call time. Anything else still in double braces after fill() is a bug.
+const RUNTIME_VARS = [/^user_number$/, /^current_time_/];
 
 function env(name, fallback) {
   const v = process.env[name];
@@ -41,13 +51,18 @@ function env(name, fallback) {
 }
 const DRY = process.argv.includes("--dry-run");
 
-function e164(name, dryFallback) {
-  const v = DRY && dryFallback !== undefined ? env(name, dryFallback) : env(name);
-  if (!/^\+[1-9]\d{7,14}$/.test(v)) {
+const E164 = /^\+[1-9]\d{7,14}$/;
+function checkE164(name, v) {
+  if (!E164.test(v)) {
     console.error(`${name} must be in E.164 format like +14155550101, got "${v}"`);
     process.exit(2);
   }
   return v;
+}
+
+function leftoverPlaceholders(obj) {
+  return [...new Set([...JSON.stringify(obj).matchAll(/\{\{([^{}]+)\}\}/g)].map((m) => m[1]))]
+    .filter((k) => !RUNTIME_VARS.some((re) => re.test(k)));
 }
 
 async function api(method, path, body) {
@@ -135,81 +150,105 @@ async function main() {
     return;
   }
 
-  const cfg = JSON.parse(readFileSync(join(here, "agent.config.json"), "utf8"));
-  const vars = {
-    agent_name: env("AGENT_NAME", "Maya"),
-    firm_name: env("FIRM_NAME", "the firm"),
-    intake_name: env("INTAKE_NAME", "James"),
-    admin_name: env("ADMIN_NAME", "Ana"),
-    main_office_number: env("MAIN_OFFICE_NUMBER", "the number on our website"),
-  };
-  const intakePhone = e164("INTAKE_PHONE", "+14155550101");
-  const adminPhone = e164("ADMIN_PHONE", "+14155550201");
-
+  const ids = loadIds();
   if (args.has("--unbind")) {
-    const ids = loadIds();
     if (!ids.phone_number) { console.log("No bound phone number recorded."); return; }
     await api("PATCH", `/update-phone-number/${encodeURIComponent(ids.phone_number)}`, { inbound_agents: null });
-    console.log(`Unbound ${ids.phone_number}. Callers will no longer reach ${vars.agent_name}.`);
+    console.log(`Unbound ${ids.phone_number}. Callers will no longer reach the agent.`);
     return;
   }
 
-  const prompt = fill(readFileSync(join(here, "prompt.md"), "utf8"), vars);
-  // Pull only the relevant sections of prompts/briefing.md into each whisper prompt. Fill the
-  // firm's names, then turn the remaining {{slots}} into [slots]: Retell treats double braces as
-  // dynamic variables and would blank them out.
-  const briefingMd = readFileSync(join(root, "prompts", "briefing.md"), "utf8");
-  const briefingSections = (...prefixes) => briefingMd.split(/\n## /).slice(1)
-    .filter((sec) => prefixes.some((p) => sec.toLowerCase().startsWith(p.toLowerCase())))
-    .map((sec) => "## " + sec.trim()).join("\n\n");
-  const briefingFor = (...prefixes) => fill(briefingSections(...prefixes), vars).replace(/\{\{(\w+)\}\}/g, "[$1]");
+  const cfg = JSON.parse(readFileSync(join(here, "agent.config.json"), "utf8"));
+  const live = JSON.parse(readFileSync(LIVE_FILE, "utf8"));
+  const vars = {};
+  for (const [key, envName] of [["firm_name", "FIRM_NAME"], ["agent_name", "AGENT_NAME"], ["intake_name", "INTAKE_NAME"], ["admin_name", "ADMIN_NAME"], ["main_office_number", "MAIN_OFFICE_NUMBER"]]) {
+    if (!live[key]) { console.error(`live.json is missing "${key}"`); process.exit(2); }
+    vars[key] = live[key];
+    const e = process.env[envName];
+    if (e && e !== live[key]) console.warn(`warn: ${envName}="${e}" in the environment differs from live.json ("${live[key]}"). Using live.json; edit it to change the name.`);
+  }
 
-  // The whisper is generated by the model from the conversation, guided by the template in
-  // prompts/briefing.md. A prompt-type handoff avoids depending on dynamic-variable rendering
-  // inside a static message, which is not confirmed for single-prompt agents.
-  const whisperPrompt = (who, role, briefing) => [
-    `You are ${vars.agent_name}, the intake assistant. You have just reached ${who}, a staff member, on a private line. The caller is on hold with music and cannot hear either of you. This is a two-way conversation with ${who}, not an announcement.`,
-    ``,
-    `STEP 1, the briefing. Speak it quickly, in one breath, under 8 seconds for a calm caller, filling in details from the conversation so far:`,
-    `"${/^(the|our) /i.test(who) ? `Hi, ${vars.agent_name} here` : `Hi ${who}, ${vars.agent_name} here`}. I've got [caller's full name], ${role}, [English, Spanish, or 'limited English, speaks <language>']. [If they confirmed a number: 'Callback' followed by the digits. If they said the number they're calling from is fine: 'Best number is the one they're calling from.'] Stay on to take it, or hang up and I'll take a message."`,
-    `If the caller volunteered why they're calling, add one short clause before "Stay on to take it" quoting three to eight of the caller's own words: "They mentioned [their exact words]." Never add legal labels the caller did not say themselves (no "retaliation", "wrongful termination", "discrimination", "harassment claim"). If the caller was upset, angry, frustrated, or distressed (crying, overwhelmed, hopeless), the briefing is longer, up to 15 seconds, and the order matters: greeting, then "Heads up, this caller is upset." BEFORE the caller's name or anything else, then in one sentence what they are upset about, in their own words, what they asked for (for example, an attorney), and what you told them (for example, that ${who} is on the intake team and will get them to the right attorney). Then the rest as usual. If the caller said they might hurt themselves or sounded in danger, say first: "Heads up, this caller may be in crisis." If the caller asked for Walter, Peg, or Anthony by name, add: "They asked for [name] by name." If no name was captured, say "a caller who didn't give their name" in place of the name. If the caller gave no number but is calling from a visible number, say "Best number is the one they're calling from." Say "No callback number captured" only if their caller id was blocked. If the caller was joking, rude, or gave obviously fake answers, say "Heads up, this caller has been joking around" (or "has been rude") and, if so, "and wouldn't give a name."`,
-    ``,
-    `STEP 2, listen. After the briefing, stop and let ${who} respond. ${who} may ask you questions before taking the call, for example: "What exactly did they say?", "How angry are they?", "Did they say what it's about?", "Did they ask for anyone?", "What did you tell them?", "Have they called before today?", "Did they mention a deadline or a court date?" Answer each question in one or two sentences, from what actually happened on this call, quoting the caller's own words where you can. Be honest: if the caller didn't say, say "They didn't say." Never guess, never characterize the legal matter, never add anything the caller didn't say. Keep it moving; the caller is waiting.`,
-    ``,
-    `STEP 3, bridge. The caller is connected as soon as ${who} says anything that is not a question ("okay", "go ahead", "put them through"), or after a few seconds with no further question. Say "Connecting you now." The only way for ${who} to decline is to hang up; if that happens the transfer fails and you go back to the caller with the callback message.`,
-    ``,
-    `Reference briefing template follows.\n\n${briefing}`,
-  ].join("\n");
+  // Phones: env if set, else whatever the live agent transfers to today. Never an invented default.
+  let intakePhone = process.env.INTAKE_PHONE;
+  let adminPhone = process.env.ADMIN_PHONE;
+  if ((!intakePhone || !adminPhone) && ids.llm_id && !DRY) {
+    const cur = await api("GET", `/get-retell-llm/${ids.llm_id}`);
+    const numberOf = (name) => (cur.general_tools || []).find((t) => t.name === name)?.transfer_destination?.number;
+    intakePhone ||= numberOf("transfer_to_intake");
+    adminPhone ||= numberOf("transfer_to_admin");
+    console.log(`Transfer numbers kept from the live agent where not set in env: intake ${intakePhone}, admin ${adminPhone}.`);
+  }
+  if (DRY) { intakePhone ||= "+14155550101"; adminPhone ||= "+14155550201"; }
+  if (!intakePhone || !adminPhone) { console.error("Set INTAKE_PHONE and ADMIN_PHONE (no live agent to read them from)."); process.exit(2); }
+  checkE164("INTAKE_PHONE", intakePhone);
+  checkE164("ADMIN_PHONE", adminPhone);
+
+  const prompt = fill(readFileSync(join(here, "prompt.md"), "utf8"), vars);
+  // The whisper is generated by the model from the conversation. A prompt-type handoff avoids
+  // depending on dynamic-variable rendering inside a static message, which is not confirmed for
+  // single-prompt agents. prompts/briefing.md documents the production (multi-person) wording; the
+  // POC wording is the one below.
+  const whisperPrompt = (dest) => {
+    const who = dest === "intake" ? vars.intake_name : vars.admin_name;
+    const team = /^(the|our) /i.test(who);
+    const hi = team ? `Hi, ${vars.agent_name} here` : `Hi ${who}, ${vars.agent_name} here`;
+    const roles = dest === "intake"
+      ? `"a new client" by default. If the caller said they already have a case (for example a caller in crisis sent to intake anyway), "who says they already have a case". If they called about someone else, "[caller's name] calling for [that person's name]".`
+      : `"who says they already have a case" for an existing client. For a vendor, court, other law firm, or anyone else, "calling about another matter, from [their organization, if they said]". If they called about someone else, "[caller's name] calling for [that person's name], who has a case with us".`;
+    const told = dest === "intake"
+      ? `that ${who} is on the intake team and will get them to the right attorney`
+      : `that they're going to the admin team, who will get them to their attorney`;
+    return [
+      `You are ${vars.agent_name}, ${vars.firm_name}'s virtual assistant. You have just reached ${team ? who : `${who}, a staff member,`} on a private line. The caller is on hold with music and cannot hear either of you. This is a two-way conversation with ${who}, not an announcement.`,
+      ``,
+      `Caller ID of the caller: {{user_number}}. If that is blank, anonymous, or still in curly braces, caller ID is unavailable.`,
+      ``,
+      `STEP 1, the briefing. Speak it quickly, in one breath, under 8 seconds for a calm caller, filling in details from the conversation so far:`,
+      `"${hi}. I've got [caller's full name], [role]. [Language, only if the caller did not speak English: 'Speaks Spanish.' or 'Limited English, speaks <language>.'] [Callback: if they gave or confirmed a number, 'Callback' and the digits in groups of three, three, four. If they said the number they're calling from is fine and caller ID is available, 'Callback is the number they're calling from,' and those digits in groups of three, three, four. If there is no number at all, 'No callback number captured.'] Stay on to take it, or hang up and I'll take a message."`,
+      `[role] is ${roles} Never say "an existing client or other matter".`,
+      `If the caller volunteered why they're calling, add one short clause before "Stay on to take it" quoting three to eight of the caller's own words: "They mentioned [their exact words]." Never add legal labels the caller did not say themselves (no "retaliation", "wrongful termination", "discrimination", "harassment claim").`,
+      `If the caller said they might hurt themselves, don't want to be here, or sounded in danger, the very first words after the greeting are "Heads up, this caller may be in crisis." Then what they said, in their own words, in one sentence, then the rest.`,
+      `Otherwise, if the caller was upset, angry, frustrated, or distressed, the briefing can run to 15 seconds and the order matters: greeting, then "Heads up, this caller is upset." before the caller's name or anything else, then in one sentence what they are upset about in their own words, what they asked for (for example, an attorney), and what you told them (for example, ${told}). Then the rest as usual.`,
+      `If the caller asked for Walter, Peg, Anthony, or any other staff member by name, add: "They asked for [name] by name." If no name was captured, say "a caller who didn't give their name" in place of the name. If the caller was joking, rude, or gave obviously fake answers, add "Heads up, this caller has been joking around" (or "has been rude").`,
+      ``,
+      `STEP 2, listen. After the briefing, stop and let ${who} respond. They may ask questions before taking the call, for example: "What exactly did they say?", "How angry are they?", "Did they say what it's about?", "Did they ask for anyone?", "What did you tell them?", "Have they called before today?", "Did they mention a deadline or a court date?" Answer each in one or two sentences, from what actually happened on this call, quoting the caller's own words where you can. If the caller didn't say, say "They didn't say." Never guess, never characterize the legal matter, never add anything the caller didn't say. Keep it moving; the caller is waiting.`,
+      ``,
+      `STEP 3, bridge. The caller is connected as soon as ${who} says anything that is not a question ("okay", "go ahead", "put them through"), or after a few seconds with no further question. Say "Connecting you now." The only way to decline is to hang up; then the transfer fails and you go back to the caller with the callback message.`,
+    ].join("\n");
+  };
 
   const transferMode = env("TRANSFER_MODE", "warm");
   if (!["warm", "cold"].includes(transferMode)) { console.error('TRANSFER_MODE must be "warm" or "cold"'); process.exit(2); }
 
-  const transferTool = (name, description, number, who, role, holdText, briefing) => ({
-    type: "transfer_call",
-    name,
-    description,
-    transfer_destination: { type: "predefined", number },
-    transfer_option: transferMode === "warm" ? {
-      type: "warm_transfer",
-      agent_detection_timeout_ms: cfg.transfer.agent_detection_timeout_ms,
-      transfer_ring_duration_ms: cfg.transfer.transfer_ring_duration_ms,
-      on_hold_music: cfg.transfer.on_hold_music,
-      opt_out_human_detection: cfg.transfer.opt_out_human_detection,
-      show_transferee_as_caller: cfg.transfer.show_transferee_as_caller,
-      private_handoff_option: { type: "prompt", prompt: whisperPrompt(who, role, briefing) },
-    } : {
-      type: "cold_transfer",
-      transfer_ring_duration_ms: cfg.transfer.transfer_ring_duration_ms,
-      show_transferee_as_caller: cfg.transfer.show_transferee_as_caller,
-    },
-    speak_during_execution: true,
-    // Warm: a fixed hold line; the briefing goes to staff privately. Cold: no whisper exists, so
-    // Maya tells the caller, in their language, what she is passing along, then transfers.
-    execution_message_type: "prompt",
-    execution_message_description: transferMode === "warm"
-      ? `In the caller's language, in one short sentence, tell them you're connecting them with ${who} now and it may take a moment. Use their first name if you have it. Example: "${holdText}"`
-      : `In the caller's language, say you are connecting them to ${who} now and that you will pass along their name and callback number. Two sentences at most. Do not characterize the legal matter.`,
-  });
+  const transferTool = (name, description, number, dest) => {
+    const who = dest === "intake" ? vars.intake_name : vars.admin_name;
+    return {
+      type: "transfer_call",
+      name,
+      description,
+      transfer_destination: { type: "predefined", number },
+      transfer_option: transferMode === "warm" ? {
+        type: "warm_transfer",
+        agent_detection_timeout_ms: cfg.transfer.agent_detection_timeout_ms,
+        transfer_ring_duration_ms: cfg.transfer.transfer_ring_duration_ms,
+        on_hold_music: cfg.transfer.on_hold_music,
+        opt_out_human_detection: cfg.transfer.opt_out_human_detection,
+        show_transferee_as_caller: cfg.transfer.show_transferee_as_caller,
+        private_handoff_option: { type: "prompt", prompt: whisperPrompt(dest) },
+      } : {
+        type: "cold_transfer",
+        transfer_ring_duration_ms: cfg.transfer.transfer_ring_duration_ms,
+        show_transferee_as_caller: cfg.transfer.show_transferee_as_caller,
+      },
+      speak_during_execution: true,
+      // Warm: the hand-off line is normally already said, so this stays minimal; the briefing goes
+      // to staff privately. Cold: no whisper exists, so Maya tells the caller what she passes along.
+      execution_message_type: "prompt",
+      execution_message_description: transferMode === "warm"
+        ? `In the caller's language. If your previous turn already told the caller you're getting them over to ${who}, say only "One moment." Otherwise say "Okay, let me get you over to ${who}, one moment." Never use the caller's name.`
+        : `In the caller's language, say you are connecting them to ${who} now and that you will pass along their name and callback number. Two sentences at most. Never use the caller's name. Do not characterize the legal matter.`,
+    };
+  };
 
   const llmBody = {
     model: process.env[cfg.llm.model_env] || cfg.llm.model_default,
@@ -218,47 +257,65 @@ async function main() {
     general_prompt: prompt,
     begin_message: `Thanks for calling ${vars.firm_name}, this is ${vars.agent_name}, the firm's virtual assistant. Are you calling about a new matter, or do you already have a case with us?`,
     general_tools: [
-      { type: "end_call", name: "end_call", description: "End the call after saying goodbye, or when the caller has hung up or gone silent." },
+      { type: "end_call", name: "end_call", description: "End the call only for a reason listed in section 8 of the prompt (wrong number, refused transcription, failed transfer after the caller answered the last question, message taken, silence after both nudges, or the caller hung up). Say goodbye first unless the caller has hung up." },
       transferTool(
         "transfer_to_intake",
-        `Warm-transfer a new client (or anyone who asked for Walter, Peg, or Anthony) to the intake manager ${vars.intake_name}. Never use this for a caller who speaks neither English nor Spanish; use transfer_to_admin for them. Call only after name and phone are collected and you have told the caller you're connecting them.`,
-        intakePhone, vars.intake_name, "a new client",
-        `Thanks, James. Let me get you over to ${vars.intake_name}, one moment.`,
-        briefingFor("Intake transfer, English", "Intake transfer, Spanish", "Senior management ask")
+        `Warm-transfer to ${vars.intake_name} on the intake team. Use for: new clients and anyone unsure, in any language; anyone who asked for Walter, Peg, or Anthony; any caller who may be in crisis, even an existing client; non-employment matters. Call only after the transcript fact, name, and number (or the caller refused them), right after the hand-off line.`,
+        intakePhone, "intake"
       ),
       transferTool(
         "transfer_to_admin",
-        `Warm-transfer an existing client or an other-matter caller to the admin team member ${vars.admin_name}. Call only after name and phone are collected and you have told the caller you're connecting them.`,
-        adminPhone, vars.admin_name, "an existing client or other matter",
-        `Okay. Let me get you over to ${vars.admin_name}, one moment.`,
-        briefingFor("Admin transfer (existing client)", "Admin transfer (other matter)")
+        `Warm-transfer to ${vars.admin_name}. Use for: existing clients (they say they already have a case with us), people calling for someone who already has a case, and other matters (vendors, courts, other law firms, sales). Never for a caller who may be in crisis. Call only after the transcript fact, name, and number (or the caller refused them), right after the hand-off line.`,
+        adminPhone, "admin"
       ),
     ],
   };
 
-  const ids = loadIds();
+  const leftovers = (agentBody) => leftoverPlaceholders({ llmBody, agentBody });
 
   if (DRY) {
     const a = cfg.agent;
-    const agentBody = buildAgentBody(a, vars, ids.llm_id || "<llm_id from create-retell-llm>", process.env.VOICE_ID || "<picked from /list-voices on the live run>");
-    const leftovers = [...JSON.stringify({ llmBody, agentBody }).matchAll(/\{\{(\w+)\}\}/g)].map((m) => m[1]);
+    const agentBody = buildAgentBody(a, vars, ids.llm_id || "<llm_id from create-retell-llm>", process.env.VOICE_ID || a.voice_id_default);
+    const unfilled = leftovers(agentBody);
     const out = {
       dry_run: true,
       would_call: [
         ids.llm_id ? `PATCH /update-retell-llm/${ids.llm_id}` : "POST /create-retell-llm",
-        process.env.VOICE_ID ? "(VOICE_ID set, /list-voices skipped)" : "GET /list-voices",
-        ids.agent_id ? `PATCH /update-agent/${ids.agent_id}` : "POST /create-agent",
+          ids.agent_id ? `PATCH /update-agent/${ids.agent_id}` : "POST /create-agent",
         process.env.RETELL_PHONE_NUMBER ? `PATCH /update-phone-number/${process.env.RETELL_PHONE_NUMBER}` : "GET /v2/list-phone-numbers, then PATCH /update-phone-number/<number>",
       ],
       env_used: { ...vars, intake_phone: intakePhone, admin_phone: adminPhone, model: llmBody.model, transfer_mode: transferMode },
       prompt_words: prompt.split(/\s+/).length,
-      unfilled_placeholders: [...new Set(leftovers)],
+      unfilled_placeholders: unfilled,
       llmBody,
       agentBody,
     };
     console.log(JSON.stringify(out, null, 2));
-    if (leftovers.length) { console.error(`\nUnfilled placeholders: ${[...new Set(leftovers)].join(", ")}`); process.exit(3); }
+    if (unfilled.length) { console.error(`\nUnfilled placeholders: ${unfilled.join(", ")}`); process.exit(3); }
     return;
+  }
+
+  const voiceId = await pickVoice(process.env.VOICE_ID || cfg.agent.voice_id_default);
+  const unfilled = leftovers(buildAgentBody(cfg.agent, vars, "x", voiceId));
+  if (unfilled.length) { console.error(`Unfilled placeholders: ${unfilled.join(", ")}. Nothing was changed.`); process.exit(3); }
+
+  // Resolve the phone number before touching anything, so a fresh checkout without ids cannot
+  // create a second agent and steal a number that is already answering calls.
+  let number = process.env.RETELL_PHONE_NUMBER || ids.phone_number;
+  const nums = await api("GET", "/v2/list-phone-numbers");
+  const numList = Array.isArray(nums) ? nums : nums?.items ?? nums?.phone_numbers ?? [];
+  if (!number) {
+    if (numList.length === 1) number = numList[0].phone_number;
+    else if (numList.length === 0) { console.log("No phone number on the account yet. Buy one in the Retell dashboard, then re-run with RETELL_PHONE_NUMBER set."); return; }
+    else { console.log("Several numbers on the account. Set RETELL_PHONE_NUMBER to one of:\n  " + numList.map((n) => n.phone_number).join("\n  ")); return; }
+  }
+  const target = numList.find((n) => n.phone_number === number);
+  if (!target) { console.error(`${number} is not on this Retell account.`); process.exit(2); }
+  const boundTo = (target.inbound_agents || []).map((x) => x.agent_id).concat(target.inbound_agent_id || []).filter(Boolean);
+  const others = boundTo.filter((id) => id !== ids.agent_id);
+  if (!ids.agent_id && others.length && !args.has("--new")) {
+    console.error(`${number} already answers with agent ${others.join(", ")}, and .retell-ids.json has no agent. Restore .retell-ids.json from git to update that agent, or pass --new to create a second one and move the number to it.`);
+    process.exit(2);
   }
 
   // Published versions are immutable. If the agent is published, open a new draft version first;
@@ -286,7 +343,6 @@ async function main() {
     console.log(`Created Retell LLM ${ids.llm_id}`);
   }
 
-  const voiceId = await pickVoice(process.env.VOICE_ID || cfg.agent.voice_id_default);
   const a = cfg.agent;
   const agentBody = buildAgentBody(a, vars, ids.llm_id, voiceId);
   if (llmVersion !== undefined) agentBody.response_engine.version = llmVersion;
@@ -303,18 +359,10 @@ async function main() {
   }
 
   // Publish the draft version so inbound calls use it.
-  await api("POST", `/publish-agent-version/${ids.agent_id}`, { version: agent.version ?? 0, version_title: "POC publish" });
+  await api("POST", `/publish-agent-version/${ids.agent_id}`, { version: agent.version ?? 0, version_title: (process.env.VERSION_NOTE || "POC publish").slice(0, 100) });
   console.log(`Published agent version ${agent.version ?? 0}`);
 
-  // Bind to a phone number.
-  let number = process.env.RETELL_PHONE_NUMBER;
-  if (!number) {
-    const nums = await api("GET", "/v2/list-phone-numbers");
-    const list = Array.isArray(nums) ? nums : nums?.items ?? nums?.phone_numbers ?? [];
-    if (list.length === 1) number = list[0].phone_number;
-    else if (list.length === 0) { console.log("No phone number on the account yet. Buy one in the Retell dashboard, then re-run with RETELL_PHONE_NUMBER set."); saveIds(ids); return; }
-    else { console.log("Several numbers on the account. Set RETELL_PHONE_NUMBER to one of:\n  " + list.map((n) => n.phone_number).join("\n  ")); saveIds(ids); return; }
-  }
+  // Bind to the phone number.
   await api("PATCH", `/update-phone-number/${encodeURIComponent(number)}`, {
     nickname: `${vars.agent_name} intake POC`,
     inbound_agents: [{ agent_id: ids.agent_id, weight: 1 }],
@@ -327,7 +375,7 @@ async function main() {
   console.log(`  New clients transfer to ${vars.intake_name} at ${intakePhone}.`);
   console.log(`  Existing clients and other matters transfer to ${vars.admin_name} at ${adminPhone}.`);
   console.log(`  Model: ${llmBody.model}. Voice: ${voiceId}. Language: ${a.language}. Transfer mode: ${transferMode}.`);
-  console.log(`  Ids saved to ${IDS_FILE} (not committed).`);
+  console.log(`  Ids saved to ${IDS_FILE}. Commit it so every checkout updates this agent.`);
 }
 
 main().catch((err) => { console.error(err.message || err); process.exit(1); });

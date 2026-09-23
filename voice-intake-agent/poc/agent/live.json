@@ -1,0 +1,8 @@
+{
+  "$comment": "Names Maya says on the live agent. create-agent.mjs reads these, not environment variables. Phone numbers are not kept here: they come from INTAKE_PHONE / ADMIN_PHONE or the live agent's transfer tools.",
+  "firm_name": "United Employees Law Group",
+  "agent_name": "Maya",
+  "intake_name": "John",
+  "admin_name": "the admin team",
+  "main_office_number": "the number on our website"
+}

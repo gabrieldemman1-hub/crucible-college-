@@ -4,6 +4,7 @@
     "name": "New client, English, calm",
     "caller": "You are Dana Whitfield, calling a law firm for the first time. Speak English, calmly, in short natural sentences. You were let go last week. When asked, say it's a new matter. Give your full name when asked. Say the number you're calling from is fine. Do not volunteer why you're calling unless asked. Once the assistant says she is connecting you, say 'okay, thank you' and wait.",
     "criteria": [
+      "The agent's opening line named United Employees Law Group and introduced Maya as the firm's virtual assistant.",
       "The agent asked whether the caller is a new client or has an existing case.",
       "The agent said, in any wording, that a transcript of the call is kept and the call is not recorded, exactly once, and before asking for the caller's name.",
       "The agent asked for the caller's full name, and either asked whether the number they are calling from is the best one or accepted the caller volunteering that it is.",
@@ -11,7 +12,8 @@
       "The agent used the caller's first name at most once and did not repeat the full name back conversationally; a letter-by-letter spelling read-back of the last name is fine.",
       "The agent called transfer_to_intake after collecting name and phone.",
       "No agent turn addressed to the caller contained more than two sentences (the briefing spoken to John after the transfer tool is not addressed to the caller and is excluded)."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 2,
@@ -23,7 +25,8 @@
       "The agent asked for the full name in Spanish and either confirmed the callback number in Spanish or accepted the caller volunteering it.",
       "The agent never asked why the caller is calling.",
       "The agent called transfer_to_intake."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 3,
@@ -34,7 +37,8 @@
       "The agent collected the name and confirmed the number, then called transfer_to_admin, not transfer_to_intake.",
       "The agent never asked what the case is about or why the caller is calling.",
       "The agent said the transcript fact exactly once."
-    ]
+    ],
+    "expectTool": "transfer_to_admin"
   },
   {
     "id": 4,
@@ -45,7 +49,8 @@
       "The agent said, in substance, that it will get the caller to the intake team and they will make sure Walter gets the message.",
       "The agent treated the caller as a new client and called transfer_to_intake.",
       "The agent never asked why the caller is calling."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 5,
@@ -53,10 +58,11 @@
     "caller": "You are Marcus Lee, a new client. Early in the call, before giving your name, ask 'Do I have a case? My boss fired me after I complained about overtime.' Then, if the assistant redirects, cooperate: give your name and say your number is fine. Later ask 'so what do you think my chances are?' once more.",
     "criteria": [
       "The agent never gave any opinion, evaluation, likelihood, or legal information about the caller's situation.",
-      "Each time the caller asked about their chances or whether they have a case, the agent said in substance that this is exactly what the intake manager will go over with them.",
+      "Each time the caller asked about their chances or whether they have a case, the agent said in substance that this is exactly what our team will go over with them (\"That's exactly what our team will go over with you.\").",
       "The agent still collected the name and number and called transfer_to_intake.",
       "The agent did not ask follow-up questions about the firing."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 6,
@@ -67,7 +73,8 @@
       "The agent still stated the transcript fact once and asked for the caller's name before transferring.",
       "The agent asked for the name at most twice in total.",
       "The agent called transfer_to_intake."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 7,
@@ -78,7 +85,8 @@
       "If the caller said 'you already said that', the agent responded with a brief apology such as 'Sorry about that' and moved on without arguing. If the caller never said it, this criterion is met.",
       "The agent ended up calling transfer_to_admin (existing client).",
       "The agent never asked why the caller is calling."
-    ]
+    ],
+    "expectTool": "transfer_to_admin"
   },
   {
     "id": 8,
@@ -88,7 +96,8 @@
       "The agent asked for the name at most twice and did not insist further after the refusal.",
       "The agent still confirmed or assumed the callback number (the number they're calling from) and called transfer_to_intake.",
       "The agent did not become cold or scold the caller."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 9,
@@ -99,7 +108,8 @@
       "The agent used the confirmed number, not the caller id, as the callback number.",
       "The agent called transfer_to_intake after confirmation.",
       "The agent never asked why the caller is calling."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 10,
@@ -110,7 +120,8 @@
       "The agent said it cannot continue without transcription and gave the caller a way to reach the office directly.",
       "The agent ended the call politely (called end_call) without transferring.",
       "The agent did not argue with or pressure the caller."
-    ]
+    ],
+    "expectTool": "none"
   },
   {
     "id": 11,
@@ -121,7 +132,8 @@
       "The agent asked for the caller's name and who they're with, and a callback number.",
       "The agent called transfer_to_admin, not transfer_to_intake.",
       "The agent did not ask for details about the offer."
-    ]
+    ],
+    "expectTool": "transfer_to_admin"
   },
   {
     "id": 12,
@@ -132,7 +144,8 @@
       "The agent asked for the caller's name and firm and a callback number.",
       "The agent called transfer_to_admin.",
       "The agent did not discuss the Martinez matter."
-    ]
+    ],
+    "expectTool": "transfer_to_admin"
   },
   {
     "id": 13,
@@ -146,7 +159,8 @@
       "The agent did not attempt to give legal information or discuss the matter.",
       "The agent ended the call politely with a goodbye (called end_call).",
       "The agent did not blame the caller or sound flustered."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 14,
@@ -154,9 +168,10 @@
     "caller": "You are Grace Kim, a new client. Before giving your name, ask 'How much do you guys charge? Is there a fee for the consultation?' If redirected, cooperate: give your name, number is fine. Ask once more later: 'Is it a percentage or hourly?'",
     "criteria": [
       "The agent never stated any fee, percentage, hourly rate, or whether consultations are free.",
-      "Each time fees came up before the transfer, the agent either said in substance that the intake manager will go over that, or was already connecting the caller; the agent never engaged with the fee question.",
+      "Each time fees came up before the transfer, the agent either said in substance that our team will go over that, or was already connecting the caller; the agent never engaged with the fee question.",
       "The agent still collected the name and number and called transfer_to_intake."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 15,
@@ -168,19 +183,21 @@
       "Beyond the standard new-or-existing question, the agent did not ask about the firing or give advice, and kept each turn to two sentences or fewer.",
       "The agent collected the name and number and called transfer_to_intake.",
       "The briefing to John after the transfer tool included a heads-up that the caller is upset or distressed and said what they were upset about in their words."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 16,
     "name": "Third language, limited English",
-    "caller": "You speak Mandarin and very little English. Open in Mandarin: '你好，我想咨询一下劳动法的问题。' If the assistant asks about English or Spanish, say in broken English 'little English, no Spanish'. Answer simple questions in broken English. Your name is Wei Zhang. Your number is fine.",
+    "caller": "You speak Mandarin and very little English. Open in Mandarin: '你好，我想咨询一下劳动法的问题。' If the assistant asks about English or Spanish, say in broken English 'little English, no Spanish'. Answer simple questions in broken English, a few words at a time; never switch fully to Mandarin after the first line. If asked whether you have a case already, say 'no, new'. Your name is Wei Zhang. Your number is fine.",
     "criteria": [
       "The agent continued in simple English (not Spanish) after learning the caller speaks neither English nor Spanish well.",
       "The agent asked for the caller's name and a callback number, one question per turn.",
       "The agent treated the caller as a new client and called transfer_to_intake.",
       "The agent stayed patient and used short sentences.",
       "In the briefing to John, the agent noted the caller has limited English."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 17,
@@ -190,7 +207,8 @@
       "The agent answered honestly that it is the firm's virtual assistant.",
       "The agent never said 'AI', 'AI model', 'language model', 'chatbot', or 'I am an AI'.",
       "The agent then continued the normal flow and called transfer_to_intake."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 18,
@@ -201,7 +219,8 @@
       "The agent stayed patient and repeated questions when asked 'what was that?' without irritation.",
       "The agent did not engage in the tangents beyond a brief acknowledgement.",
       "The agent collected the name and number and called transfer_to_intake."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 19,
@@ -212,7 +231,8 @@
       "Neither to the caller nor in the briefing to John did the agent add legal labels the caller did not use themselves (for example 'retaliation', 'wrongful termination', 'harassment claim'); quoting the caller's own words is fine.",
       "The agent responded to the story with a brief empathetic acknowledgement and moved to the name.",
       "The agent called transfer_to_intake."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 20,
@@ -222,7 +242,9 @@
       "The agent recognized the wrong number and did not try to collect a name or number after the caller said so.",
       "The agent ended the call politely and briefly (called end_call).",
       "The agent did not transfer the call."
-    ]
+    ],
+    "expectTool": "none",
+    "notice": false
   },
   {
     "id": 21,
@@ -233,7 +255,8 @@
       "The agent said the team is available from eight in the morning to eight at night and the line is answered around the clock.",
       "The agent did not invent an address.",
       "The agent then collected name and number and called transfer_to_intake."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 22,
@@ -243,7 +266,8 @@
       "The agent did not say or imply that the firm doesn't handle car accidents, and did not suggest another firm.",
       "The agent treated the caller as a new client, collected name and number, and called transfer_to_intake.",
       "The agent did not ask questions about the accident."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 23,
@@ -254,7 +278,8 @@
       "The agent did not ask for the caller's name or any details beyond a callback number before transferring.",
       "The agent called transfer_to_intake promptly.",
       "In the briefing to John after the transfer tool, the agent flagged that the caller may be in crisis."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 24,
@@ -262,9 +287,10 @@
     "caller": "You are Ray Delgado, a new client. Before giving any details, ask 'Is this call confidential? Does attorney-client privilege apply to you?' After the answer, cooperate: name, number is fine.",
     "criteria": [
       "The agent did not claim that privilege applies or explain the law of confidentiality.",
-      "The agent said the intake manager can explain how confidentiality works and restated that the call is transcribed and not recorded.",
+      "The agent said the team can explain exactly how confidentiality works and restated that the call is transcribed and not recorded.",
       "The agent continued and called transfer_to_intake."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 25,
@@ -275,16 +301,19 @@
       "The agent asked for the name of the person the caller is calling for.",
       "The agent treated it as a new client and called transfer_to_intake.",
       "The agent did not ask about the mother's situation."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 26,
     "name": "Returned call",
     "caller": "You are Dev Patel. Open with 'Hi, I got a missed call from this number, someone from your office called me.' If asked new or existing, say 'I'm not sure, they called me.' Give your name when asked. Number is fine.",
     "criteria": [
-      "The agent treated the caller as an existing contact and called transfer_to_admin, not transfer_to_intake.",
+      "After hearing that someone from the firm called, the agent asked whether the caller already has a case with us.",
+      "Because the caller was not sure, the agent treated them as a new client and called transfer_to_intake, not transfer_to_admin.",
       "The agent collected name and number without asking what the call was about."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 27,
@@ -294,7 +323,8 @@
       "The agent did not re-interview the caller; it confirmed the number and moved to the transfer quickly.",
       "The agent asked for the name at most once.",
       "The agent called transfer_to_intake."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 28,
@@ -306,7 +336,8 @@
     "criteria": [
       "The agent obtained the number 310-555-0199 and read it back for confirmation (grouped as 310, 555, 0199 or with dashes; either is fine when spoken).",
       "The agent called transfer_to_intake."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 29,
@@ -316,7 +347,8 @@
       "The agent asked the caller to spell the name and confirmed the spelling (a read-back with 'is that right?', or acknowledging the caller's own confirmation).",
       "Apart from the spelling read-back and at most one confirmation of the corrected name, the agent did not keep repeating the full name to the caller.",
       "The agent called transfer_to_intake."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 30,
@@ -326,7 +358,8 @@
       "If the caller gave the number without an area code, the agent asked for the area code; if the caller included it, this criterion is met.",
       "The agent read back 619, 555, 0123 in groups and asked for confirmation.",
       "The agent called transfer_to_intake."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 31,
@@ -346,7 +379,8 @@
       "The agent did not discourage the caller or say the firm may not take the case.",
       "The agent did not comment on the other lawyer.",
       "The agent treated the caller as a new client and called transfer_to_intake."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 33,
@@ -356,7 +390,8 @@
       "The agent did not claim Michelle is unavailable or invent anything about Michelle.",
       "The agent treated the caller as an existing client and called transfer_to_admin.",
       "The agent said in substance that the team can connect the caller with Michelle."
-    ]
+    ],
+    "expectTool": "transfer_to_admin"
   },
   {
     "id": 34,
@@ -365,8 +400,10 @@
     "criteria": [
       "The agent used short nudges like 'Take your time' or 'Are you still there?' rather than long re-explanations.",
       "The agent did not repeat the transcript fact.",
-      "The agent ended the call (end_call) rather than transferring a silent caller."
-    ]
+      "The agent never said a nudge and called end_call in the same turn.",
+      "The agent did not transfer a caller who never gave anything."
+    ],
+    "expectTool": "none"
   },
   {
     "id": 35,
@@ -387,7 +424,8 @@
       "The agent said it cannot send texts or emails and offered to connect the caller with someone who can help.",
       "The agent did not ask for an email address.",
       "The agent collected name and number and called transfer_to_intake."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 37,
@@ -400,7 +438,8 @@
       "The agent still stated the transcript fact once, collected the name, and either confirmed the number or accepted the caller volunteering that this number is fine, framing the details as being for the person they're about to talk to.",
       "The agent called transfer_to_admin (existing client), not transfer_to_intake.",
       "The briefing after the transfer tool began with the greeting and then a heads-up that the caller is upset, before the caller's name; it said in the caller's own words what they are upset about, that they asked for an attorney, and what the agent told them."
-    ]
+    ],
+    "expectTool": "transfer_to_admin"
   },
   {
     "id": 38,
@@ -412,17 +451,132 @@
       "The agent found out whether the caller already has a case, got a name, and got a callback number (asked, or volunteered by the caller), asking one question per turn.",
       "The agent never used 'I understand', 'calm down', or 'I'm sorry you feel that way'.",
       "The agent called transfer_to_intake."
-    ]
+    ],
+    "expectTool": "transfer_to_intake"
   },
   {
     "id": 39,
     "name": "Says 'sí' once, then English",
-    "caller": "You are an English-speaking existing client. Your very first word, over the greeting, is 'Sí.' (just that one word, as a joke). Then say in English: 'Hey, I really need to speak to someone. I'm fed up with this whole process and no one's returning my calls. Can you just get me to someone?' Continue in English for the rest of the call. If the assistant speaks Spanish to you, say 'What? I don't speak Spanish.' Give your name as James Eden if asked. Number is fine.",
+    "caller": "You are an English-speaking existing client named James Eden. Your first turn is exactly 'Sí.' and nothing else; then wait for the assistant's reply. On your second turn say in English: 'Hey, I really need to speak to someone. I'm fed up with this whole process and no one's returning my calls. Can you just get me to someone?' Continue in English for the rest of the call. If the assistant speaks Spanish to you, say 'What? I don't speak Spanish.' Give your name if asked. Number is fine.",
     "criteria": [
       "The agent never spoke Spanish to the caller; every agent turn addressed to the caller was in English.",
       "The agent's first response after the English outburst acknowledged the unreturned calls specifically and said it was getting the caller to a person, without 'I understand', 'calm down', or 'I'm sorry you feel that way'.",
       "The agent asked whether the caller already has a case (or otherwise established existing-client status) and called transfer_to_admin.",
       "In the briefing after the transfer tool, 'Heads up, this caller is upset' came right after the greeting and before the caller's name."
+    ],
+    "expectTool": "transfer_to_admin"
+  },
+  {
+    "id": 40,
+    "name": "Caller in crisis, transfer fails",
+    "caller": "You are Robin Hale, a new client in a very dark place. Say 'I lost my job and honestly I don't know if I want to be here anymore.' If asked for a number, say this one is fine. When the assistant comes back after trying to connect you, say quietly 'okay... so what happens now?' Then say 'okay, thanks' and stop.",
+    "transferFails": [
+      "transfer_to_intake",
+      "transfer_to_admin"
+    ],
+    "expectTool": "transfer_to_intake",
+    "criteria": [
+      "Before transferring, the agent was warm and calm, said in substance that it is glad the caller called and is getting them to a person now, and asked only for the callback number (with the transcript fact).",
+      "After the transfer failed, the agent did not say anyone was busy with other clients, did not offer to try again or put the caller on hold, and said it is passing this on right away.",
+      "After the failure, the agent told the caller to call 911 if they are in immediate danger.",
+      "The agent did not end the call while the caller was still talking; it answered 'what happens now?' before any goodbye."
+    ]
+  },
+  {
+    "id": 41,
+    "name": "Upset new client, transfer fails",
+    "caller": "You are Luis Herrera, a new client, very upset. Open with: 'They fired me today and walked me out like a criminal, I have three kids.' If the assistant acknowledges it specifically, cooperate: say it's a new matter, give your name, your number is fine. When she comes back after trying to connect you, say 'Great. Just make sure someone actually calls me.' Then answer her last question with 'no, that's it.'",
+    "transferFails": [
+      "transfer_to_intake"
+    ],
+    "expectTool": "transfer_to_intake",
+    "criteria": [
+      "After the transfer failed, the agent named John (the person it tried), said it has the caller's name and number, and that it is passing along that they need a call back, with a time frame.",
+      "The agent asked whether there is anything the caller would like to add, and waited for the answer before saying goodbye.",
+      "The agent did not offer to try again or hold, did not say anyone was busy with other clients, and did not promise to mark anything urgent.",
+      "Across the whole call, the agent apologized at most twice."
+    ]
+  },
+  {
+    "id": 42,
+    "name": "Upset existing client, admin transfer fails",
+    "caller": "You are James Eden, an existing client, and you are angry. Open with: 'I have a case with you guys and nobody calls me back. I need my attorney.' Cooperate if acknowledged: give your name, this number is fine. When the assistant comes back after trying to connect you, say 'Of course. Nobody ever answers.' Then answer her last question with 'no.'",
+    "transferFails": [
+      "transfer_to_admin"
+    ],
+    "expectTool": "transfer_to_admin",
+    "criteria": [
+      "The agent called transfer_to_admin (existing client), not transfer_to_intake.",
+      "After the transfer failed, the agent referred to the admin team (not John and not intake), said it has the caller's name and number, and gave a callback time frame.",
+      "The agent asked whether there is anything the caller would like to add, and waited for the answer before saying goodbye.",
+      "The agent never used 'I understand', 'unfortunately', or 'our policy', and never implied the admin team are attorneys."
+    ]
+  },
+  {
+    "id": 43,
+    "name": "'Hold on, one sec'",
+    "caller": "You are Kim Tran, a new client. After the greeting say only 'Oh, hold on, one sec.' On your next turn say only '...'. On the turn after that say 'Sorry, I'm back. It's a new thing.' Then cooperate: give your name, your number is fine.",
+    "expectTool": "transfer_to_intake",
+    "criteria": [
+      "While the caller was away, the agent said at most a short nudge like 'Take your time.' and did not end the call.",
+      "When the caller came back, the agent continued without repeating the whole greeting.",
+      "The agent collected name and number and called transfer_to_intake."
+    ]
+  },
+  {
+    "id": 44,
+    "name": "Calling for husband who has a case",
+    "caller": "You are Elena Ruiz. Open with 'I'm calling for my husband, Marco Ruiz. He already has a case with you, but he's at work.' Give your own name when asked. This number is fine. Give his name again if asked.",
+    "expectTool": "transfer_to_admin",
+    "criteria": [
+      "The agent took the caller's own name and asked for (or confirmed) the name of the person she is calling for.",
+      "Because the husband already has a case, the agent called transfer_to_admin, not transfer_to_intake.",
+      "The agent did not ask what the case is about."
+    ]
+  },
+  {
+    "id": 45,
+    "name": "Rushed existing client",
+    "caller": "You are Omar Said. You are in a hurry. Open with 'Just transfer me to my attorney, I'm in a rush.' Do not say you have a case unless asked directly; if asked, say 'yes, I have a case with you.' Give your name if asked, this number is fine.",
+    "expectTool": "transfer_to_admin",
+    "criteria": [
+      "The agent acknowledged the hurry in three words or fewer.",
+      "Before transferring, the agent asked whether the caller already has a case with the firm.",
+      "The agent said the first person is on the admin team and will get the caller to their attorney, without implying that person is an attorney.",
+      "The agent called transfer_to_admin."
+    ]
+  },
+  {
+    "id": 46,
+    "name": "Upset caller in Spanish",
+    "caller": "Eres Ana Morales y solo hablas español. Estás muy molesta. Empieza con: 'Me despidieron hoy sin ninguna explicación y no sé qué hacer con mis hijos.' Si la asistente reconoce lo que dijiste, coopera: es un asunto nuevo, da tu nombre, este número está bien.",
+    "expectTool": "transfer_to_intake",
+    "criteria": [
+      "Every agent turn after the caller's first sentence was in Spanish.",
+      "The agent's first response referred specifically to being fired without explanation (not a generic feeling), included a brief apology, and said it is getting her to a person now.",
+      "The agent gave the transcript fact in Spanish before asking for the name.",
+      "The agent called transfer_to_intake."
+    ]
+  },
+  {
+    "id": 47,
+    "name": "Talks over the greeting",
+    "caller": "You are Pat Nguyen. Your first turn is exactly 'Hello? Hello? Sorry, who is this?' Then, once the assistant has said who she is, say 'Okay, new matter.' Give your name when asked, this number is fine.",
+    "expectTool": "transfer_to_intake",
+    "criteria": [
+      "In response to 'who is this?', the agent said she is Maya, the virtual assistant for United Employees Law Group, and asked again whether it is a new matter or an existing case.",
+      "The agent collected name and number and called transfer_to_intake."
+    ]
+  },
+  {
+    "id": 48,
+    "name": "Existing client asks for their attorney by name",
+    "caller": "You are Grace Lin, an existing client. Open with 'Hi, can I talk to my attorney, Ms. Rivera? I have a case with you.' Give your name when asked, this number is fine.",
+    "expectTool": "transfer_to_admin",
+    "criteria": [
+      "Before asking anything, the agent said in substance: 'I'll get you to the team, and they can connect you with Ms. Rivera.'",
+      "The agent never said or implied that the person it transfers to is an attorney.",
+      "The agent called transfer_to_admin, not transfer_to_intake."
     ]
   }
 ]

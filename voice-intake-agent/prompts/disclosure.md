@@ -1,5 +1,7 @@
 # Greeting and disclosure wording
 
+> **Status.** This is the counsel-review draft for the production flow. The live proof of concept says less and says it differently: an English greeting that names the firm and Maya as its virtual assistant, then the transcript fact folded into the name question ("Just so you know, we keep a transcript of the call, but it's not recorded. Can I get your full name?"). See `poc/agent/prompt.md`. The deflection line is now "That's exactly what our team will go over with you." Whether "not recorded" can stay is an open firm decision while Retell keeps call audio.
+
 **For counsel review.** These are the exact words the agent says at the start of every call, before any question. Nothing else in the call refers to recording or transcription. Once approved, this file is copied verbatim into the `greet_disclose` node of the conversation flow; the file is the source of truth.
 
 Placeholders: `{{firm_name}}` is the firm's name as it should be spoken. `{{agent_name}}` is the agent's name (placeholder "Maya").

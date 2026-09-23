@@ -222,7 +222,7 @@ Transfers attempted, none succeeded, caller hung up on hold → `abandoned` but 
 | Language | `Preferred_Language__c` picklist: English, Spanish, Unknown |
 | Caller type | `Caller_Type__c` picklist: New Client, Existing Client, Other |
 | Reason | Lead Description |
-| Disposition | `Intake_Transfer_Outcome__c` picklist: Transferred Successfully, Existing Client Transferred, Other Matter Transferred, Transfer Failed - Message Taken, Abandoned, Spam |
+| Disposition | `Intake_Transfer_Outcome__c` picklist: Transferred Successfully, Existing Client Transferred, Other Matter Transferred, Transfer Failed - Message Taken, Caller Hung Up While Holding, Abandoned, Spam |
 | Lead source | LeadSource "Phone - AI Intake" |
 | Owner | Accepted staff's Salesforce user id, else the "AI Intake Unassigned" queue |
 | Call id | `Retell_Call_Id__c` external id on Lead and Task |

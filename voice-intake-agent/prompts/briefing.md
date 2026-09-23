@@ -1,5 +1,7 @@
 # Warm transfer briefing (whisper) templates
 
+> **Status.** These are the production (multi-person, slot-by-slot) templates. The proof of concept has one person per line, so its briefing ends "Stay on to take it, or hang up and I'll take a message" rather than "I'll try the next person"; its wording lives in the whisper prompt in `poc/agent/create-agent.mjs`, and the review page now shows what Maya actually said rather than a rendering of these templates.
+
 Spoken by the agent to the staff member only, after they answer and before the caller is bridged. The caller hears hold music. Kept under 8 seconds: on the first live calls a 14-second whisper left the caller on hold for 30 seconds in total, and one hung up.
 
 The agent does not ask why the caller is calling (firm decision, Sep 22). `{{reason_clause}}` is empty unless the caller volunteered a reason, in which case it is "They mentioned: {reason}. " in their own words.

@@ -2,8 +2,11 @@
 // First thing to run in a session that can reach Retell. Confirms the key works, shows the phone
 // numbers on the account and what each is bound to, and checks the local setup. Read-only.
 //
-// Env: RETELL_API_KEY, or an API credential on the environment for api.retellai.com. INTAKE_PHONE, ADMIN_PHONE, RETELL_PHONE_NUMBER, FIRM_NAME,
-//      MAIN_OFFICE_NUMBER are checked if present. RETELL_BASE_URL optional.
+// Also compares the live agent with the firm's decisions (live.json and agent.config.json): greeting
+// names the firm, voice, speed, backchannel, interruption sensitivity, transfer numbers, storage.
+//
+// Env: RETELL_API_KEY, or an API credential on the environment for api.retellai.com. INTAKE_PHONE,
+//      ADMIN_PHONE, RETELL_PHONE_NUMBER are checked if present. RETELL_BASE_URL optional.
 // Usage: node poc/agent/preflight.mjs
 
 import { readFileSync, existsSync } from "node:fs";
@@ -33,15 +36,19 @@ if (!KEY) warn("RETELL_API_KEY not set; expecting an API credential on the envir
 else if (!/^key_[0-9a-f]{20,}$/i.test(KEY)) warn(`RETELL_API_KEY does not look like a Retell key (starts "${KEY.slice(0, 4)}", ${KEY.length} chars).`);
 else ok(`RETELL_API_KEY present (${KEY.length} chars).`);
 
-for (const name of ["INTAKE_PHONE", "ADMIN_PHONE", "RETELL_PHONE_NUMBER", "MAIN_OFFICE_NUMBER"]) {
+for (const name of ["INTAKE_PHONE", "ADMIN_PHONE", "RETELL_PHONE_NUMBER"]) {
   const v = process.env[name];
-  if (!v) warn(`${name} not set${name === "INTAKE_PHONE" || name === "ADMIN_PHONE" ? " (required by create-agent.mjs)" : ""}.`);
+  if (!v) warn(`${name} not set${name === "INTAKE_PHONE" || name === "ADMIN_PHONE" ? " (create-agent.mjs keeps the live agent's number)" : ""}.`);
   else if (!E164.test(v)) fail(`${name}="${v}" is not E.164 (expected like +14155550101).`);
   else ok(`${name}=${v}`);
 }
 if (process.env.INTAKE_PHONE && process.env.INTAKE_PHONE === process.env.ADMIN_PHONE) warn("INTAKE_PHONE and ADMIN_PHONE are the same phone; the admin scenario will ring the same handset.");
-if (!process.env.FIRM_NAME) warn('FIRM_NAME not set; Maya will say "the firm".');
-for (const name of ["INTAKE_NAME", "ADMIN_NAME"]) if (!process.env[name]) warn(`${name} not set; default first name will be used.`);
+const live = JSON.parse(readFileSync(join(here, "live.json"), "utf8"));
+const cfg = JSON.parse(readFileSync(join(here, "agent.config.json"), "utf8"));
+ok(`live.json: firm "${live.firm_name}", agent ${live.agent_name}, intake ${live.intake_name}, admin "${live.admin_name}".`);
+for (const [key, envName] of [["firm_name", "FIRM_NAME"], ["intake_name", "INTAKE_NAME"], ["admin_name", "ADMIN_NAME"], ["main_office_number", "MAIN_OFFICE_NUMBER"]]) {
+  if (process.env[envName] && process.env[envName] !== live[key]) warn(`${envName}="${process.env[envName]}" differs from live.json; create-agent.mjs ignores it.`);
+}
 
 const ids = existsSync(IDS_FILE) ? JSON.parse(readFileSync(IDS_FILE, "utf8")) : {};
 if (ids.agent_id) ok(`Previous run found: llm ${ids.llm_id}, agent ${ids.agent_id}, number ${ids.phone_number || "(unbound)"}. create-agent.mjs will update, not duplicate.`);
@@ -81,7 +88,34 @@ else {
 
 if (ids.agent_id) {
   const ag = await api(`/get-agent/${ids.agent_id}`);
-  if (ag.status === 200) ok(`Agent ${ids.agent_id} exists: "${ag.json.agent_name}", language ${ag.json.language}, voice ${ag.json.voice_id}.`);
+  if (ag.status === 200) {
+    const g = ag.json, want = cfg.agent;
+    ok(`Agent ${ids.agent_id} exists: "${g.agent_name}", version ${g.version}${g.is_published ? " (published)" : " (draft)"}, language ${g.language}, voice ${g.voice_id}.`);
+    console.log("\nLive agent against the firm's decisions");
+    const same = (label, got, exp) => (got === exp ? ok(`${label}: ${got}`) : fail(`${label} is ${JSON.stringify(got)}, expected ${JSON.stringify(exp)}. Re-run create-agent.mjs.`));
+    same("voice", g.voice_id, want.voice_id_default);
+    same("voice model", g.voice_model, want.voice_model);
+    same("voice speed", g.voice_speed, want.voice_speed);
+    same("backchannel", g.enable_backchannel, want.enable_backchannel);
+    same("interruption sensitivity", g.interruption_sensitivity, want.interruption_sensitivity);
+    same("denoising", g.denoising_mode, want.denoising_mode);
+    if (g.data_storage_setting === "everything") warn(`data_storage_setting is "everything": Retell keeps call audio, while Maya tells callers the call is not recorded. Open firm decision.`);
+    else ok(`data_storage_setting: ${g.data_storage_setting}`);
+    const llmId = g.response_engine?.llm_id;
+    const llm = llmId ? await api(`/get-retell-llm/${llmId}${g.response_engine?.version !== undefined ? `?version=${g.response_engine.version}` : ""}`) : null;
+    if (llm?.status === 200) {
+      const begin = String(llm.json.begin_message || "");
+      if (begin.includes(live.firm_name)) ok(`greeting names ${live.firm_name}`);
+      else fail(`greeting does not name ${live.firm_name}: "${begin}"`);
+      for (const name of ["transfer_to_intake", "transfer_to_admin"]) {
+        const t = (llm.json.general_tools || []).find((x) => x.name === name);
+        const num = t?.transfer_destination?.number;
+        if (!t) fail(`${name} tool missing`);
+        else if (!E164.test(num || "")) fail(`${name} number "${num}" is not E.164`);
+        else ok(`${name} -> ${num} (${t.transfer_option?.type})`);
+      }
+    } else warn(`Could not read the agent's LLM ${llmId} (HTTP ${llm?.status}).`);
+  }
   else warn(`Agent ${ids.agent_id} from .retell-ids.json not found (HTTP ${ag.status}); create-agent.mjs will fail on update. Delete .retell-ids.json to start fresh.`);
 }
 

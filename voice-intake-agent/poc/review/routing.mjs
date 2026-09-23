@@ -58,7 +58,7 @@ export function decideRouting(call, config) {
     if (bh) {
       list = `intake.${lang}`;
       staffIds = config.lists.intake[lang];
-      reasons.push(lang === "es" ? "Caller spoke Spanish: Spanish intake list." : call.language === "other" ? "Caller spoke a third language: English list, message taken." : "Caller spoke English: English intake list.");
+      reasons.push(lang === "es" ? "Caller spoke Spanish: Spanish intake list." : call.language === "other" ? "Caller spoke a third language: English list, transferred like any other caller." : "Caller spoke English: English intake list.");
     } else {
       list = "overnight";
       staffIds = config.lists.overnight;
@@ -87,7 +87,7 @@ export function decideRouting(call, config) {
   if (staffIds.length > 1) reasons.push(`If no answer: ${staffIds.slice(1).map((id) => config.staff[id].name).join(", then ")}.`);
 
   const cw = bh ? config.callbackWindow.businessHours : config.callbackWindow.afterHours;
-  return { list, staffIds, target, reasons, businessHours: bh, callbackWindow: cw[lang] || cw.en };
+  return { list, staffIds, target, reasons, businessHours: bh, callbackWindow: cw[lang] || cw.en, callbackWindowStaff: cw.en };
 }
 
 /** Build a routing config for the demo from two phones plus the example config's hours and wording. */
@@ -100,6 +100,11 @@ export function demoConfig(base, { intakeName, intakePhone, adminName, adminPhon
     },
     lists: { intake: { en: ["intake"], es: ["intake"] }, admin: ["admin"], overnight: ["intake"] },
     overnight: { handlesExistingClients: true },
+    // The same wording Maya uses (prompt.md section 6).
+    callbackWindow: {
+      businessHours: { en: "within the hour", es: "dentro de la hora" },
+      afterHours: { en: "first thing in the morning", es: "a primera hora de la mañana" },
+    },
   };
 }
 
@@ -129,7 +134,7 @@ if (process.argv.includes("--selftest")) {
   let r = decideRouting({ language: "en", callerType: "new_client", askedForSeniorManagement: false, at: weekday }, cfg);
   check("new client EN -> intake.en, James", r.list === "intake.en" && r.target?.name === "James");
   r = decideRouting({ language: "es", callerType: "new_client", askedForSeniorManagement: false, at: weekday }, cfg);
-  check("new client ES -> intake.es", r.list === "intake.es" && r.callbackWindow === "dentro de una hora hábil");
+  check("new client ES -> intake.es", r.list === "intake.es" && r.callbackWindow === "dentro de la hora");
   r = decideRouting({ language: "en", callerType: "existing_client", askedForSeniorManagement: false, at: weekday }, cfg);
   check("existing client -> admin, Ana", r.list === "admin" && r.target?.name === "Ana");
   r = decideRouting({ language: "en", callerType: "other", askedForSeniorManagement: false, at: weekday }, cfg);

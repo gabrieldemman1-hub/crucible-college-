@@ -1,5 +1,7 @@
 # Scripted caller scenarios
 
+> **Production test plan (multi-person routing, conversation flow).** For what the proof-of-concept Maya does today, the source of truth is `poc/agent/prompt.md`, and the automated checks are `poc/tests/scenarios.json`. Where this file differs (for example the full disclosure before any question, or asking the reason), the POC files win until this plan is revised.
+
 Run each scenario in English and Spanish by calling the Retell number from a cell phone. Transfer slots point at three test phones during phases 1 and 2:
 
 - **T1** answers and stays on the line (accept).

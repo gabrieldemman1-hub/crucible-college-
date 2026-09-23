@@ -24,7 +24,7 @@
     "reminder_max_count": 2,
     "max_call_duration_ms": 600000,
     "data_storage_setting": "everything",
-    "opt_in_signed_url": false,
+    "opt_in_signed_url": true,
     "boosted_keywords_base": [
       "Walter",
       "Peg",
@@ -39,7 +39,7 @@
       {
         "type": "boolean",
         "name": "disclosure_given",
-        "description": "True if, before asking for the caller's name, the agent said in any wording that a transcript of the call is kept and that the call is not recorded (for example 'we keep a transcript of the call, but it's not recorded')."
+        "description": "True if, before asking for the caller's name or number, the agent said in any wording that a transcript of the call is kept and that it is not recorded. False if the agent asked for a name or number first, or never said it."
       },
       {
         "type": "enum",
@@ -84,7 +84,7 @@
       {
         "type": "string",
         "name": "reason",
-        "description": "One sentence, in the caller's own words, of why they called. No legal characterization added by the agent."
+        "description": "Only if the caller volunteered why they were calling: one sentence in their own words. Empty if they did not say. Their answer to 'new matter or existing case' is not a reason. No legal characterization added by the agent."
       },
       {
         "type": "boolean",
@@ -104,7 +104,7 @@
       {
         "type": "boolean",
         "name": "legal_information_given",
-        "description": "True if the agent gave any legal information, opinion, case evaluation, fee, timeline, or outcome. Should be false."
+        "description": "True only if the agent gave legal information, an opinion on the caller's matter, a case evaluation, a fee, a case timeline, or a likely outcome. Not legal information: office hours, callback time frames, that the firm is fully remote, who the caller will talk to, and the fixed line 'That's exactly what our team will go over with you.' Should be false."
       },
       {
         "type": "enum",
@@ -129,7 +129,7 @@
   "llm": {
     "model_env": "RETELL_MODEL",
     "model_default": "gpt-4.1",
-    "model_temperature": 0.2,
+    "model_temperature": 0,
     "tool_call_strict_mode": true
   },
   "transfer": {

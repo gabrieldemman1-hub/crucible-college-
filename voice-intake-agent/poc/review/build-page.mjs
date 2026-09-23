@@ -26,14 +26,15 @@ function callHtml(c, i) {
   const tone = TONE[sf.dispositionKey] || "muted";
   const flags = [];
   if (a.legal_information_given) flags.push(`<span class="pill bad">Legal information given</span>`);
-  if (a.disclosure_given === false) flags.push(`<span class="pill bad">Disclosure missing</span>`);
+  // Computed from the transcript (pull-calls.mjs), not the model's own post-call judgement.
+  if (c.disclosure === "missing") flags.push(`<span class="pill bad">Transcript notice missing</span>`);
   if (a.asked_for_senior_management) flags.push(`<span class="pill">Asked for ${esc(a.requested_person || "senior management")}</span>`);
 
   const transcript = (c.transcript || []).map((u) =>
     `<div class="line ${u.role === "agent" ? "agent" : u.role === "user" ? "caller" : "other"}"><span class="who">${u.role === "agent" ? esc(data.names.agent) : u.role === "user" ? "Caller" : "Staff"}</span><span class="what">${esc(u.content)}</span></div>`).join("");
 
-  const heard = (c.whisperHeard || []).length
-    ? `<h4>What the staff phone heard</h4>${c.whisperHeard.map((u) => `<p class="quiet">${esc(u.content)}</p>`).join("")}`
+  const heard = (c.handoff || []).some((u) => u.role === "staff")
+    ? `<h4>The staff line, in order</h4>${c.handoff.map((u) => `<p class="${u.role === "staff" ? "" : "quiet"}"><strong>${u.role === "staff" ? "Staff" : esc(data.names.agent)}:</strong> ${esc(u.content)}</p>`).join("")}`
     : "";
 
   const attempts = (sf.attempts || []).length
@@ -65,11 +66,12 @@ function callHtml(c, i) {
       <section class="card">
         <h3><span class="dot preview"></span>Routing</h3>
         <p class="lead-line">${c.routing.target ? `${esc(c.routing.list)} → <strong>${esc(c.routing.target.name)}</strong> <span class="mono">${esc(c.routing.target.number)}</span>` : `${esc(c.routing.list)} → <strong>no transfer</strong>`}</p>
+        ${c.routing.used ? `<p>${esc(data.names.agent)} used <span class="mono">${esc(c.routing.used.tool)}</span> → <strong>${esc(c.routing.used.name)}</strong></p>` : ""}
         <ul>${c.routing.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>
         ${attempts}
       </section>
       <section class="card">
-        <h3><span class="dot real"></span>Briefing whispered to ${esc(c.routing.target?.name || "staff")}</h3>
+        <h3><span class="dot real"></span>Briefing${c.routing.used ? ` to ${esc(c.routing.used.name)}` : ""}, as spoken</h3>
         <blockquote>${esc(c.briefing)}</blockquote>
         ${heard}
       </section>
@@ -91,7 +93,7 @@ const scenarios = [
   "New client, Spanish",
   "Existing client → admin",
   "Asks for Walter → intake, never Walter",
-  "\"Do I have a case?\" deflected",
+  "\"Do I have a case?\" deflected to the team",
   "Nobody answers → fallback message and Task",
 ];
 
@@ -204,7 +206,7 @@ footer{margin-top:32px;color:var(--muted);font-size:.85rem}
       <div class="staff">
         <div><span>Intake (English and Spanish)</span><span><strong>${esc(data.staff.intake.name)}</strong> <span class="mono">${esc(data.staff.intake.number)}</span></span></div>
         <div><span>Admin</span><span><strong>${esc(data.staff.admin.name)}</strong> <span class="mono">${esc(data.staff.admin.number)}</span></span></div>
-        <div><span>Overnight</span><span><strong>${esc(data.staff.intake.name)}</strong> <span class="quiet">new clients only</span></span></div>
+        <div><span>Overnight</span><span><strong>${esc(data.staff.intake.name)}</strong> <span class="quiet">new and existing clients, 8pm to 8am Pacific</span></span></div>
       </div>
     </section>
     <section class="panel">
@@ -213,7 +215,7 @@ footer{margin-top:32px;color:var(--muted);font-size:.85rem}
     </section>
   </div>
   ${data.calls.length ? data.calls.map(callHtml).join("\n") : `<p class="quiet">No calls yet. Place a test call, then run pull-calls.mjs and build-page.mjs.</p>`}
-  <footer>Transcribed, not recorded. Names and numbers on this page belong to test callers. Production design: PLAN-v2.md.</footer>
+  <footer>Names and numbers on this page belong to test callers. Production design: PLAN-v2.md.</footer>
 </div>
 `;
 
