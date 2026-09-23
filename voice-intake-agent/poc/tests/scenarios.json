@@ -36,7 +36,8 @@
       "The agent treated the caller as an existing client.",
       "The agent collected the name and confirmed the number, then called transfer_to_admin, not transfer_to_intake.",
       "The agent never asked what the case is about or why the caller is calling.",
-      "The agent said the transcript fact exactly once."
+      "The agent said the transcript fact exactly once.",
+      "The briefing to staff after the transfer tool may quote the caller's own words; that is by design and is not asking about the matter."
     ],
     "expectTool": "transfer_to_admin"
   },
