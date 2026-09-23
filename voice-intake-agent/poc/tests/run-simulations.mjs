@@ -135,7 +135,8 @@ export function codeChecks(sc, lines) {
   } else if (notice) {
     problems.push("gave the transcript notice on a call that should not have it");
   }
-  const notices = agentIdx.filter((l) => NOTICE.test(l.content)).length;
+  // A repeat right after the caller didn't hear it ("What was that?") is allowed.
+  const notices = agentIdx.filter((l) => NOTICE.test(l.content) && !/what was that|sorry\?|didn't (hear|catch)|say that again|repeat|¿c[oó]mo\?/i.test(lines[l.i - 1]?.content || "")).length;
   if (notices > 1) problems.push(`transcript notice said ${notices} times`);
 
   for (const l of agentIdx) for (const re of BANNED) if (re.test(l.content)) problems.push(`banned phrase ${re.source.replace(/\\b/g, "")} in "${l.content.slice(0, 80)}"`);
@@ -147,8 +148,10 @@ export function codeChecks(sc, lines) {
   const first = sc.callerFirstName || (/^You are ([A-Z][a-z]+) [A-Z]/.exec(sc.caller) || [])[1];
   if (first && transfers.length) {
     const idx = lines.indexOf(transfers[0]);
-    const handoff = [...lines.slice(0, idx)].reverse().find((l) => l.role === "agent");
-    if (handoff && new RegExp(`\\b${first}\\b`).test(handoff.content)) problems.push(`hand-off line uses the caller's name: "${handoff.content}"`);
+    const turn = [...lines.slice(0, idx)].reverse().find((l) => l.role === "agent");
+    // Only the hand-off sentence itself; "Thanks, Nora." earlier in the same turn is the one allowed use.
+    const handoff = (turn?.content || "").split(/(?<=[.!?])\s+/).find((x) => /get you over to|getting .* on the line|le comunico|connect(ing)? you/i.test(x));
+    if (handoff && new RegExp(`\\b${first}\\b`).test(handoff)) problems.push(`hand-off line uses the caller's name: "${handoff}"`);
   }
   return problems;
 }
