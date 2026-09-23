@@ -275,6 +275,7 @@ async function main() {
     variables: DETAIL_VARS.map((v) => ({ type: "string", ...v })),
   };
 
+  const STAFF_GREETING = (dest) => `Hi, this is ${vars.agent_name} from ${vars.firm_name} with a caller for ${dest === "intake" ? "intake" : "the admin team"}. ${/^(the|our) /i.test(staffName(dest)) ? "Can you hear me?" : `Is this ${staffName(dest)}?`}`;
   const transferAgentPrompt = (dest) => {
     const who = staffName(dest);
     const told = dest === "intake"
@@ -294,7 +295,9 @@ async function main() {
       `- Asked for: {{asked_for}}`,
       `- Notes: {{call_notes}}`,
       ``,
-      `FIRST, wait for the other side to speak, then decide who answered. Say nothing about the caller (no name, number, or anything they said) until a live person has spoken to you and it is clearly not a recording. If you hear a voicemail greeting ("you've reached...", "leave a message", a beep), a "state your name" call-screening message, a phone menu, or any recording, do not brief and do not leave a message: call cancel_transfer at once.`,
+      cfg.transfer.staff_side_speaks_first
+        ? `FIRST, your opening line has already been spoken: "${STAFF_GREETING(dest)}". Now listen and decide who answered. Say nothing about the caller (no name, number, or anything they said) until a live person has spoken to you and it is clearly not a recording. If you hear a voicemail greeting ("you've reached...", "leave a message", a beep), a "state your name" call-screening message, a phone menu, or any recording, do not brief and do not leave a message: call cancel_transfer at once. If a live person answers with something like "yes" or "speaking", go straight to the briefing.`
+        : `FIRST, wait for the other side to speak, then decide who answered. Say nothing about the caller (no name, number, or anything they said) until a live person has spoken to you and it is clearly not a recording. If you hear a voicemail greeting ("you've reached...", "leave a message", a beep), a "state your name" call-screening message, a phone menu, or any recording, do not brief and do not leave a message: call cancel_transfer at once.`,
       ``,
       `THEN the briefing, quickly, in one breath (under 8 seconds for a calm caller): "${hiFor(dest)}. [Heads-up, if any, first.] I've got [name], [who they are]. [Language, if any.] [If upset: the upset details in one sentence, e.g. what they asked for and ${told}.] [If they asked for someone: 'They asked for <name> by name.'] [If their words: 'They mentioned <their words>.'] Callback [digits, or 'is the number they're calling from' with the digits, or 'No callback number captured']. Can you take them?"`,
       `If you have no saved details at all, say: "${hiFor(dest)}. I've got a caller for you. Can you take them?"`,
@@ -376,10 +379,11 @@ async function main() {
     model: process.env[cfg.llm.model_env] || cfg.llm.model_default,
     model_temperature: cfg.llm.model_temperature,
     general_prompt: transferAgentPrompt(dest),
-    // The staff side speaks first ("Hello?"), so a voicemail greeting or call screener is heard
-    // before Maya says anything about the caller.
-    start_speaker: "user",
-    begin_message: "",
+    // Default: the staff side speaks first ("Hello?"), so a voicemail greeting or call screener is
+    // heard before Maya says anything about the caller. With staff_side_speaks_first, Maya opens
+    // with a greeting that reveals nothing about the caller, then listens.
+    start_speaker: cfg.transfer.staff_side_speaks_first ? "agent" : "user",
+    begin_message: cfg.transfer.staff_side_speaks_first ? STAFF_GREETING(dest) : "",
     general_tools: [
       { type: "bridge_transfer", name: "bridge_transfer", description: `Connect the caller to ${staffName(dest)}. Only after a clear yes.`, speak_during_execution: true, execution_message_type: "static_text", execution_message_description: "Great, connecting you now." },
       { type: "cancel_transfer", name: "cancel_transfer", description: "Do not connect the caller: voicemail, call screening, a no, or no clear yes after asking twice. The caller goes back to the main line for a message.", speak_during_execution: true, execution_message_type: "prompt", execution_message_description: "If a live person said no or couldn't take the call, say exactly \"No problem, I'll take a message.\" If it was a voicemail, a recording, or a call-screening system, say nothing at all." },

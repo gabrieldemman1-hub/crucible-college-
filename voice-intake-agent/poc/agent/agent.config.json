@@ -134,6 +134,7 @@
   },
   "transfer": {
     "mode": "agentic",
+    "staff_side_speaks_first": false,
     "decision_timeout_ms": 45000,
     "agent_detection_timeout_ms": 25000,
     "transfer_ring_duration_ms": 30000,
