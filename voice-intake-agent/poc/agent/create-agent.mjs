@@ -261,7 +261,7 @@ async function main() {
     { name: "caller_name", description: "The caller's full name as they gave it. If they gave none, the words \"a caller who didn't give their name\"." },
     { name: "caller_role", description: "Who the caller is, as a short phrase that follows their name: \"a new client\", \"who says they already have a case\", \"calling about another matter, from <their organization>\", or \"<caller> calling for <person>, who has a case with us\" / \"calling for <person>\". Never \"an existing client or other matter\"." },
     { name: "callback", description: "The callback number, digits in groups of three, three, four (\"949 383 7098\"). If they said the number they're calling from is fine, use the caller ID digits. If there is no number at all, \"none\"." },
-    { name: "language_note", description: "Empty if the call was in English, or if the caller only said a lone word like \"sí\". \"Speaks Spanish.\" only if they spoke full Spanish sentences. For any other language, \"Limited English, speaks <language>.\"" },
+    { name: "language_note", description: "Empty if the whole call was in English, or if the caller only said a lone word like \"sí\". \"Speaks Spanish.\" only if they spoke full Spanish sentences. If they spoke any other language at any point, even one sentence, \"Limited English, speaks <that language>.\"" },
     { name: "heads_up", description: "Empty for a calm caller. Otherwise exactly one of: \"Heads up, this caller may be in crisis.\" (hurting themselves, not wanting to be here, danger), \"Heads up, this caller is upset.\", \"Heads up, this caller has been joking around.\", \"Heads up, this caller has been rude.\"" },
     { name: "upset_details", description: "Only if the caller was upset or in crisis: one sentence with what they are upset about in their own words, what they asked for, and what you told them. Otherwise empty." },
     { name: "their_words", description: "If the caller volunteered why they're calling, three to eight of their exact words. Otherwise empty. No legal labels they did not say." },
@@ -294,7 +294,7 @@ async function main() {
       `- Asked for: {{asked_for}}`,
       `- Notes: {{call_notes}}`,
       ``,
-      `FIRST, check who answered. If you hear a voicemail greeting, a "state your name" call-screening message, a phone menu, or a recording, do not brief: call cancel_transfer at once.`,
+      `FIRST, wait for the other side to speak, then decide who answered. Say nothing about the caller (no name, number, or anything they said) until a live person has spoken to you and it is clearly not a recording. If you hear a voicemail greeting ("you've reached...", "leave a message", a beep), a "state your name" call-screening message, a phone menu, or any recording, do not brief and do not leave a message: call cancel_transfer at once.`,
       ``,
       `THEN the briefing, quickly, in one breath (under 8 seconds for a calm caller): "${hiFor(dest)}. [Heads-up, if any, first.] I've got [name], [who they are]. [Language, if any.] [If upset: the upset details in one sentence, e.g. what they asked for and ${told}.] [If they asked for someone: 'They asked for <name> by name.'] [If their words: 'They mentioned <their words>.'] Callback [digits, or 'is the number they're calling from' with the digits, or 'No callback number captured']. Can you take them?"`,
       `If you have no saved details at all, say: "${hiFor(dest)}. I've got a caller for you. Can you take them?"`,
@@ -302,7 +302,7 @@ async function main() {
       `THEN listen. ${who} may ask questions ("What did they say?", "How angry are they?", "Did they ask for anyone?", "What did you tell them?"). Answer each in one or two sentences from the saved details and notes, quoting the caller's words where you have them. If you don't know, say "They didn't say." Never guess and never characterize the legal matter. After answering, ask again: "Can you take them?"`,
       ``,
       `DECIDE. Only a clear yes connects the caller: "yes", "yeah", "sure", "go ahead", "put them through", "I'll take it", "okay, send them over". When you hear that, call bridge_transfer.`,
-      `A no, "I can't right now", "I'm busy", "not now", or "take a message": say "No problem, I'll take a message." and call cancel_transfer.`,
+      `A no, "I can't right now", "I'm busy", "not now", or "take a message": call cancel_transfer (it says "No problem, I'll take a message." for you).`,
       `Anything unclear (a bare "okay" in the middle of a question, "hold on", "wait", "um", silence): do not connect. Ask once, "Should I put them through?" If it is still not a clear yes, call cancel_transfer.`,
       `Keep it short: the caller is waiting on hold. Never connect the caller without a clear yes.`,
     ].join("\n");
@@ -376,10 +376,13 @@ async function main() {
     model: process.env[cfg.llm.model_env] || cfg.llm.model_default,
     model_temperature: cfg.llm.model_temperature,
     general_prompt: transferAgentPrompt(dest),
-    start_speaker: "agent",
+    // The staff side speaks first ("Hello?"), so a voicemail greeting or call screener is heard
+    // before Maya says anything about the caller.
+    start_speaker: "user",
+    begin_message: "",
     general_tools: [
       { type: "bridge_transfer", name: "bridge_transfer", description: `Connect the caller to ${staffName(dest)}. Only after a clear yes.`, speak_during_execution: true, execution_message_type: "static_text", execution_message_description: "Great, connecting you now." },
-      { type: "cancel_transfer", name: "cancel_transfer", description: "Do not connect the caller: voicemail, call screening, a no, or no clear yes after asking twice. The caller goes back to the main line for a message.", speak_during_execution: false },
+      { type: "cancel_transfer", name: "cancel_transfer", description: "Do not connect the caller: voicemail, call screening, a no, or no clear yes after asking twice. The caller goes back to the main line for a message.", speak_during_execution: true, execution_message_type: "prompt", execution_message_description: "If a live person said no or couldn't take the call, say exactly \"No problem, I'll take a message.\" If it was a voicemail, a recording, or a call-screening system, say nothing at all." },
     ],
   });
   const llmBody = buildLlmBody(null);

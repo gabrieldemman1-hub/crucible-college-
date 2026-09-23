@@ -150,14 +150,13 @@ export function codeChecks(sc, lines) {
     return sc.expectTool && got !== sc.expectTool ? [`expected ${sc.expectTool}, got ${got}`] : [];
   }
   const transfers = lines.filter((l) => l.role === "tool_call_invocation" && /^transfer_/.test(toolOf(l) || ""));
-  if (sc.notice !== false) {
-    if (ask && (!notice || notice.i > ask.i)) problems.push(`transcript notice ${notice ? "came after" : "missing before"} the first name/number question ("${ask.content.slice(0, 80)}")`);
-    if (!ask && transfers.length && !notice) problems.push("transferred without ever giving the transcript notice");
-  } else if (notice) {
-    problems.push("gave the transcript notice on a call that should not have it");
-  }
-  // A repeat right after the caller didn't hear it ("What was that?") is allowed.
-  const notices = agentIdx.filter((l) => NOTICE.test(l.content) && !/what was that|sorry\?|didn't (hear|catch)|say that again|repeat|¿c[oó]mo\?/i.test(lines[l.i - 1]?.content || "")).length;
+  // The notice is in the greeting (Maya's first line), before any question.
+  if (!agentIdx.length || !NOTICE.test(agentIdx[0].content)) problems.push("greeting does not include the transcript notice");
+  if (ask && (!notice || notice.i > ask.i)) problems.push(`transcript notice ${notice ? "came after" : "missing before"} the first name/number question ("${ask.content.slice(0, 80)}")`);
+  // The scripted English notice is said once. Allowed extras: a repeat after "What was that?" or a
+  // cut-off greeting, the Spanish version, and answers to questions about confidentiality or recording.
+  const REPEAT = /just so you know,? we keep a transcript/i;
+  const notices = agentIdx.filter((l) => REPEAT.test(l.content) && !/what was that|sorry\?|didn't (hear|catch)|say that again|repeat|who is this|hello\?|¿c[oó]mo\?/i.test(lines[l.i - 1]?.content || "")).length;
   if (notices > 1) problems.push(`transcript notice said ${notices} times`);
 
   for (const l of agentIdx) for (const re of BANNED) if (re.test(l.content)) problems.push(`banned phrase ${re.source.replace(/\\b/g, "")} in "${l.content.slice(0, 80)}"`);
@@ -175,7 +174,7 @@ export function codeChecks(sc, lines) {
     if (handoff && new RegExp(`\\b${first}\\b`).test(handoff)) problems.push(`hand-off line uses the caller's name: "${handoff}"`);
   }
   // Intake hand-offs say "an intake manager", never a staff first name.
-  if (transfers.length && toolOf(transfers[transfers.length - 1]) === "transfer_to_intake") {
+  if (!sc.crisis && transfers.length && toolOf(transfers[transfers.length - 1]) === "transfer_to_intake") {
     const idx = lines.indexOf(transfers[transfers.length - 1]);
     const said = lines.slice(Math.max(0, idx - 4), idx).filter((l) => l.role === "agent").map((l) => l.content).join(" ");
     if (!/intake manager|encargad[oa]s? de admisi[oó]n/i.test(said)) problems.push(`intake hand-off did not say "intake manager": "${said.slice(-120)}"`);

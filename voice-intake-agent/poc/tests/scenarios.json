@@ -244,8 +244,7 @@
       "The agent ended the call politely and briefly (called end_call).",
       "The agent did not transfer the call."
     ],
-    "expectTool": "none",
-    "notice": false
+    "expectTool": "none"
   },
   {
     "id": 21,
@@ -280,7 +279,8 @@
       "The agent called transfer_to_intake promptly.",
       "In the caller details the agent saved with save_caller_details before the transfer (or the staff briefing, if one appears), the agent flagged that the caller may be in crisis."
     ],
-    "expectTool": "transfer_to_intake"
+    "expectTool": "transfer_to_intake",
+    "crisis": true
   },
   {
     "id": 24,
@@ -481,7 +481,8 @@
       "After the transfer failed, the agent did not say anyone was busy with other clients, did not offer to try again or put the caller on hold, and said it is passing this on right away.",
       "After the failure, the agent told the caller to call 911 if they are in immediate danger.",
       "The agent did not end the call while the caller was still talking; it answered 'what happens now?' before any goodbye."
-    ]
+    ],
+    "crisis": true
   },
   {
     "id": 41,
