@@ -1,0 +1,145 @@
+{
+  "$comment": "Non-secret settings for the proof-of-concept Retell agent. Field names match the Retell API (retell-sdk 6.x). Numbers, names, and the API key come from environment variables read by create-agent.mjs.",
+  "agent": {
+    "agent_name": "Maya Intake (POC)",
+    "language": "multi",
+    "voice_id_default": "11labs-Grace",
+    "voice_model": "eleven_v3",
+    "voice_temperature": 0.9,
+    "voice_speed": 1.05,
+    "responsiveness": 1,
+    "interruption_sensitivity": 0.35,
+    "enable_backchannel": false,
+    "backchannel_frequency": 0.7,
+    "backchannel_words": [
+      "mm-hmm",
+      "okay",
+      "I see",
+      "sure"
+    ],
+    "normalize_for_speech": true,
+    "begin_message_delay_ms": 300,
+    "end_call_after_silence_ms": 20000,
+    "reminder_trigger_ms": 10000,
+    "reminder_max_count": 2,
+    "max_call_duration_ms": 600000,
+    "data_storage_setting": "everything",
+    "opt_in_signed_url": true,
+    "boosted_keywords_base": [
+      "Walter",
+      "Peg",
+      "Anthony",
+      "Maya",
+      "intake",
+      "employment",
+      "despido",
+      "discriminación"
+    ],
+    "post_call_analysis_data": [
+      {
+        "type": "boolean",
+        "name": "disclosure_given",
+        "description": "True if the agent's greeting (or its repeat after a cut-off) told the caller that a transcript of the call is kept, before asking for the caller's name or number."
+      },
+      {
+        "type": "enum",
+        "name": "caller_type",
+        "choices": [
+          "new_client",
+          "existing_client",
+          "other",
+          "unknown"
+        ],
+        "description": "new_client: a person seeking help with a new matter or unsure. existing_client: says they already have a case with the firm. other: vendor, opposing counsel, court, sales, wrong number. unknown: could not tell."
+      },
+      {
+        "type": "enum",
+        "name": "language",
+        "choices": [
+          "en",
+          "es",
+          "other",
+          "unknown"
+        ],
+        "description": "The language the caller mostly used."
+      },
+      {
+        "type": "string",
+        "name": "caller_full_name",
+        "description": "The caller's full name as confirmed. Empty if not given.",
+        "examples": [
+          "Carlos Mendoza",
+          "Jane Doe"
+        ]
+      },
+      {
+        "type": "string",
+        "name": "callback_phone",
+        "description": "The best callback number as confirmed, digits only with country code if known. If the caller confirmed the number they were calling from, write CALLER_ID.",
+        "examples": [
+          "+14155550123",
+          "CALLER_ID"
+        ]
+      },
+      {
+        "type": "string",
+        "name": "reason",
+        "description": "Only if the caller volunteered why they were calling: one sentence in their own words. Empty if they did not say. Their answer to 'new matter or existing case' is not a reason. No legal characterization added by the agent."
+      },
+      {
+        "type": "boolean",
+        "name": "asked_for_senior_management",
+        "description": "True if the caller asked for Walter, Peg, or Anthony by name."
+      },
+      {
+        "type": "string",
+        "name": "requested_person",
+        "description": "Name of the person the caller asked for by name, if any. Empty otherwise."
+      },
+      {
+        "type": "boolean",
+        "name": "message_taken",
+        "description": "True if the agent told the caller someone would call them back instead of connecting them."
+      },
+      {
+        "type": "boolean",
+        "name": "legal_information_given",
+        "description": "True only if the agent gave legal information, an opinion on the caller's matter, a case evaluation, a fee, a case timeline, or a likely outcome. Not legal information: office hours, callback time frames, that the firm is fully remote, who the caller will talk to, and the fixed line 'That's exactly what our team will go over with you.' Should be false."
+      },
+      {
+        "type": "enum",
+        "name": "caller_mood",
+        "choices": [
+          "calm",
+          "frustrated",
+          "angry",
+          "distressed"
+        ],
+        "description": "The caller's emotional state at their most intense point: calm; frustrated (annoyed, impatient); angry (raised voice, complaints, demands); distressed (crying, hopeless, mentions of self-harm)."
+      },
+      {
+        "type": "string",
+        "name": "upset_about",
+        "description": "If the caller was frustrated, angry, or distressed: what they were upset about, in their own words, one sentence. Otherwise empty."
+      }
+    ],
+    "denoising_mode": "noise-and-background-speech-cancellation",
+    "stt_mode": "accurate"
+  },
+  "llm": {
+    "model_env": "RETELL_MODEL",
+    "model_default": "gpt-4.1",
+    "model_temperature": 0,
+    "tool_call_strict_mode": true
+  },
+  "transfer": {
+    "mode": "agentic",
+    "staff_side_speaks_first": true,
+    "decision_timeout_ms": 45000,
+    "agent_detection_timeout_ms": 25000,
+    "transfer_ring_duration_ms": 30000,
+    "on_hold_music": "relaxing_sound",
+    "opt_out_human_detection": false,
+    "show_transferee_as_caller": false
+  }
+}

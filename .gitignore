@@ -1,2 +1,9 @@
 node_modules/
 _site/
+
+# voice intake agent proof of concept: secrets and test-call transcripts stay local
+voice-intake-agent/poc/review/calls.json
+voice-intake-agent/poc/review/index.html
+voice-intake-agent/poc/tests/.retell-tests.json
+voice-intake-agent/poc/tests/results.json
+voice-intake-agent/poc/tests/report.md

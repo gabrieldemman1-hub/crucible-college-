@@ -1,0 +1,43 @@
+{
+  "timezone": "America/Los_Angeles",
+  "businessHours": {
+    "mon": ["08:00", "20:00"],
+    "tue": ["08:00", "20:00"],
+    "wed": ["08:00", "20:00"],
+    "thu": ["08:00", "20:00"],
+    "fri": ["08:00", "20:00"],
+    "sat": ["08:00", "20:00"],
+    "sun": ["08:00", "20:00"]
+  },
+  "holidays": ["2026-11-26", "2026-12-25", "2027-01-01"],
+  "staff": {
+    "mlopez":  { "name": "Maria",  "number": "+14155550101", "email": "maria@example-firm.com",  "languages": ["en", "es"], "salesforceUserId": "005000000000001AAA", "role": "intake" },
+    "jsmith":  { "name": "James",  "number": "+14155550102", "email": "james@example-firm.com",  "languages": ["en"],       "salesforceUserId": "005000000000002AAA", "role": "intake" },
+    "lgarcia": { "name": "Lucia",  "number": "+14155550103", "email": "lucia@example-firm.com",  "languages": ["es"],       "salesforceUserId": "005000000000003AAA", "role": "intake" },
+    "arivera": { "name": "Ana",    "number": "+14155550201", "email": "ana@example-firm.com",    "languages": ["en", "es"], "role": "admin" },
+    "bchen":   { "name": "Ben",    "number": "+14155550202", "email": "ben@example-firm.com",    "languages": ["en"],       "role": "admin" },
+    "snight":  { "name": "Sofia",  "number": "+14155550301", "email": "sofia@example-firm.com",  "languages": ["en", "es"], "salesforceUserId": "005000000000004AAA", "role": "overnight" }
+  },
+  "lists": {
+    "intake": {
+      "en": ["mlopez", "jsmith"],
+      "es": ["mlopez", "lgarcia"]
+    },
+    "admin": ["arivera", "bchen"],
+    "overnight": ["snight"]
+  },
+  "overnight": {
+    "handlesExistingClients": true
+  },
+  "seniorManagement": ["Walter", "Peg", "Anthony"],
+  "callbackWindow": {
+    "businessHours": {
+      "en": "within one business hour",
+      "es": "dentro de una hora hábil"
+    },
+    "afterHours": {
+      "en": "first thing in the morning",
+      "es": "a primera hora de la mañana"
+    }
+  }
+}
