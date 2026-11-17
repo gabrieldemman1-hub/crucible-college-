@@ -6,5 +6,5 @@ pagination:
 permalink: "/lessons/{{ lesson.slug }}/"
 layout: lesson.njk
 eleventyComputed:
-  title: "{{ lesson.tag }} — {{ lesson.title }}"
+  title: "{{ lesson.tag }} — {{ lesson.title | safe }}"
 ---

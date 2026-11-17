@@ -18,23 +18,30 @@ near-identical pages.
 
 ## Run locally
 
+Requires Node 18 or newer.
+
 ```bash
 npm install
 npm run dev
 ```
 
 Then open http://localhost:8080. `npm run dev` rebuilds and reloads on every
-file change. For a production build (output in `_site/`):
+file change. For a production build (output in `_site/`, which is emptied
+first so pages for renamed or removed lessons don't linger):
 
 ```bash
 npm run build
 ```
 
-Deploy by uploading `_site/` to any static host.
+Deploy by uploading `_site/` to any static host. The build includes a
+`404.html`, which most static hosts serve automatically for unknown addresses.
 
-> Note: lesson URLs are root-relative (`/lessons/...`), so the site expects to
-> be served from a domain root (every static host's default). If you ever need
-> to serve it from a subpath, set Eleventy's `pathPrefix`.
+> Note: every URL on the site is root-relative (`/lessons/...`,
+> `/assets/...`), so it only works when served from a domain root: a custom
+> domain, Netlify, Cloudflare Pages, or a GitHub Pages user/organisation site.
+> It does not work from a subpath such as a GitHub Pages project site
+> (`username.github.io/repo/`) — Eleventy's `pathPrefix` has no effect on
+> these URLs, so subpath hosting would need code changes.
 
 ## Where the curriculum lives
 
@@ -53,8 +60,9 @@ from it at build time:
 Each slot generates a card on `/builds/` and a detail page at
 `/builds/build-NN/` (rank seal, subclass/exotic pills, three-weapon loadout
 display with image placeholders, Setup and How It Works sections, and
-higher/lower-rank pager). Fill a slot by editing its entry there and
-rebuilding.
+higher/lower-rank pager). Fill a slot by adding `name`, `tagline`, `subclass`,
+`exotic` and `weapons` to its entry there (the header comment lists every
+field) and rebuilding; anything you leave out keeps its placeholder text.
 
 ## Adding a new chapter (or lesson)
 
@@ -110,10 +118,10 @@ All implemented in `src/assets/progress.js` + `styles.css`, no frameworks:
   completed lessons. Keyboard: the chevron button toggles it, Esc closes.
   Hidden on small screens (the curriculum page covers it there).
 - **Command palette** — Ctrl/⌘+K (or the search pill in the nav) opens a
-  quick-switcher over every page and lesson; type to filter, arrows + Enter
-  to jump.
+  quick-switcher over every top-level page and lesson (the individual build
+  pages are not in it); type to filter, arrows + Enter to jump.
 - **Progress ring** — the nav progress counter includes an SVG ring that
-  fills violet and turns gold at 10/10.
+  fills violet and turns gold when every lesson is complete.
 - **Read-progress bar** — a 2px bar under the header on lesson pages tracks
   scroll position.
 - **Completion feedback** — marking a lesson complete stamps the lesson seal
@@ -124,20 +132,23 @@ All implemented in `src/assets/progress.js` + `styles.css`, no frameworks:
 
 ## How progress tracking works
 
-All client-side, in `src/assets/progress.js` (the only script on the site,
-loaded by every page):
+All client-side, in `src/assets/progress.js` (the only external script,
+loaded by every page; `base.njk` also carries a small inline theme script):
 
 - **Completion** — "Mark as complete" writes
   `localStorage["crucible-college:complete:v1"]` (a `{slug: true}` map). On
   every page load the script re-renders: the lesson toggle, gold-filled seals
   and ticks in the chapter sidebar, "Completed" pills on curriculum cards, the
-  curriculum progress bar, and the "X / N" counter in the top nav.
+  curriculum progress bar, and the "X / N" counter in the top nav. It does the
+  same when you come back to a page with the browser's Back button, or change
+  progress in another tab.
 - **Resume** — every lesson page view writes its slug to
   `localStorage["crucible-college:resume:v1"]`. The Home page's "Continue
   training" card reads it and deep-links to that lesson; with no history it
   shows a "start at the beginning" state pointing at Lesson 1.
 - **Degradation** — all storage access is wrapped in try/catch. If storage is
-  blocked, the site works normally; completion just doesn't persist.
+  blocked, the site works normally; completion just doesn't persist, and the
+  toast says so.
 
 The lesson total is never hardcoded — it's rendered from `curriculum.js` at
 build time, so it stays correct as chapters are added.
@@ -148,15 +159,23 @@ build time, so it stays correct as chapters are added.
 ├── .eleventy.js              # build config
 ├── src/
 │   ├── _data/curriculum.js   # ★ SINGLE SOURCE OF TRUTH — edit this
+│   ├── _data/builds.js       # Meta Builds slots
 │   ├── _includes/base.njk    # HTML shell: nav, progress, footer
 │   ├── _includes/lesson.njk  # lesson page template
+│   ├── _includes/build.njk   # build page template
 │   ├── lessons.njk           # generates one page per lesson
+│   ├── build-pages.njk       # generates one page per build
 │   ├── index.njk             # Home
 │   ├── curriculum.njk        # Curriculum
+│   ├── builds.njk            # Meta Builds (ranked list)
 │   ├── dictionary.njk        # Dictionary (A–Z Crucible glossary)
 │   ├── resources.njk         # Resources (external links)
+│   ├── 404.njk               # "Page not found" page (/404.html)
 │   └── assets/
 │       ├── styles.css        # design system (Void Hunter)
-│       └── progress.js       # completion + resume storage module
+│       └── progress.js       # progress tracking + all UI behaviours
 └── _site/                    # build output (deploy this)
 ```
+
+`tracker/` and `design-explorations/` are separate from the site and are not
+part of the build.

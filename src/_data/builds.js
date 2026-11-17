@@ -7,13 +7,17 @@
  * here and run `npm run build`. All fields are PLACEHOLDERS for you to fill
  * in as the meta shifts; the page structure marks them accordingly.
  *
- * Build fields:
+ * Build fields (only rank, setup and howItWorks are set today; add any of the
+ * others to a slot and it replaces the placeholder text shown for it):
  *   rank     — 1–10, shown in the rank seal
- *   slug     — URL segment; page becomes /builds/<slug>/
- *   name     — placeholder build name (rename when you fill the slot)
- *   subclass — placeholder subclass label
- *   exotic   — placeholder exotic armor piece
- *   weapons  — the loadout display: kinetic / energy / power slots
+ *   slug     — URL segment; page becomes /builds/<slug>/ (default: build-NN)
+ *   name     — build name (default: "Build Slot NN"); once a slot has a name
+ *              its card on /builds/ drops the "Placeholder" chip
+ *   tagline  — one line under the name
+ *   subclass — subclass label
+ *   exotic   — exotic armor piece
+ *   weapons  — the loadout display: three { slot, name, note } entries for
+ *              the kinetic / energy / power slots
  *   setup    — author note for the Setup section
  *   howItWorks — author note for the How It Works section
  * ─────────────────────────────────────────────────────────────────────────────
@@ -76,21 +80,23 @@ const slots = [
 
 const builds = slots.map((slot) => {
   const nn = String(slot.rank).padStart(2, "0");
+  const slug = slot.slug || "build-" + nn;
   return {
     rank: slot.rank,
-    slug: "build-" + nn,
-    name: "Build Slot " + nn,
-    tagline: "Placeholder for the #" + slot.rank + " Hunter build in the current meta.",
-    subclass: "Subclass TBD",
-    exotic: "Exotic armor TBD",
-    weapons: [
+    slug,
+    filled: Boolean(slot.name),
+    name: slot.name || "Build Slot " + nn,
+    tagline: slot.tagline || "Placeholder for the #" + slot.rank + " Hunter build in the current meta.",
+    subclass: slot.subclass || "Subclass TBD",
+    exotic: slot.exotic || "Exotic armor TBD",
+    weapons: slot.weapons || [
       { slot: "Kinetic", name: "Kinetic weapon TBD", note: "Weapon name, archetype, and the roll that matters." },
       { slot: "Energy", name: "Energy weapon TBD", note: "Weapon name, archetype, and the roll that matters." },
       { slot: "Power", name: "Power weapon TBD", note: "Heavy pick for when ammo drops — or note if it's flexible." }
     ],
     setup: slot.setup,
     howItWorks: slot.howItWorks,
-    url: "/builds/build-" + nn + "/"
+    url: "/builds/" + slug + "/"
   };
 });
 

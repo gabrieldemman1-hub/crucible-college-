@@ -4,8 +4,11 @@
   "private": true,
   "description": "Crucible College — a Destiny 2 Crucible course for Hunters",
   "scripts": {
-    "build": "eleventy",
+    "build": "node -e \"require('fs').rmSync('_site',{recursive:true,force:true})\" && eleventy",
     "dev": "eleventy --serve"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.0.0"

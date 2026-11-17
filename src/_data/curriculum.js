@@ -309,7 +309,8 @@ lessons.forEach((lesson, i) => {
     : null;
 });
 
-// Minimal index shipped to the browser for the Resume control.
+// Minimal index shipped to the browser for the Resume control, the progress
+// totals, and the command palette.
 const index = lessons.map((l) => ({ slug: l.slug, tag: l.tag, title: l.title, url: l.url }));
 
 module.exports = { chapters, lessons, index };

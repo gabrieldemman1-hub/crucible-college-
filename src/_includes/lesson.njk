@@ -126,7 +126,7 @@ active: curriculum
     </article>
 
     <aside class="lesson-sidebar" aria-label="Lessons in this chapter">
-      <h2 class="lesson-sidebar__title">Chapter {{ lesson.chapterNumber }}<span>{{ lesson.chapterTitle }}</span></h2>
+      <h2 class="lesson-sidebar__title">Chapter {{ lesson.chapterNumber }} <span>{{ lesson.chapterTitle }}</span></h2>
       <ol class="lesson-sidebar__list">
         {% for ch in curriculum.chapters %}
           {% if ch.number == lesson.chapterNumber %}

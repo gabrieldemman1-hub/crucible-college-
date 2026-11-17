@@ -18,7 +18,7 @@ active: builds
         <p class="build-header__kicker">Ranked #{{ build.rank }} in the current meta</p>
         <h1>{{ build.name }}</h1>
         <!-- PLACEHOLDER: build name + tagline -->
-        <p class="build-header__tagline placeholder-text">{{ build.tagline }}</p>
+        <p class="build-header__tagline{% if not build.filled %} placeholder-text{% endif %}">{{ build.tagline }}</p>
         <div class="pills">
           <span class="pill pill--subclass">{{ build.subclass }}</span>
           <span class="pill">{{ build.exotic }}</span>
