@@ -233,8 +233,19 @@ html:not(.js) .chapter__progress { display: none; }
 html { scroll-padding-top: calc(var(--header-h, 4rem) + 0.75rem); }
 /* The header's own controls sit inside that padding, so the browser would
    treat them as hidden and scroll the page each time keyboard focus moved
-   into the header. Drop the padding while focus is there. */
-html:has(.site-header:focus-within) { scroll-padding-top: 0; }
+   into the header. Where the header is sticky (wider than 40rem), drop the
+   padding while focus is there, and put it on the bottom edge instead so
+   PageDown / PageUp / Space still move by the window height less the header.
+   Not on the bottom inside the open menu or in a very short window, where it
+   could itself leave a focused control outside the padded area. */
+@media not all and (max-width: 40rem) {
+  html:has(.site-header:focus-within) { scroll-padding-top: 0; }
+  @media (min-height: 24rem) {
+    html:has(.site-header:focus-within):not(:has(.nav-dropdown__panel:focus-within)) {
+      scroll-padding-bottom: calc(var(--header-h, 4rem) + 0.75rem);
+    }
+  }
+}
 
 .site-header {
   background: var(--header-bg);
@@ -517,6 +528,7 @@ main { min-height: 60vh; overflow-x: clip; }
 
 .chapter { margin-bottom: 2.75rem; }
 .chapter__heading {
+  display: flow-root; /* keeps the floated counter chip inside, above the rule */
   border-bottom: 1px solid var(--line-600);
   padding-bottom: 0.5rem;
   margin-bottom: 1.25rem;
@@ -1126,6 +1138,10 @@ html.js-reveal .reveal.is-visible { opacity: 1; transform: none; }
     background-clip: text;
     color: transparent;
     animation: sheen 5s ease-in-out infinite;
+    /* The gradient is painted only inside the box; the slanted last letter
+       reaches past it. Widen the box without moving anything. */
+    padding-inline-end: 0.12em;
+    margin-inline-end: -0.12em;
   }
   @keyframes sheen { 50% { background-position: 100%; } }
 }
@@ -1254,6 +1270,13 @@ html.js-reveal .reveal.is-visible { opacity: 1; transform: none; }
 @container (max-width: 21.5rem) {
   .build-card--placeholder { padding-top: 2.4rem; }
 }
+/* In the multi-column grid, filled cards take the same strip for as long as
+   any slot is still a placeholder, so names line up across a row. */
+@media (min-width: 40.0625rem) {
+  @container (max-width: 21.5rem) {
+    .build-cards:has(.build-card--placeholder) .build-card { padding-top: 2.4rem; }
+  }
+}
 
 .pill--subclass { color: var(--violet-200); border-color: var(--violet-500); }
 
@@ -1349,6 +1372,11 @@ html.js-reveal .reveal.is-visible { opacity: 1; transform: none; }
 @media (min-width: 40.0625rem) and (max-width: 72rem) {
   html { scroll-padding-top: calc(var(--header-h, 7rem) + 0.75rem); }
   .lesson-sidebar { top: calc(var(--header-h, 7rem) + 0.9rem); }
+  @media (min-height: 24rem) {
+    html:has(.site-header:focus-within):not(:has(.nav-dropdown__panel:focus-within)) {
+      scroll-padding-bottom: calc(var(--header-h, 7rem) + 0.75rem);
+    }
+  }
 }
 
 @media (max-width: 40rem) {

@@ -39,8 +39,8 @@
   syncHeaderHeight();
   window.addEventListener("resize", syncHeaderHeight);
   window.addEventListener("load", syncHeaderHeight);
-  // The header can also change height without a resize (web font swap, the
-  // nav counter growing to "10 / 10" and wrapping).
+  // The header can also change height without a resize (for example a late
+  // web font swap re-wrapping the nav).
   if (window.ResizeObserver) {
     var headerEl = document.querySelector(".site-header");
     if (headerEl) new ResizeObserver(syncHeaderHeight).observe(headerEl);
@@ -313,6 +313,7 @@
     dropdown.addEventListener("focusin", fitPanel);
     window.addEventListener("resize", fitPanel);
     fitPanel();
+    syncExpanded(); // the pointer can already rest on the menu when the page loads
     // Web fonts arriving after this first fit shift the nav: fit again.
     if (document.fonts && document.fonts.ready && document.fonts.ready.then) document.fonts.ready.then(fitPanel);
 
@@ -340,6 +341,13 @@
       // Only close when focus verifiably moved elsewhere on the page —
       // a null relatedTarget (window blur, etc.) should not slam the menu shut.
       if (e.relatedTarget && !dropdown.contains(e.relatedTarget)) setOpen(false);
+    });
+    // A page restored from the Back/Forward cache starts un-pinned again; the
+    // pointer may still rest on the menu and show it.
+    window.addEventListener("pageshow", function (e) {
+      if (!e.persisted) return;
+      dropdown.classList.remove("is-dismissed");
+      setOpen(false);
     });
   }
 
@@ -598,7 +606,8 @@
   }
 
   // Back/Forward can restore a page from the browser's cache without running
-  // init() again: bring progress, theme and open overlays up to date.
+  // init() again: bring progress, theme and the search palette up to date
+  // (the Curriculum menu resets itself in initDropdown).
   window.addEventListener("pageshow", function (e) {
     if (!e.persisted) return; // normal loads are handled by init()
     var slug = document.body.getAttribute("data-lesson-slug");
@@ -611,12 +620,6 @@
     }
     var dialog = document.querySelector("[data-palette]");
     if (dialog && dialog.open) dialog.close();
-    var dd = document.querySelector("[data-dropdown]");
-    if (dd) {
-      dd.classList.remove("is-open", "is-dismissed");
-      var ddToggle = dd.querySelector("[data-dropdown-toggle]");
-      if (ddToggle) ddToggle.setAttribute("aria-expanded", "false");
-    }
   });
 
   // Progress changed in another tab or window.
