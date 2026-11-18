@@ -18,7 +18,7 @@ active: builds
         <p class="build-header__kicker">Ranked #{{ build.rank }} in the current meta</p>
         <h1>{{ build.name }}</h1>
         <!-- PLACEHOLDER: build name + tagline -->
-        <p class="build-header__tagline{% if not build.filled %} placeholder-text{% endif %}">{{ build.tagline }}</p>
+        <p class="build-header__tagline{% if not build.taglineFilled %} placeholder-text{% endif %}">{{ build.tagline }}</p>
         <div class="pills">
           <span class="pill pill--subclass">{{ build.subclass }}</span>
           <span class="pill">{{ build.exotic }}</span>
@@ -39,7 +39,7 @@ active: builds
           <div class="weapon-card__info">
             <span class="weapon-card__slot">{{ weapon.slot }}</span>
             <span class="weapon-card__name">{{ weapon.name }}</span>
-            <span class="weapon-card__note placeholder-text">{{ weapon.note }}</span>
+            <span class="weapon-card__note{% if not build.weaponsFilled %} placeholder-text{% endif %}">{{ weapon.note }}</span>
           </div>
         </li>
         {% endfor %}

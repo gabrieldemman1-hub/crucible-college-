@@ -163,17 +163,21 @@ code {
 }
 .skip-link:focus-visible { left: 0.5rem; top: 0.5rem; }
 
-/* Controls that only work with the script stay hidden until it runs
+/* Controls and read-outs that need JavaScript are hidden when it is off
    (the inline script in base.njk adds .js to <html>). */
 html:not(.js) [data-dropdown-toggle],
 html:not(.js) [data-palette-open],
 html:not(.js) [data-theme-toggle],
 html:not(.js) [data-complete-toggle],
-html:not(.js) .nav-progress { display: none; }
+html:not(.js) .nav-progress,
+html:not(.js) .course-progress,
+html:not(.js) .chapter__progress { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    transition-duration: 0.01ms !important;
+    /* none, not a tiny duration: a non-zero duration turns every property
+       change into a transition, and the script would measure mid-change. */
+    transition: none !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
@@ -227,6 +231,10 @@ html:not(.js) .nav-progress { display: none; }
 /* ── Header & nav ─────────────────────────────────────────────────────── */
 
 html { scroll-padding-top: calc(var(--header-h, 4rem) + 0.75rem); }
+/* The header's own controls sit inside that padding, so the browser would
+   treat them as hidden and scroll the page each time keyboard focus moved
+   into the header. Drop the padding while focus is there. */
+html:has(.site-header:focus-within) { scroll-padding-top: 0; }
 
 .site-header {
   background: var(--header-bg);
@@ -1084,6 +1092,16 @@ html.js-reveal .reveal.is-visible { opacity: 1; transform: none; }
   pointer-events: none;
   z-index: -1;
 }
+/* Where main cannot clip it (no overflow-x: clip), keep the glow inside the
+   hero so the wider box does not make the page scroll sideways. */
+@supports not (overflow-x: clip) {
+  .hero::before {
+    inset: -3rem 0 -2rem;
+    background:
+      radial-gradient(38rem 22rem at 85% 8%, var(--glow-a), transparent 60%),
+      radial-gradient(28rem 18rem at 8% 85%, var(--glow-b), transparent 65%);
+  }
+}
 .hero::after {
   content: "";
   position: absolute;
@@ -1228,6 +1246,14 @@ html.js-reveal .reveal.is-visible { opacity: 1; transform: none; }
 .build-card__tagline { font-size: var(--step--1); line-height: 1.5; }
 .build-card .pills { margin-top: auto; padding-top: 0.35rem; }
 .build-card__chip { position: absolute; top: 0.7rem; right: 0.7rem; }
+/* A card narrower than about 20.5rem has no room for the chip beside the
+   name (small phones, and the first widths of each extra grid column): below
+   21.5rem the chip gets its own strip above. Full-width desktop cards are
+   22.5rem and keep the chip beside the name. Filled slots have no chip. */
+.build-cards > li { container-type: inline-size; }
+@container (max-width: 21.5rem) {
+  .build-card--placeholder { padding-top: 2.4rem; }
+}
 
 .pill--subclass { color: var(--violet-200); border-color: var(--violet-500); }
 
@@ -1307,9 +1333,22 @@ html.js-reveal .reveal.is-visible { opacity: 1; transform: none; }
   .lesson-sidebar { position: static; order: 2; }
 }
 
-@media (max-width: 66.25rem) {
+/* Below the nav's own max-width the links take a second row. One row needs
+   about 68rem with the web fonts and a "10 / 10" counter; the rest is room
+   for a classic scrollbar and wider fallback fonts. */
+@media (max-width: 72rem) {
   .nav-links { margin-inline-start: 0; order: 3; flex-basis: 100%; flex-wrap: wrap; }
   .nav-search { margin-inline-start: auto; }
+  /* Without the script nothing keeps the menu inside the window: hang it
+     from the start of the links row instead of from the Curriculum link. */
+  html:not(.js) .nav-links { position: relative; }
+  html:not(.js) .nav-dropdown { position: static; }
+  html:not(.js) .nav-dropdown__panel { left: 0; right: auto; }
+}
+/* Two-row sticky header: fallback height for when the script has not set --header-h. */
+@media (min-width: 40.0625rem) and (max-width: 72rem) {
+  html { scroll-padding-top: calc(var(--header-h, 7rem) + 0.75rem); }
+  .lesson-sidebar { top: calc(var(--header-h, 7rem) + 0.9rem); }
 }
 
 @media (max-width: 40rem) {
@@ -1346,5 +1385,23 @@ html.js-reveal .reveal.is-visible { opacity: 1; transform: none; }
 @media print {
   html.js-reveal .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
   .site-header { position: static; }
-  .nav-search, .theme-toggle, .nav-dropdown__toggle, .toast, .skip-link { display: none; }
+  .nav-search, .theme-toggle, .nav-dropdown__toggle, .complete-toggle, .toast, .skip-link { display: none; }
+  /* Backgrounds are normally not printed: text that sits on one needs its own ink. */
+  .button--primary { background: none; color: var(--text-100); }
+  .hero__title em { background: none; color: var(--violet-300); }
+  .sidebar-item__tick, .nav-dropdown__tick { color: var(--gold-200); }
+  /* Paper is white: print the dark theme with the light palette
+     (keep in step with :root[data-theme="light"] at the top of this file). */
+  :root:not([data-theme="light"]) {
+    color-scheme: light;
+    --ink-900: #f6f3fc; --ink-800: #ffffff; --panel-800: #ffffff; --panel-700: #efeaf9;
+    --line-600: #dcd4ee; --well: #f1edfa;
+    --violet-500: #5b47b0; --violet-400: #6a55c7; --violet-300: #5b47b0; --violet-200: #41328a;
+    --text-100: #241c3d; --text-300: #4e4568; --text-400: #6f6790;
+    --gold-400: #b08f2e; --gold-200: #7a6316; --gold-ink: #241d07;
+    --header-bg: rgba(255, 255, 255, 0.85); --placeholder-bg: rgba(91, 71, 176, 0.06);
+    --backdrop: rgba(36, 28, 61, 0.4);
+    --shadow-soft: 0 10px 24px rgba(46, 36, 80, 0.14); --shadow-pop: 0 24px 60px rgba(46, 36, 80, 0.2);
+    --glow-a: rgba(91, 71, 176, 0.14); --glow-b: rgba(108, 86, 217, 0.08); --hero-line: rgba(91, 71, 176, 0.25);
+  }
 }

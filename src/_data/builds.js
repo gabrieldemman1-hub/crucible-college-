@@ -13,11 +13,12 @@
  *   slug     — URL segment; page becomes /builds/<slug>/ (default: build-NN)
  *   name     — build name (default: "Build Slot NN"); once a slot has a name
  *              its card on /builds/ drops the "Placeholder" chip
- *   tagline  — one line under the name
+ *   tagline  — one line under the name (styled as placeholder text until set)
  *   subclass — subclass label
  *   exotic   — exotic armor piece
  *   weapons  — the loadout display: three { slot, name, note } entries for
- *              the kinetic / energy / power slots
+ *              the kinetic / energy / power slots (notes are styled as
+ *              placeholder text until set)
  *   setup    — author note for the Setup section
  *   howItWorks — author note for the How It Works section
  * ─────────────────────────────────────────────────────────────────────────────
@@ -85,6 +86,8 @@ const builds = slots.map((slot) => {
     rank: slot.rank,
     slug,
     filled: Boolean(slot.name),
+    taglineFilled: Boolean(slot.tagline),
+    weaponsFilled: Boolean(slot.weapons),
     name: slot.name || "Build Slot " + nn,
     tagline: slot.tagline || "Placeholder for the #" + slot.rank + " Hunter build in the current meta.",
     subclass: slot.subclass || "Subclass TBD",

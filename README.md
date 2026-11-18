@@ -58,7 +58,8 @@ from it at build time:
 
 **Meta Builds live in `src/_data/builds.js`** — ten ranked placeholder slots.
 Each slot generates a card on `/builds/` and a detail page at
-`/builds/build-NN/` (rank seal, subclass/exotic pills, three-weapon loadout
+`/builds/build-NN/`, or `/builds/<slug>/` once the slot sets a `slug`
+(rank seal, subclass/exotic pills, three-weapon loadout
 display with image placeholders, Setup and How It Works sections, and
 higher/lower-rank pager). Fill a slot by adding `name`, `tagline`, `subclass`,
 `exotic` and `weapons` to its entry there (the header comment lists every
@@ -123,7 +124,8 @@ All implemented in `src/assets/progress.js` + `styles.css`, no frameworks:
 - **Progress ring** — the nav progress counter includes an SVG ring that
   fills violet and turns gold when every lesson is complete.
 - **Read-progress bar** — a 2px bar under the header on lesson pages tracks
-  scroll position.
+  scroll position (on phones, where the header scrolls away, it is pinned to
+  the top of the window instead).
 - **Completion feedback** — marking a lesson complete stamps the lesson seal
   (a quick scale animation) and shows a "progress saved" toast.
 - **Motion** — scroll-reveal on cards/sections (IntersectionObserver) and

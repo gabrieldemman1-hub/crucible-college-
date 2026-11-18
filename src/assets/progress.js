@@ -39,6 +39,12 @@
   syncHeaderHeight();
   window.addEventListener("resize", syncHeaderHeight);
   window.addEventListener("load", syncHeaderHeight);
+  // The header can also change height without a resize (web font swap, the
+  // nav counter growing to "10 / 10" and wrapping).
+  if (window.ResizeObserver) {
+    var headerEl = document.querySelector(".site-header");
+    if (headerEl) new ResizeObserver(syncHeaderHeight).observe(headerEl);
+  }
 
   // ── Storage layer (all access guarded) ──────────────────────────────────
 
@@ -181,27 +187,38 @@
     if (seal) seal.classList.toggle("is-complete", done);
   }
 
+  var resumeDefault = null; // the server-rendered "start here" state of the Home card
+
   function renderResumeCard() {
     var card = document.querySelector("[data-resume]");
     if (!card) return;
-
-    var slug = getResumeSlug();
-    if (!slug) return; // first visit — keep the server-rendered "start here" state
-
-    var lessons = getLessonIndex();
-    var match = null;
-    for (var i = 0; i < lessons.length; i++) {
-      if (lessons[i].slug === slug) { match = lessons[i]; break; }
-    }
-    if (!match) return; // stale slug (lesson removed) — fall back to default state
-
-    card.setAttribute("href", match.url);
     var kicker = card.querySelector("[data-resume-kicker]");
     var title = card.querySelector("[data-resume-title]");
     var tag = card.querySelector("[data-resume-tag]");
-    if (kicker) kicker.textContent = "Continue where you left off";
-    if (title) title.textContent = "Lesson " + match.tag + " — " + match.title;
-    if (tag) tag.textContent = match.tag;
+    if (!resumeDefault) {
+      // First call is from init(), on the untouched markup.
+      resumeDefault = {
+        href: card.getAttribute("href"),
+        kicker: kicker ? kicker.textContent : "",
+        title: title ? title.textContent : "",
+        tag: tag ? tag.textContent : ""
+      };
+    }
+
+    var slug = getResumeSlug();
+    var match = null;
+    if (slug) {
+      var lessons = getLessonIndex();
+      for (var i = 0; i < lessons.length; i++) {
+        if (lessons[i].slug === slug) { match = lessons[i]; break; }
+      }
+    }
+    // No history, or a stale slug (lesson removed, storage cleared in another
+    // tab): show the "start here" state again.
+    card.setAttribute("href", match ? match.url : resumeDefault.href);
+    if (kicker) kicker.textContent = match ? "Continue where you left off" : resumeDefault.kicker;
+    if (title) title.textContent = match ? "Lesson " + match.tag + " — " + match.title : resumeDefault.title;
+    if (tag) tag.textContent = match ? match.tag : resumeDefault.tag;
   }
 
   function renderAll(map) {
@@ -264,7 +281,7 @@
 
     function setOpen(open) {
       dropdown.classList.toggle("is-open", open);
-      if (toggle) toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      syncExpanded();
     }
 
     var panel = dropdown.querySelector("[data-dropdown-panel]");
@@ -282,23 +299,28 @@
       else if (r.right > vw - margin) shift = vw - margin - r.right;
       if (shift) panel.style.right = (parseFloat(window.getComputedStyle(panel).right) - shift) + "px";
     }
-    function syncExpanded() {
+    // aria-expanded follows what is on screen: pinned open, or shown by hover.
+    // The enter/leave handlers pass the answer in, because browsers differ on
+    // whether :hover has already changed when those events fire.
+    function syncExpanded(hovered) {
+      if (hovered === undefined) hovered = dropdown.matches(":hover");
       var shown = dropdown.classList.contains("is-open") ||
-        (canHover && dropdown.matches(":hover") && !dropdown.classList.contains("is-dismissed"));
+        (canHover && hovered && !dropdown.classList.contains("is-dismissed"));
       if (toggle) toggle.setAttribute("aria-expanded", shown ? "true" : "false");
     }
-    dropdown.addEventListener("mouseenter", function () { fitPanel(); syncExpanded(); });
-    dropdown.addEventListener("mouseleave", function () { dropdown.classList.remove("is-dismissed"); syncExpanded(); });
+    dropdown.addEventListener("mouseenter", function () { fitPanel(); syncExpanded(true); });
+    dropdown.addEventListener("mouseleave", function () { dropdown.classList.remove("is-dismissed"); syncExpanded(false); });
     dropdown.addEventListener("focusin", fitPanel);
     window.addEventListener("resize", fitPanel);
     fitPanel();
+    // Web fonts arriving after this first fit shift the nav: fit again.
+    if (document.fonts && document.fonts.ready && document.fonts.ready.then) document.fonts.ready.then(fitPanel);
 
     if (toggle) {
       toggle.addEventListener("click", function () {
         fitPanel();
         dropdown.classList.remove("is-dismissed");
         setOpen(!dropdown.classList.contains("is-open"));
-        syncExpanded();
       });
     }
     document.addEventListener("click", function (e) {
@@ -352,6 +374,7 @@
       var map = getCompleteMap();
       list.textContent = "";
       list.hidden = !filtered.length;
+      input.setAttribute("aria-expanded", filtered.length ? "true" : "false");
       if (emptyMsg) {
         emptyMsg.hidden = !!filtered.length;
         emptyMsg.textContent = filtered.length ? "" : "No matches — try a lesson tag like “2A”.";
@@ -402,6 +425,7 @@
       });
       activeIndex = 0;
       render();
+      list.scrollTop = 0; // the highlight is back on the first result
     }
 
     function open() {
@@ -546,7 +570,7 @@
             stampSeal();
             showToast(saved ? "Lesson sealed — progress saved" : "Lesson sealed — but this browser isn’t saving progress");
           } else {
-            showToast("Marked as not complete");
+            showToast(saved ? "Marked as not complete" : "Marked as not complete — but this browser isn’t saving progress");
           }
         });
       }
