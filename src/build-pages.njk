@@ -6,5 +6,5 @@ pagination:
 permalink: "/builds/{{ build.slug }}/"
 layout: build.njk
 eleventyComputed:
-  title: "Build #{{ build.rank }} — {{ build.name }}"
+  title: "Build #{{ build.rank }} — {{ build.name | safe }}"
 ---

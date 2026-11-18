@@ -1,11 +1,14 @@
 /**
- * Crucible College — progress tracking + UI behaviors (the ONLY script).
+ * Crucible College — progress tracking + UI behaviors (the only external
+ * script; base.njk also carries a small inline script that sets the theme
+ * before first paint).
  *
  * Loaded by every page via base.njk. Concerns:
  *   1. Completion:  localStorage["crucible-college:complete:v1"] = {"<slug>": true, ...}
  *   2. Resume:      localStorage["crucible-college:resume:v1"]   = "<slug>"
- *   3. UI behaviors: nav dropdown, command palette (Ctrl/⌘+K), progress ring,
- *      lesson read-progress bar, scroll-reveal, completion toast + seal stamp.
+ *   3. UI behaviors: theme toggle, nav dropdown, command palette (Ctrl/⌘+K),
+ *      progress ring, lesson read-progress bar, scroll-reveal, completion
+ *      toast + seal stamp.
  *
  * Every storage access is wrapped in try/catch: if storage is unavailable
  * (private mode, blocked, quota), the site stays fully usable — completion
@@ -24,6 +27,25 @@
     reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   } catch (e) { /* treat as motion-ok */ }
 
+  // ── Header height → CSS (anchor offset + sticky sidebar offset) ─────────
+  // Runs at once, before the browser scrolls to a #fragment. The value is 0
+  // where the header is not sticky (phones).
+  function syncHeaderHeight() {
+    var header = document.querySelector(".site-header");
+    if (!header) return;
+    var sticky = window.getComputedStyle(header).position === "sticky";
+    document.documentElement.style.setProperty("--header-h", (sticky ? header.offsetHeight : 0) + "px");
+  }
+  syncHeaderHeight();
+  window.addEventListener("resize", syncHeaderHeight);
+  window.addEventListener("load", syncHeaderHeight);
+  // The header can also change height without a resize (for example a late
+  // web font swap re-wrapping the nav).
+  if (window.ResizeObserver) {
+    var headerEl = document.querySelector(".site-header");
+    if (headerEl) new ResizeObserver(syncHeaderHeight).observe(headerEl);
+  }
+
   // ── Storage layer (all access guarded) ──────────────────────────────────
 
   function storageGet(key) {
@@ -38,7 +60,7 @@
     if (!raw) return {};
     try {
       var parsed = JSON.parse(raw);
-      return parsed && typeof parsed === "object" ? parsed : {};
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
     } catch (e) {
       return {};
     }
@@ -56,9 +78,10 @@
   }
 
   function completeCount(map) {
+    var lessons = getLessonIndex();
     var n = 0;
-    for (var key in map) {
-      if (Object.prototype.hasOwnProperty.call(map, key) && map[key] === true) n++;
+    for (var i = 0; i < lessons.length; i++) {
+      if (isComplete(map, lessons[i].slug)) n++;
     }
     return n;
   }
@@ -118,7 +141,22 @@
       var slug = el.getAttribute("data-lesson-card") ||
                  el.getAttribute("data-sidebar-lesson") ||
                  el.getAttribute("data-lesson-link");
-      el.classList.toggle("is-complete", isComplete(map, slug));
+      var done = isComplete(map, slug);
+      el.classList.toggle("is-complete", done);
+      // The tick is decorative; sidebar and dropdown items also get the state
+      // as hidden text (curriculum cards already show a "Completed" pill).
+      if (!el.hasAttribute("data-lesson-card")) {
+        var note = el.querySelector("[data-complete-note]");
+        if (done && !note) {
+          note = document.createElement("span");
+          note.className = "visually-hidden";
+          note.setAttribute("data-complete-note", "");
+          note.textContent = " (completed)";
+          el.appendChild(note);
+        } else if (!done && note) {
+          note.parentNode.removeChild(note);
+        }
+      }
     }
   }
 
@@ -149,27 +187,38 @@
     if (seal) seal.classList.toggle("is-complete", done);
   }
 
+  var resumeDefault = null; // the server-rendered "start here" state of the Home card
+
   function renderResumeCard() {
     var card = document.querySelector("[data-resume]");
     if (!card) return;
-
-    var slug = getResumeSlug();
-    if (!slug) return; // first visit — keep the server-rendered "start here" state
-
-    var lessons = getLessonIndex();
-    var match = null;
-    for (var i = 0; i < lessons.length; i++) {
-      if (lessons[i].slug === slug) { match = lessons[i]; break; }
-    }
-    if (!match) return; // stale slug (lesson removed) — fall back to default state
-
-    card.setAttribute("href", match.url);
     var kicker = card.querySelector("[data-resume-kicker]");
     var title = card.querySelector("[data-resume-title]");
     var tag = card.querySelector("[data-resume-tag]");
-    if (kicker) kicker.textContent = "Continue where you left off";
-    if (title) title.textContent = "Lesson " + match.tag + " — " + match.title;
-    if (tag) tag.textContent = match.tag;
+    if (!resumeDefault) {
+      // First call is from init(), on the untouched markup.
+      resumeDefault = {
+        href: card.getAttribute("href"),
+        kicker: kicker ? kicker.textContent : "",
+        title: title ? title.textContent : "",
+        tag: tag ? tag.textContent : ""
+      };
+    }
+
+    var slug = getResumeSlug();
+    var match = null;
+    if (slug) {
+      var lessons = getLessonIndex();
+      for (var i = 0; i < lessons.length; i++) {
+        if (lessons[i].slug === slug) { match = lessons[i]; break; }
+      }
+    }
+    // No history, or a stale slug (lesson removed, storage cleared in another
+    // tab): show the "start here" state again.
+    card.setAttribute("href", match ? match.url : resumeDefault.href);
+    if (kicker) kicker.textContent = match ? "Continue where you left off" : resumeDefault.kicker;
+    if (title) title.textContent = match ? "Lesson " + match.tag + " — " + match.title : resumeDefault.title;
+    if (tag) tag.textContent = match ? match.tag : resumeDefault.tag;
   }
 
   function renderAll(map) {
@@ -202,23 +251,25 @@
 
   // ── Theme toggle (initial theme is set pre-paint by an inline script) ──
 
+  function syncThemeLabel() {
+    var btn = document.querySelector("[data-theme-toggle]");
+    if (!btn) return;
+    var theme = document.documentElement.getAttribute("data-theme");
+    btn.setAttribute("aria-label",
+      theme === "light" ? "Switch to dark theme" : "Switch to light theme");
+  }
+
   function initThemeToggle() {
     var btn = document.querySelector("[data-theme-toggle]");
     if (!btn) return;
-
-    function syncLabel() {
-      var theme = document.documentElement.getAttribute("data-theme");
-      btn.setAttribute("aria-label",
-        theme === "light" ? "Switch to dark theme" : "Switch to light theme");
-    }
 
     btn.addEventListener("click", function () {
       var next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
       document.documentElement.setAttribute("data-theme", next);
       storageSet(THEME_KEY, next);
-      syncLabel();
+      syncThemeLabel();
     });
-    syncLabel();
+    syncThemeLabel();
   }
 
   // ── Nav dropdown (hover via CSS; click/keyboard here) ──────────────────
@@ -230,27 +281,73 @@
 
     function setOpen(open) {
       dropdown.classList.toggle("is-open", open);
-      if (toggle) toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      syncExpanded();
     }
+
+    var panel = dropdown.querySelector("[data-dropdown-panel]");
+    var canHover = false;
+    try { canHover = window.matchMedia("(hover: hover)").matches; } catch (e) { /* no hover */ }
+
+    // Keep the panel inside the viewport (it is anchored to the nav item, which can sit far left).
+    function fitPanel() {
+      if (!panel) return;
+      panel.style.right = "";
+      var r = panel.getBoundingClientRect();
+      if (!r.width) return; // display:none on small screens
+      var vw = document.documentElement.clientWidth, margin = 16, shift = 0;
+      if (r.left < margin) shift = margin - r.left;
+      else if (r.right > vw - margin) shift = vw - margin - r.right;
+      if (shift) panel.style.right = (parseFloat(window.getComputedStyle(panel).right) - shift) + "px";
+    }
+    // aria-expanded follows what is on screen: pinned open, or shown by hover.
+    // The enter/leave handlers pass the answer in, because browsers differ on
+    // whether :hover has already changed when those events fire.
+    function syncExpanded(hovered) {
+      if (hovered === undefined) hovered = dropdown.matches(":hover");
+      var shown = dropdown.classList.contains("is-open") ||
+        (canHover && hovered && !dropdown.classList.contains("is-dismissed"));
+      if (toggle) toggle.setAttribute("aria-expanded", shown ? "true" : "false");
+    }
+    dropdown.addEventListener("mouseenter", function () { fitPanel(); syncExpanded(true); });
+    dropdown.addEventListener("mouseleave", function () { dropdown.classList.remove("is-dismissed"); syncExpanded(false); });
+    dropdown.addEventListener("focusin", fitPanel);
+    window.addEventListener("resize", fitPanel);
+    fitPanel();
+    syncExpanded(); // the pointer can already rest on the menu when the page loads
+    // Web fonts arriving after this first fit shift the nav: fit again.
+    if (document.fonts && document.fonts.ready && document.fonts.ready.then) document.fonts.ready.then(fitPanel);
 
     if (toggle) {
       toggle.addEventListener("click", function () {
+        fitPanel();
+        dropdown.classList.remove("is-dismissed");
         setOpen(!dropdown.classList.contains("is-open"));
       });
     }
     document.addEventListener("click", function (e) {
       if (!dropdown.contains(e.target)) setOpen(false);
     });
-    dropdown.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && dropdown.classList.contains("is-open")) {
-        setOpen(false);
-        if (toggle) toggle.focus();
-      }
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape") return;
+      var hovered = canHover && dropdown.matches(":hover");
+      if (!dropdown.classList.contains("is-open") && !hovered) return;
+      var hadFocus = dropdown.contains(document.activeElement);
+      setOpen(false);
+      if (hovered) dropdown.classList.add("is-dismissed");
+      syncExpanded();
+      if (hadFocus && toggle) toggle.focus();
     });
     dropdown.addEventListener("focusout", function (e) {
       // Only close when focus verifiably moved elsewhere on the page —
       // a null relatedTarget (window blur, etc.) should not slam the menu shut.
       if (e.relatedTarget && !dropdown.contains(e.relatedTarget)) setOpen(false);
+    });
+    // A page restored from the Back/Forward cache starts un-pinned again; the
+    // pointer may still rest on the menu and show it.
+    window.addEventListener("pageshow", function (e) {
+      if (!e.persisted) return;
+      dropdown.classList.remove("is-dismissed");
+      setOpen(false);
     });
   }
 
@@ -266,6 +363,7 @@
 
     var input = dialog.querySelector("[data-palette-input]");
     var list = dialog.querySelector("[data-palette-results]");
+    var emptyMsg = dialog.querySelector("[data-palette-empty]");
 
     var items = [
       { tag: "•", title: "Home", url: "/" },
@@ -283,18 +381,23 @@
     function render() {
       var map = getCompleteMap();
       list.textContent = "";
+      list.hidden = !filtered.length;
+      input.setAttribute("aria-expanded", filtered.length ? "true" : "false");
+      if (emptyMsg) {
+        emptyMsg.hidden = !!filtered.length;
+        emptyMsg.textContent = filtered.length ? "" : "No matches — try a lesson tag like “2A”.";
+      }
       if (!filtered.length) {
-        var empty = document.createElement("p");
-        empty.className = "palette__empty";
-        empty.textContent = "No matches — try a lesson tag like “2A”.";
-        list.appendChild(empty);
+        input.removeAttribute("aria-activedescendant");
         return;
       }
+      input.setAttribute("aria-activedescendant", "palette-opt-" + activeIndex);
       for (var i = 0; i < filtered.length; i++) {
         var item = filtered[i];
         var li = document.createElement("li");
         li.className = "palette__item" + (i === activeIndex ? " is-active" : "");
         li.setAttribute("role", "option");
+        li.id = "palette-opt-" + i;
         li.setAttribute("aria-selected", i === activeIndex ? "true" : "false");
         li.setAttribute("data-url", item.url);
         li.setAttribute("data-idx", String(i));
@@ -318,6 +421,11 @@
       }
     }
 
+    function scrollActiveIntoView() {
+      var el = list.children[activeIndex];
+      if (el && el.scrollIntoView) el.scrollIntoView({ block: "nearest" });
+    }
+
     function applyFilter(query) {
       var q = query.trim().toLowerCase();
       filtered = !q ? items.slice() : items.filter(function (item) {
@@ -325,6 +433,7 @@
       });
       activeIndex = 0;
       render();
+      list.scrollTop = 0; // the highlight is back on the first result
     }
 
     function open() {
@@ -336,7 +445,7 @@
 
     function go() {
       var item = filtered[activeIndex];
-      if (item) window.location.assign(item.url);
+      if (item) { dialog.close(); window.location.assign(item.url); }
     }
 
     if (openBtn) openBtn.addEventListener("click", open);
@@ -344,6 +453,7 @@
     document.addEventListener("keydown", function (e) {
       if ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "K")) {
         e.preventDefault();
+        if (e.repeat) return;
         if (dialog.open) { dialog.close(); } else { open(); }
       }
     });
@@ -355,10 +465,12 @@
         e.preventDefault();
         activeIndex = Math.min(activeIndex + 1, filtered.length - 1);
         render();
+        scrollActiveIntoView();
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         activeIndex = Math.max(activeIndex - 1, 0);
         render();
+        scrollActiveIntoView();
       } else if (e.key === "Enter") {
         e.preventDefault();
         go();
@@ -367,7 +479,7 @@
 
     list.addEventListener("click", function (e) {
       var li = e.target.closest("[data-url]");
-      if (li) window.location.assign(li.getAttribute("data-url"));
+      if (li) { dialog.close(); window.location.assign(li.getAttribute("data-url")); }
     });
     list.addEventListener("mousemove", function (e) {
       var li = e.target.closest("[data-idx]");
@@ -377,8 +489,11 @@
     });
 
     // Click on the backdrop (the dialog element itself) closes.
+    var downOnBackdrop = false;
+    dialog.addEventListener("mousedown", function (e) { downOnBackdrop = e.target === dialog; });
     dialog.addEventListener("click", function (e) {
-      if (e.target === dialog) dialog.close();
+      if (e.target === dialog && downOnBackdrop) dialog.close();
+      downOnBackdrop = false;
     });
   }
 
@@ -417,14 +532,22 @@
     if (!els.length) return;
 
     document.documentElement.classList.add("js-reveal");
+    function cleanupReveal(el) {
+      // 165ms max stagger + 500ms transition; afterwards hand the element back to its own hover styles
+      setTimeout(function () {
+        el.classList.remove("reveal", "is-visible");
+        el.style.transitionDelay = "";
+      }, 800);
+    }
     var observer = new IntersectionObserver(function (entries) {
       for (var i = 0; i < entries.length; i++) {
         if (entries[i].isIntersecting) {
           entries[i].target.classList.add("is-visible");
           observer.unobserve(entries[i].target);
+          cleanupReveal(entries[i].target);
         }
       }
-    }, { threshold: 0.1, rootMargin: "0px 0px -4% 0px" });
+    }, { threshold: 0, rootMargin: "0px 0px -4% 0px" });
 
     for (var i = 0; i < els.length; i++) {
       els[i].classList.add("reveal");
@@ -446,16 +569,16 @@
       var toggle = document.querySelector("[data-complete-toggle]");
       if (toggle) {
         toggle.addEventListener("click", function () {
-          var current = getCompleteMap();
-          var nowDone = !isComplete(current, lessonSlug);
+          var nowDone = toggle.getAttribute("aria-pressed") !== "true";
           var next = setComplete(lessonSlug, nowDone);
+          var saved = isComplete(getCompleteMap(), lessonSlug) === nowDone;
           renderToggle(next, lessonSlug);
           renderAll(next);
           if (nowDone) {
             stampSeal();
-            showToast("Lesson sealed — progress saved");
+            showToast(saved ? "Lesson sealed — progress saved" : "Lesson sealed — but this browser isn’t saving progress");
           } else {
-            showToast("Marked as not complete");
+            showToast(saved ? "Marked as not complete" : "Marked as not complete — but this browser isn’t saving progress");
           }
         });
       }
@@ -469,6 +592,40 @@
     initReadProgress();
     initReveal();
   }
+
+  // ── Keeping an already-rendered page current ───────────────────────────
+
+  // Re-read storage and redraw everything that shows progress. Never writes,
+  // so two open tabs cannot bounce storage events between each other.
+  function refreshProgress() {
+    var map = getCompleteMap();
+    var slug = document.body.getAttribute("data-lesson-slug");
+    if (slug) renderToggle(map, slug);
+    renderAll(map);
+    renderResumeCard();
+  }
+
+  // Back/Forward can restore a page from the browser's cache without running
+  // init() again: bring progress, theme and the search palette up to date
+  // (the Curriculum menu resets itself in initDropdown).
+  window.addEventListener("pageshow", function (e) {
+    if (!e.persisted) return; // normal loads are handled by init()
+    var slug = document.body.getAttribute("data-lesson-slug");
+    if (slug) setResumeSlug(slug); // this lesson is the one being viewed again
+    refreshProgress();
+    var theme = storageGet(THEME_KEY);
+    if (theme === "light" || theme === "dark") {
+      document.documentElement.setAttribute("data-theme", theme);
+      syncThemeLabel();
+    }
+    var dialog = document.querySelector("[data-palette]");
+    if (dialog && dialog.open) dialog.close();
+  });
+
+  // Progress changed in another tab or window.
+  window.addEventListener("storage", function (e) {
+    if (e.key === null || e.key === COMPLETE_KEY || e.key === RESUME_KEY) refreshProgress();
+  });
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
